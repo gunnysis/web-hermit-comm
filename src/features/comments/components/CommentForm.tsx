@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { useComments } from '../hooks/useComments'
+import type { useComments } from '../hooks/useComments'
 import { resolveDisplayName } from '@/lib/anonymous'
 import { DEFAULT_PUBLIC_BOARD_ID } from '@/lib/constants'
 
@@ -11,11 +11,11 @@ interface CommentFormProps {
   postId: number
   userId: string | null
   boardId?: number
+  createMutation: ReturnType<typeof useComments>['createMutation']
 }
 
-export function CommentForm({ postId, userId, boardId = DEFAULT_PUBLIC_BOARD_ID }: CommentFormProps) {
+export function CommentForm({ postId, userId, boardId = DEFAULT_PUBLIC_BOARD_ID, createMutation }: CommentFormProps) {
   const [content, setContent] = useState('')
-  const { createMutation } = useComments(postId)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

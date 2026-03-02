@@ -42,13 +42,14 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     if (!confirm('게시글을 삭제할까요?')) return
     try {
       await deletePost(postId)
-      queryClient.removeQueries({ queryKey: ['post', postId] })
-      queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
-      queryClient.invalidateQueries({ queryKey: ['groupPosts'] })
       toast.success('게시글이 삭제됐습니다.')
       const groupId = post?.group_id
       router.push(groupId ? `/groups/${groupId}` : '/')
-    } catch {
+      queryClient.removeQueries({ queryKey: ['post', postId] })
+      queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
+      queryClient.invalidateQueries({ queryKey: ['groupPosts'] })
+    } catch (err) {
+      console.error('deletePost error:', err)
       toast.error('삭제에 실패했습니다.')
     }
   }

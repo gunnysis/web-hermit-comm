@@ -13,18 +13,18 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Comment } from '@/types/database'
-import { useComments } from '../hooks/useComments'
+import type { useComments } from '../hooks/useComments'
 
 interface CommentItemProps {
   comment: Comment
   currentUserId: string | null
-  postId: number
+  updateMutation: ReturnType<typeof useComments>['updateMutation']
+  deleteMutation: ReturnType<typeof useComments>['deleteMutation']
 }
 
-export function CommentItem({ comment, currentUserId, postId }: CommentItemProps) {
+export function CommentItem({ comment, currentUserId, updateMutation, deleteMutation }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState(comment.content)
-  const { updateMutation, deleteMutation } = useComments(postId)
   const canEdit = currentUserId === comment.author_id
 
   const timeAgo = formatDistanceToNow(new Date(comment.created_at), {

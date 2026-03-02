@@ -13,7 +13,7 @@ interface CommentSectionProps {
 }
 
 export function CommentSection({ postId, userId, boardId }: CommentSectionProps) {
-  const { query } = useComments(postId)
+  const { query, createMutation, updateMutation, deleteMutation } = useComments(postId)
 
   return (
     <div className="space-y-4">
@@ -21,7 +21,7 @@ export function CommentSection({ postId, userId, boardId }: CommentSectionProps)
         댓글 {query.data ? `${query.data.length}개` : ''}
       </h3>
 
-      <CommentForm postId={postId} userId={userId} boardId={boardId} />
+      <CommentForm postId={postId} userId={userId} boardId={boardId} createMutation={createMutation} />
 
       <Separator />
 
@@ -47,7 +47,8 @@ export function CommentSection({ postId, userId, boardId }: CommentSectionProps)
           key={comment.id}
           comment={comment}
           currentUserId={userId}
-          postId={postId}
+          updateMutation={updateMutation}
+          deleteMutation={deleteMutation}
         />
       ))}
     </div>
