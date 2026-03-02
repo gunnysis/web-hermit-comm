@@ -148,6 +148,15 @@
     @apply prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none;
   }
 
+  /* Tiptap placeholder */
+  .ProseMirror p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: var(--muted-foreground);
+    pointer-events: none;
+    height: 0;
+  }
+
   /* 카드 호버 효과 */
   .card-hover {
     @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
