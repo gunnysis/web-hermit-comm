@@ -3,16 +3,20 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { EMOTION_EMOJI } from '@/lib/constants'
 import { PostCard } from './PostCard'
 import { PostCardSkeleton } from './PostCardSkeleton'
+import { EmptyState } from '@/components/ui/empty-state'
 import { searchPosts } from '../api/searchApi'
 
 export function SearchView() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const initialQ = searchParams.get('q') ?? ''
+  const emotion = searchParams.get('emotion') ?? ''
   const [input, setInput] = useState(initialQ)
   const [query, setQuery] = useState(initialQ)
 
@@ -21,19 +25,19 @@ export function SearchView() {
     const timer = setTimeout(() => {
       const trimmed = input.trim()
       setQuery(trimmed)
-      if (trimmed) {
-        router.replace(`/search?q=${encodeURIComponent(trimmed)}`, { scroll: false })
-      } else {
-        router.replace('/search', { scroll: false })
-      }
+      const params = new URLSearchParams()
+      if (trimmed) params.set('q', trimmed)
+      if (emotion) params.set('emotion', emotion)
+      const qs = params.toString()
+      router.replace(`/search${qs ? `?${qs}` : ''}`, { scroll: false })
     }, 500)
     return () => clearTimeout(timer)
-  }, [input, router])
+  }, [input, emotion, router])
 
   const { data, isLoading } = useQuery({
-    queryKey: ['search', query],
-    queryFn: () => searchPosts(query),
-    enabled: query.length > 0,
+    queryKey: ['search', query, emotion],
+    queryFn: () => searchPosts(query, { emotion: emotion || undefined }),
+    enabled: query.length > 0 || !!emotion,
     staleTime: 30 * 1000,
   })
 
@@ -50,6 +54,18 @@ export function SearchView() {
         />
       </div>
 
+      {emotion && (
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="text-xs gap-1">
+            <span>{EMOTION_EMOJI[emotion] ?? '💬'}</span>
+            {emotion}
+            <button onClick={() => router.replace('/search', { scroll: false })} className="ml-1 hover:text-foreground">
+              <X size={12} />
+            </button>
+          </Badge>
+        </div>
+      )}
+
       {isLoading && (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => <PostCardSkeleton key={i} />)}
@@ -57,13 +73,11 @@ export function SearchView() {
       )}
 
       {!isLoading && query && data?.length === 0 && (
-        <p className="text-center text-muted-foreground py-12">
-          &apos;{query}&apos;에 대한 검색 결과가 없습니다.
-        </p>
+        <EmptyState icon={Search} title={`'${query}'에 대한 검색 결과가 없습니다`} description="다른 검색어로 시도해보세요." />
       )}
 
       {!query && (
-        <p className="text-center text-muted-foreground py-12">검색어를 입력하세요.</p>
+        <EmptyState icon={Search} title="검색어를 입력하세요" />
       )}
 
       {data && data.length > 0 && (

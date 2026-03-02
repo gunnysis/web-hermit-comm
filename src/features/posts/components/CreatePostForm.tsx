@@ -83,6 +83,15 @@ export function CreatePostForm() {
     }
   }
 
+  if (!user) {
+    return (
+      <div className="text-center py-12 space-y-3">
+        <p className="text-muted-foreground">글을 작성하려면 로그인이 필요합니다.</p>
+        <Button variant="outline" onClick={() => router.push('/login')}>로그인</Button>
+      </div>
+    )
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {/* 제목 */}

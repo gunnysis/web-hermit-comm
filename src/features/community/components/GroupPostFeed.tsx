@@ -6,6 +6,8 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
 import { PostCard } from '@/features/posts/components/PostCard'
 import { PostCardSkeleton } from '@/features/posts/components/PostCardSkeleton'
 import { Button } from '@/components/ui/button'
+import { EmptyState } from '@/components/ui/empty-state'
+import { FileText } from 'lucide-react'
 
 interface GroupPostFeedProps {
   groupId: number
@@ -38,7 +40,7 @@ export function GroupPostFeed({ groupId, boardId }: GroupPostFeedProps) {
           ? Array.from({ length: 5 }).map((_, i) => <PostCardSkeleton key={i} />)
           : posts.map((post) => <PostCard key={post.id} post={post} />)}
         {!isLoading && posts.length === 0 && (
-          <p className="text-center text-muted-foreground py-12">아직 게시글이 없습니다.</p>
+          <EmptyState icon={FileText} title="아직 게시글이 없습니다" description="첫 번째 게시글을 작성해보세요." />
         )}
       </div>
 

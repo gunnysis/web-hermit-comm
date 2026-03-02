@@ -5,6 +5,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { AuthProvider } from "@/features/auth/AuthProvider";
 import { BottomNav } from "@/components/layout/BottomNav";
+import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
@@ -37,6 +38,7 @@ export default function RootLayout({
           <AuthProvider>
             {children}
             <BottomNav />
+            <ScrollToTop />
           </AuthProvider>
         </QueryProvider>
         <Toaster />

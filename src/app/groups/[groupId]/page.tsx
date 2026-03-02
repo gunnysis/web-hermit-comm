@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useGroupBoards } from '@/features/community/hooks/useGroupBoards'
 import { GroupPostFeed } from '@/features/community/components/GroupPostFeed'
 import { useAuthContext } from '@/features/auth/AuthProvider'
-import { getGroupMember, leaveGroup } from '@/features/community/api/communityApi'
+import { getGroup, getGroupMember, leaveGroup } from '@/features/community/api/communityApi'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 interface PageProps {
@@ -26,6 +26,11 @@ export default function GroupPage({ params }: PageProps) {
   const [selectedBoardId, setSelectedBoardId] = useState<number | null>(null)
 
   const { data: boards, isLoading: boardsLoading } = useGroupBoards(groupId)
+
+  const { data: group } = useQuery({
+    queryKey: ['group', groupId],
+    queryFn: () => getGroup(groupId),
+  })
 
   const { data: member, isLoading: memberLoading } = useQuery({
     queryKey: ['groupMember', groupId, user?.id],
@@ -89,9 +94,12 @@ export default function GroupPage({ params }: PageProps) {
       {/* 그룹 헤더 */}
       <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-sm">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/groups')}>
-            <ArrowLeft size={18} />
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => router.push('/groups')}>
+              <ArrowLeft size={18} />
+            </Button>
+            <h1 className="text-base font-semibold truncate">{group?.name ?? ''}</h1>
+          </div>
           <div className="flex items-center gap-1">
             {member && (
               <>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import type { useComments } from '../hooks/useComments'
@@ -40,21 +41,30 @@ export function CommentForm({ postId, userId, boardId = DEFAULT_PUBLIC_BOARD_ID,
     )
   }
 
+  if (!userId) {
+    return (
+      <div className="text-center py-4 text-sm text-muted-foreground">
+        댓글을 작성하려면{' '}
+        <Link href="/login" className="text-primary underline underline-offset-2">로그인</Link>
+        이 필요합니다.
+      </div>
+    )
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-2">
       <Textarea
-        placeholder={userId ? '댓글을 입력하세요...' : '로그인이 필요합니다'}
+        placeholder="댓글을 입력하세요..."
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={2}
-        disabled={!userId}
         className="text-sm resize-none"
       />
       <div className="flex justify-end">
         <Button
           type="submit"
           size="sm"
-          disabled={!content.trim() || !userId || createMutation.isPending}
+          disabled={!content.trim() || createMutation.isPending}
         >
           댓글 등록
         </Button>

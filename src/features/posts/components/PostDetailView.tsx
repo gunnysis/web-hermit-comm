@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { ArrowLeft, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { ArrowLeft, MoreHorizontal, Pencil, Trash2, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
@@ -114,6 +114,23 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
         >
           <ArrowLeft size={16} className="mr-1" /> 뒤로
         </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8"
+            onClick={async () => {
+              const url = `${window.location.origin}/post/${postId}`
+              if (navigator.share) {
+                try { await navigator.share({ title: post.title, url }) } catch { /* cancelled */ }
+              } else {
+                await navigator.clipboard.writeText(url)
+                toast.success('링크가 복사됐습니다.')
+              }
+            }}
+          >
+            <Share2 size={16} />
+          </Button>
         {canEdit && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -134,6 +151,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         )}
+        </div>
       </div>
 
       {/* 제목 및 메타 */}
@@ -144,7 +162,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
           <span aria-hidden>·</span>
           <time dateTime={post.created_at}>{timeAgo}</time>
         </div>
-        <EmotionTags emotions={emotions} />
+        <EmotionTags emotions={emotions} clickable />
       </header>
 
       <Separator />

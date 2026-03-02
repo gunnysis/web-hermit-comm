@@ -10,6 +10,8 @@ import { EmotionTrend } from './EmotionTrend'
 import { DEFAULT_PUBLIC_BOARD_ID } from '@/lib/constants'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { EmptyState } from '@/components/ui/empty-state'
+import { FileText } from 'lucide-react'
 
 type SortOrder = 'latest' | 'popular'
 
@@ -60,7 +62,7 @@ export function PublicFeed() {
           : posts.map((post) => <PostCard key={post.id} post={post} />)}
 
         {!isLoading && posts.length === 0 && (
-          <p className="text-center text-muted-foreground py-16">아직 게시글이 없습니다.</p>
+          <EmptyState icon={FileText} title="아직 게시글이 없습니다" description="첫 번째 게시글을 작성해보세요." />
         )}
       </div>
 

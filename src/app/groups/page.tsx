@@ -7,6 +7,8 @@ import { useMyGroups } from '@/features/community/hooks/useMyGroups'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
+import { EmptyState } from '@/components/ui/empty-state'
+import { Users } from 'lucide-react'
 
 export default function GroupsPage() {
   const { user } = useAuthContext()
@@ -30,10 +32,7 @@ export default function GroupsPage() {
         )}
 
         {!isLoading && groups?.length === 0 && (
-          <p className="text-center text-muted-foreground py-12">
-            아직 참여한 그룹이 없습니다.<br />
-            <span className="text-sm">초대 코드로 그룹에 참여해보세요.</span>
-          </p>
+          <EmptyState icon={Users} title="아직 참여한 그룹이 없습니다" description="초대 코드로 그룹에 참여해보세요." />
         )}
 
         <div className="space-y-3">

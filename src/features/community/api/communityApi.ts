@@ -2,6 +2,16 @@ import { createClient } from '@/utils/supabase/client'
 import type { Group, Board, GroupMember, PostWithCounts, CreatePostRequest } from '@/types/database'
 import { PAGE_SIZE } from '@/lib/constants'
 
+export async function getGroup(groupId: number): Promise<Group | null> {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('groups')
+    .select('*')
+    .eq('id', groupId)
+    .single()
+  return data as Group | null
+}
+
 export async function getMyGroups(userId: string): Promise<Group[]> {
   const supabase = createClient()
   const { data, error } = await supabase

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { MessageCircle, Heart } from 'lucide-react'
+import { MessageCircle, ThumbsUp } from 'lucide-react'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import type { PostWithCounts } from '@/types/database'
@@ -70,7 +70,7 @@ export function PostCard({ post }: PostCardProps) {
 
         <CardFooter className="pt-1 gap-4">
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Heart size={13} />
+            <ThumbsUp size={13} />
             <span className="tabular-nums">{post.like_count ?? 0}</span>
           </span>
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
