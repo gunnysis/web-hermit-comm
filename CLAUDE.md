@@ -43,3 +43,25 @@ Node.js 22 필수. nvm 사용 시: `export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/n
 - `next.config.ts`: `withSentryConfig` 래핑. org: `gunnys`, project: `gns-hermit-comm`.
 - `sentry.client.config.ts` / `sentry.server.config.ts` / `sentry.edge.config.ts` 세 파일로 분리.
 - 빌드 시 소스맵 업로드에 `SENTRY_AUTH_TOKEN` 환경 변수 필요.
+
+## 멀티프로젝트 관리
+
+이 웹 레포와 앱 레포(`C:\Users\Administrator\programming\apps\gns-hermit-comm`, Windows)가 동일 Supabase 백엔드를 공유.
+
+### 역할 경계
+
+- **Supabase 마이그레이션 원본**: 앱 레포. 마이그레이션은 앱에서만 생성.
+- **Edge Functions**: 앱 레포의 `supabase/functions/`.
+- **웹 레포**: 마이그레이션 복사본 유지 (`scripts/sync-from-app.sh`로 동기화).
+
+### 동기화 대상
+
+- `supabase/migrations/` — 앱에서 생성 후 이 레포에 복사
+- `src/types/database.ts` ← 앱 `src/types/index.ts` (수동 검토 후 적용)
+- `src/lib/constants.ts`의 `VALIDATION`, `ALLOWED_EMOTIONS`, `EMOTION_EMOJI` — 앱과 값 동일하게 유지
+
+### 동기화 시 주의사항
+
+- `src/lib/anonymous.ts` (별칭 해시 알고리즘·목록): **앱과 독립 유지**. 변경 시 기존 사용자 alias가 바뀜.
+- 상수 값 변경 시 앱 `src/shared/lib/constants.ts`도 함께 업데이트.
+- 동기화 스크립트: `scripts/sync-from-app.sh`

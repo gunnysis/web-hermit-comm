@@ -154,7 +154,21 @@ CREATE INDEX IF NOT EXISTS idx_post_analysis_emotions ON post_analysis USING GIN
 CREATE INDEX IF NOT EXISTS idx_posts_group_created_at ON posts(group_id, created_at DESC);
 DROP INDEX IF EXISTS idx_post_analysis_post_id;
 
--- ========== 10. REALTIME: Add tables to publication ==========
+-- ========== 10. VIEW FIX: posts_with_like_count counts ALL reaction types ==========
+-- Previously filtered reaction_type = 'like', but actual data uses emoji types ('👍','❤️','😂')
+CREATE OR REPLACE VIEW posts_with_like_count WITH (security_invoker = true) AS
+SELECT
+  p.id, p.title, p.content, p.author, p.author_id,
+  p.created_at, p.board_id, p.group_id,
+  p.is_anonymous, p.display_name, p.member_id, p.image_url,
+  COALESCE((SELECT SUM(r.count) FROM reactions r WHERE r.post_id = p.id), 0)::int AS like_count,
+  (SELECT COUNT(*)::int FROM comments c WHERE c.post_id = p.id AND c.deleted_at IS NULL) AS comment_count,
+  COALESCE(pa.emotions, ARRAY[]::text[]) AS emotions
+FROM posts p
+LEFT JOIN post_analysis pa ON pa.post_id = p.id
+WHERE p.deleted_at IS NULL;
+
+-- ========== 11. REALTIME: Add tables to publication ==========
 -- post_analysis already added, add others needed for realtime
 ALTER PUBLICATION supabase_realtime ADD TABLE public.reactions;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.user_reactions;
