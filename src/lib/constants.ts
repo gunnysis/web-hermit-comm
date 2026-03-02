@@ -1,6 +1,14 @@
 export const DEFAULT_PUBLIC_BOARD_ID = 1
 export const PAGE_SIZE = 20
 
+/** 입력 유효성 검사 상수 */
+export const VALIDATION = {
+  POST_TITLE_MAX: 100,
+  POST_CONTENT_MAX: 5000,
+  COMMENT_MAX: 1000,
+  AUTHOR_MAX: 50,
+} as const
+
 export const ADJECTIVES = [
   '조용한', '평화로운', '수줍은', '느긋한', '차분한',
   '따뜻한', '신중한', '소박한', '고요한', '온화한',
