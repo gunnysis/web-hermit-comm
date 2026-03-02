@@ -10,9 +10,10 @@ interface CommentSectionProps {
   postId: number
   userId: string | null
   boardId?: number
+  groupId?: number
 }
 
-export function CommentSection({ postId, userId, boardId }: CommentSectionProps) {
+export function CommentSection({ postId, userId, boardId, groupId }: CommentSectionProps) {
   const { query, createMutation, updateMutation, deleteMutation } = useComments(postId)
 
   return (
@@ -21,7 +22,7 @@ export function CommentSection({ postId, userId, boardId }: CommentSectionProps)
         댓글 {query.data ? `${query.data.length}개` : ''}
       </h3>
 
-      <CommentForm postId={postId} userId={userId} boardId={boardId} createMutation={createMutation} />
+      <CommentForm postId={postId} userId={userId} boardId={boardId} groupId={groupId} createMutation={createMutation} />
 
       <Separator />
 

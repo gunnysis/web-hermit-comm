@@ -171,6 +171,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
         postId={postId}
         userId={user?.id ?? null}
         boardId={post.board_id ?? undefined}
+        groupId={post.group_id ?? undefined}
       />
     </article>
   )
