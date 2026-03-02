@@ -7,7 +7,7 @@ export async function checkAppAdmin(userId: string): Promise<boolean> {
     .from('app_admin')
     .select('user_id')
     .eq('user_id', userId)
-    .single()
+    .maybeSingle()
   return !!data
 }
 

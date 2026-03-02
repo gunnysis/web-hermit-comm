@@ -36,7 +36,7 @@ export async function toggleReaction(
     .eq('post_id', postId)
     .eq('user_id', userId)
     .eq('reaction_type', reactionType)
-    .single()
+    .maybeSingle()
 
   if (existing) {
     // 취소: user_reactions 삭제 + reactions count 감소
@@ -46,7 +46,7 @@ export async function toggleReaction(
       .select('id, count')
       .eq('post_id', postId)
       .eq('reaction_type', reactionType)
-      .single()
+      .maybeSingle()
     if (reaction) {
       if (reaction.count <= 1) {
         await supabase.from('reactions').delete().eq('id', reaction.id)
@@ -62,7 +62,7 @@ export async function toggleReaction(
       .select('id, count')
       .eq('post_id', postId)
       .eq('reaction_type', reactionType)
-      .single()
+      .maybeSingle()
     if (reaction) {
       await supabase.from('reactions').update({ count: reaction.count + 1 }).eq('id', reaction.id)
     } else {

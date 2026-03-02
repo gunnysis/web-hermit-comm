@@ -11,8 +11,10 @@ export function usePostAnalysis(postId: number) {
     queryKey: ['postAnalysis', postId],
     queryFn: () => getPostAnalysis(postId),
     refetchInterval: (query) => {
-      // 결과가 없으면 1.5초마다 폴링
-      return query.state.data ? false : 1500
+      if (query.state.data) return false
+      // 최대 30회(~45초) 폴링 후 중단
+      if (query.state.dataUpdateCount > 30) return false
+      return 1500
     },
     staleTime: 5 * 60 * 1000,
   })

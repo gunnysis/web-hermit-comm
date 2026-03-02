@@ -52,9 +52,10 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       queryClient.removeQueries({ queryKey: ['post', postId] })
       queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
       queryClient.invalidateQueries({ queryKey: ['groupPosts'] })
-    } catch (err) {
+    } catch (err: unknown) {
       console.error('deletePost error:', err)
-      toast.error('삭제에 실패했습니다.')
+      const msg = err instanceof Error ? err.message : (err as { message?: string })?.message
+      toast.error(msg || '삭제에 실패했습니다.')
     } finally {
       setIsDeleting(false)
       setDeleteDialogOpen(false)

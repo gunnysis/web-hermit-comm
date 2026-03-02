@@ -30,7 +30,7 @@ export async function getPostServer(postId: number): Promise<PostWithCounts | nu
     .from('posts_with_like_count')
     .select('*')
     .eq('id', postId)
-    .single()
+    .maybeSingle()
   return data as PostWithCounts | null
 }
 

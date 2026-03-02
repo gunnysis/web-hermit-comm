@@ -8,7 +8,7 @@ export async function getGroup(groupId: number): Promise<Group | null> {
     .from('groups')
     .select('*')
     .eq('id', groupId)
-    .single()
+    .maybeSingle()
   return data as Group | null
 }
 
@@ -44,7 +44,7 @@ export async function getGroupMember(groupId: number, userId: string): Promise<G
     .eq('user_id', userId)
     .eq('status', 'approved')
     .is('left_at', null)
-    .single()
+    .maybeSingle()
   return data as GroupMember | null
 }
 
@@ -93,7 +93,7 @@ export async function joinGroupByInviteCode(
     .select('id, status')
     .eq('group_id', group.id)
     .eq('user_id', userId)
-    .single()
+    .maybeSingle()
 
   if (existing) {
     if (existing.status === 'approved') throw new Error('이미 가입된 그룹입니다.')
