@@ -43,7 +43,7 @@ export async function deleteComment(commentId: number): Promise<void> {
   const supabase = createClient()
   const { error } = await supabase
     .from('comments')
-    .update({ deleted_at: new Date().toISOString() })
+    .delete()
     .eq('id', commentId)
   if (error) throw error
 }

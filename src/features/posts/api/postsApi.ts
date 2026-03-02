@@ -70,7 +70,7 @@ export async function deletePost(postId: number): Promise<void> {
   const supabase = createClient()
   const { error } = await supabase
     .from('posts')
-    .update({ deleted_at: new Date().toISOString() })
+    .delete()
     .eq('id', postId)
   if (error) throw error
 }
