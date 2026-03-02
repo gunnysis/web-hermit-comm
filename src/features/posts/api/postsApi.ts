@@ -33,9 +33,9 @@ export async function getPost(postId: number): Promise<PostWithCounts | null> {
     .from('posts_with_like_count')
     .select('*')
     .eq('id', postId)
-    .maybeSingle()
+    .limit(1)
   if (error) throw error
-  return data as PostWithCounts | null
+  return (data?.[0] as PostWithCounts) ?? null
 }
 
 export async function createPost(
@@ -82,8 +82,8 @@ export async function getPostAnalysis(postId: number) {
     .from('post_analysis')
     .select('*')
     .eq('post_id', postId)
-    .maybeSingle()
-  return data
+    .limit(1)
+  return data?.[0] ?? null
 }
 
 export async function invokeAnalyzeOnDemand(postId: number) {

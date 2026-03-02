@@ -8,8 +8,8 @@ export async function getGroup(groupId: number): Promise<Group | null> {
     .from('groups')
     .select('*')
     .eq('id', groupId)
-    .maybeSingle()
-  return data as Group | null
+    .limit(1)
+  return (data?.[0] as Group) ?? null
 }
 
 export async function getMyGroups(userId: string): Promise<Group[]> {
@@ -44,8 +44,8 @@ export async function getGroupMember(groupId: number, userId: string): Promise<G
     .eq('user_id', userId)
     .eq('status', 'approved')
     .is('left_at', null)
-    .maybeSingle()
-  return data as GroupMember | null
+    .limit(1)
+  return (data?.[0] as GroupMember) ?? null
 }
 
 export async function getGroupPosts(
@@ -81,19 +81,21 @@ export async function joinGroupByInviteCode(
   userId: string,
 ): Promise<{ group_id: number }> {
   const supabase = createClient()
-  const { data: group, error: groupError } = await supabase
+  const { data: groupRows } = await supabase
     .from('groups')
     .select('id')
     .eq('invite_code', inviteCode)
-    .single()
-  if (groupError || !group) throw new Error('유효하지 않은 초대 코드입니다.')
+    .limit(1)
+  const group = groupRows?.[0] ?? null
+  if (!group) throw new Error('유효하지 않은 초대 코드입니다.')
 
-  const { data: existing } = await supabase
+  const { data: existingRows } = await supabase
     .from('group_members')
     .select('id, status')
     .eq('group_id', group.id)
     .eq('user_id', userId)
-    .maybeSingle()
+    .limit(1)
+  const existing = existingRows?.[0] ?? null
 
   if (existing) {
     if (existing.status === 'approved') throw new Error('이미 가입된 그룹입니다.')

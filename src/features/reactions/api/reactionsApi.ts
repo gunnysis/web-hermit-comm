@@ -30,23 +30,25 @@ export async function toggleReaction(
   const supabase = createClient()
 
   // user_reactions에 존재 여부 확인
-  const { data: existing } = await supabase
+  const { data: existingRows } = await supabase
     .from('user_reactions')
     .select('id')
     .eq('post_id', postId)
     .eq('user_id', userId)
     .eq('reaction_type', reactionType)
-    .maybeSingle()
+    .limit(1)
+  const existing = existingRows?.[0] ?? null
 
   if (existing) {
     // 취소: user_reactions 삭제 + reactions count 감소
     await supabase.from('user_reactions').delete().eq('id', existing.id)
-    const { data: reaction } = await supabase
+    const { data: reactionRows } = await supabase
       .from('reactions')
       .select('id, count')
       .eq('post_id', postId)
       .eq('reaction_type', reactionType)
-      .maybeSingle()
+      .limit(1)
+    const reaction = reactionRows?.[0] ?? null
     if (reaction) {
       if (reaction.count <= 1) {
         await supabase.from('reactions').delete().eq('id', reaction.id)
@@ -57,12 +59,13 @@ export async function toggleReaction(
   } else {
     // 추가: user_reactions insert + reactions upsert
     await supabase.from('user_reactions').insert({ post_id: postId, user_id: userId, reaction_type: reactionType })
-    const { data: reaction } = await supabase
+    const { data: reactionRows } = await supabase
       .from('reactions')
       .select('id, count')
       .eq('post_id', postId)
       .eq('reaction_type', reactionType)
-      .maybeSingle()
+      .limit(1)
+    const reaction = reactionRows?.[0] ?? null
     if (reaction) {
       await supabase.from('reactions').update({ count: reaction.count + 1 }).eq('id', reaction.id)
     } else {

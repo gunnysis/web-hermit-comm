@@ -30,8 +30,8 @@ export async function getPostServer(postId: number): Promise<PostWithCounts | nu
     .from('posts_with_like_count')
     .select('*')
     .eq('id', postId)
-    .maybeSingle()
-  return data as PostWithCounts | null
+    .limit(1)
+  return (data?.[0] as PostWithCounts) ?? null
 }
 
 export async function getEmotionTrendServer(days = 7) {

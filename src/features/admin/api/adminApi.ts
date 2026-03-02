@@ -7,8 +7,8 @@ export async function checkAppAdmin(userId: string): Promise<boolean> {
     .from('app_admin')
     .select('user_id')
     .eq('user_id', userId)
-    .maybeSingle()
-  return !!data
+    .limit(1)
+  return (data?.length ?? 0) > 0
 }
 
 export async function getMyManagedGroups(userId: string): Promise<Group[]> {
