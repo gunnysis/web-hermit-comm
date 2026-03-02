@@ -121,7 +121,7 @@ export function CreateGroupPostForm({ groupId }: CreateGroupPostFormProps) {
           <div className="relative w-fit">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={imagePreview} alt="첨부 이미지" className="max-h-48 rounded-md object-contain border" />
-            <Button type="button" size="icon" variant="destructive" className="absolute top-1 right-1 h-6 w-6" onClick={() => { setImageFile(null); setImagePreview(null) }}>
+            <Button type="button" size="icon" variant="destructive" className="absolute top-1 right-1 h-6 w-6" onClick={() => { setImageFile(null); setImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = '' }}>
               <X size={12} />
             </Button>
           </div>
