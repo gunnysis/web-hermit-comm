@@ -38,7 +38,7 @@ export default async function PostPage({ params }: PageProps) {
       queryFn: () => getCommentsServer(postId),
     }),
     queryClient.prefetchQuery({
-      queryKey: ['reactions', postId],
+      queryKey: ['postReactions', postId],
       queryFn: () => getReactionsServer(postId),
     }),
   ])

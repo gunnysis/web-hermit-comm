@@ -41,10 +41,8 @@ export async function updateComment(commentId: number, content: string): Promise
 
 export async function deleteComment(commentId: number): Promise<void> {
   const supabase = createClient()
-  const { error, count } = await supabase
-    .from('comments')
-    .delete({ count: 'exact' })
-    .eq('id', commentId)
+  const { error } = await supabase.rpc('soft_delete_comment', {
+    p_comment_id: commentId,
+  })
   if (error) throw error
-  if (count === 0) throw new Error('댓글을 삭제할 수 없습니다.')
 }

@@ -11,12 +11,13 @@ interface ReactionBarProps {
 }
 
 export function ReactionBar({ postId, userId }: ReactionBarProps) {
-  const { reactions, userReactions, toggle, isPending } = useReactions(postId, userId)
+  const { reactions, toggle, isPending } = useReactions(postId, userId)
 
   const getCount = (type: string) =>
     reactions.find((r) => r.reaction_type === type)?.count ?? 0
 
-  const isActive = (type: string) => userReactions.includes(type)
+  const isActive = (type: string) =>
+    reactions.find((r) => r.reaction_type === type)?.user_reacted ?? false
 
   return (
     <div className="flex flex-wrap gap-2">

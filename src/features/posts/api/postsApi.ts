@@ -68,12 +68,10 @@ export async function updatePost(
 
 export async function deletePost(postId: number): Promise<void> {
   const supabase = createClient()
-  const { error, count } = await supabase
-    .from('posts')
-    .delete({ count: 'exact' })
-    .eq('id', postId)
+  const { error } = await supabase.rpc('soft_delete_post', {
+    p_post_id: postId,
+  })
   if (error) throw error
-  if (count === 0) throw new Error('게시글을 삭제할 수 없습니다. 권한이 없거나 이미 삭제된 게시글입니다.')
 }
 
 export async function getPostAnalysis(postId: number) {
