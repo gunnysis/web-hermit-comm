@@ -93,7 +93,18 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     <article className="space-y-6 animate-fade-in">
       {/* 상단 내비게이션 */}
       <div className="flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={() => router.back()} className="-ml-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            if (window.history.length > 1) {
+              router.back()
+            } else {
+              router.push(post?.group_id ? `/groups/${post.group_id}` : '/')
+            }
+          }}
+          className="-ml-2"
+        >
           <ArrowLeft size={16} className="mr-1" /> 뒤로
         </Button>
         {canEdit && (
