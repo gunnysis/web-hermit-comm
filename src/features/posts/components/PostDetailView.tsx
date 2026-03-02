@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
@@ -21,6 +22,7 @@ import { EmotionTags } from './EmotionTags'
 import { RecommendedPosts } from './RecommendedPosts'
 import { ReactionBar } from '@/features/reactions/components/ReactionBar'
 import { CommentSection } from '@/features/comments/components/CommentSection'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
@@ -37,9 +39,11 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
   const { data: analysis } = usePostAnalysis(postId)
 
   const canEdit = user?.id === post?.author_id
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const handleDelete = async () => {
-    if (!confirm('게시글을 삭제할까요?')) return
+    setIsDeleting(true)
     try {
       await deletePost(postId)
       toast.success('게시글이 삭제됐습니다.')
@@ -51,6 +55,9 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     } catch (err) {
       console.error('deletePost error:', err)
       toast.error('삭제에 실패했습니다.')
+    } finally {
+      setIsDeleting(false)
+      setDeleteDialogOpen(false)
     }
   }
 
@@ -119,7 +126,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
                 <Pencil size={14} className="mr-2" /> 수정
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={handleDelete}
+                onClick={() => setDeleteDialogOpen(true)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 size={14} className="mr-2" /> 삭제
@@ -183,6 +190,15 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
         userId={user?.id ?? null}
         boardId={post.board_id ?? undefined}
         groupId={post.group_id ?? undefined}
+      />
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="게시글을 삭제할까요?"
+        description="삭제한 게시글은 복구할 수 없습니다."
+        confirmLabel="삭제"
+        onConfirm={handleDelete}
+        isPending={isDeleting}
       />
     </article>
   )

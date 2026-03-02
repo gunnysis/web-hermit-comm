@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import type { Comment } from '@/types/database'
 import type { useComments } from '../hooks/useComments'
 
@@ -25,6 +26,7 @@ interface CommentItemProps {
 export function CommentItem({ comment, currentUserId, updateMutation, deleteMutation }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState(comment.content)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const canEdit = currentUserId === comment.author_id
 
   const timeAgo = formatDistanceToNow(new Date(comment.created_at), {
@@ -41,8 +43,9 @@ export function CommentItem({ comment, currentUserId, updateMutation, deleteMuta
   }
 
   const handleDelete = () => {
-    if (!confirm('댓글을 삭제할까요?')) return
-    deleteMutation.mutate(comment.id)
+    deleteMutation.mutate(comment.id, {
+      onSettled: () => setDeleteDialogOpen(false),
+    })
   }
 
   return (
@@ -64,7 +67,7 @@ export function CommentItem({ comment, currentUserId, updateMutation, deleteMuta
                 <Pencil size={14} className="mr-2" /> 수정
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={handleDelete}
+                onClick={() => setDeleteDialogOpen(true)}
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 size={14} className="mr-2" /> 삭제
@@ -98,6 +101,14 @@ export function CommentItem({ comment, currentUserId, updateMutation, deleteMuta
       ) : (
         <p className="text-sm whitespace-pre-wrap">{comment.content}</p>
       )}
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="댓글을 삭제할까요?"
+        confirmLabel="삭제"
+        onConfirm={handleDelete}
+        isPending={deleteMutation.isPending}
+      />
     </div>
   )
 }
