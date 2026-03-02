@@ -23,6 +23,7 @@ import { ReactionBar } from '@/features/reactions/components/ReactionBar'
 import { CommentSection } from '@/features/comments/components/CommentSection'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface PostDetailViewProps {
   postId: number
@@ -31,6 +32,7 @@ interface PostDetailViewProps {
 export function PostDetailView({ postId }: PostDetailViewProps) {
   const router = useRouter()
   const { user } = useAuthContext()
+  const queryClient = useQueryClient()
   const { data: post, isLoading, isError } = usePostDetail(postId)
   const { data: analysis } = usePostAnalysis(postId)
 
@@ -40,8 +42,12 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     if (!confirm('게시글을 삭제할까요?')) return
     try {
       await deletePost(postId)
+      queryClient.removeQueries({ queryKey: ['post', postId] })
+      queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
+      queryClient.invalidateQueries({ queryKey: ['groupPosts'] })
       toast.success('게시글이 삭제됐습니다.')
-      router.push('/')
+      const groupId = post?.group_id
+      router.push(groupId ? `/groups/${groupId}` : '/')
     } catch {
       toast.error('삭제에 실패했습니다.')
     }
