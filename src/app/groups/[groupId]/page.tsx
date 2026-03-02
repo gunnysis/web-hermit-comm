@@ -47,7 +47,33 @@ export default function GroupPage({ params }: PageProps) {
     }
   }
 
-  if (!member && !memberLoading && user) {
+  // 멤버 로딩 중
+  if (memberLoading) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
+        <Skeleton className="h-14 w-full" />
+        <Skeleton className="h-8 w-32" />
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} className="h-24 w-full rounded-lg" />
+        ))}
+      </div>
+    )
+  }
+
+  // 미로그인
+  if (!user) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center space-y-4">
+        <p className="text-muted-foreground">로그인이 필요합니다.</p>
+        <Button variant="outline" onClick={() => router.push('/groups')}>
+          <ArrowLeft size={14} className="mr-1" /> 그룹 목록으로
+        </Button>
+      </div>
+    )
+  }
+
+  // 권한 없음
+  if (!member) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center space-y-4">
         <p className="text-muted-foreground">이 그룹에 접근할 권한이 없습니다.</p>
