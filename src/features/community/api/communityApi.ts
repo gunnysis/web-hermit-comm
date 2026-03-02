@@ -52,7 +52,6 @@ export async function getGroupPosts(
     .from('posts_with_like_count')
     .select('*')
     .eq('group_id', groupId)
-    .is('deleted_at', null)
 
   if (boardId) query = query.eq('board_id', boardId)
 
