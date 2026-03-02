@@ -9,14 +9,13 @@ import { resolveDisplayName } from '@/lib/anonymous'
 import { DEFAULT_PUBLIC_BOARD_ID } from '@/lib/constants'
 
 interface CommentFormProps {
-  postId: number
   userId: string | null
   boardId?: number
   groupId?: number
   createMutation: ReturnType<typeof useComments>['createMutation']
 }
 
-export function CommentForm({ postId, userId, boardId = DEFAULT_PUBLIC_BOARD_ID, groupId, createMutation }: CommentFormProps) {
+export function CommentForm({ userId, boardId = DEFAULT_PUBLIC_BOARD_ID, groupId, createMutation }: CommentFormProps) {
   const [content, setContent] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -22,7 +22,7 @@ export function CommentSection({ postId, userId, boardId, groupId }: CommentSect
         댓글 {query.data ? `${query.data.length}개` : ''}
       </h3>
 
-      <CommentForm postId={postId} userId={userId} boardId={boardId} groupId={groupId} createMutation={createMutation} />
+      <CommentForm userId={userId} boardId={boardId} groupId={groupId} createMutation={createMutation} />
 
       <Separator />
 
