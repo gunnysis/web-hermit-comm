@@ -19,9 +19,12 @@ export function SearchView() {
   // 500ms 디바운스
   useEffect(() => {
     const timer = setTimeout(() => {
-      setQuery(input.trim())
-      if (input.trim()) {
-        router.replace(`/search?q=${encodeURIComponent(input.trim())}`, { scroll: false })
+      const trimmed = input.trim()
+      setQuery(trimmed)
+      if (trimmed) {
+        router.replace(`/search?q=${encodeURIComponent(trimmed)}`, { scroll: false })
+      } else {
+        router.replace('/search', { scroll: false })
       }
     }, 500)
     return () => clearTimeout(timer)
