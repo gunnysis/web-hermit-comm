@@ -18,14 +18,6 @@ export const ANIMALS = [
   '거북이', '다람쥐', '고슴도치', '수달', '판다',
 ]
 
-export const ALLOWED_EMOTIONS = [
-  '고립감', '무기력', '불안', '외로움', '슬픔',
-  '그리움', '두려움', '답답함', '설렘', '기대감',
-  '안도감', '평온함', '즐거움',
-] as const
-
-export const EMOTION_EMOJI: Record<string, string> = {
-  고립감: '🫥', 무기력: '😶', 불안: '😰', 외로움: '😔', 슬픔: '😢',
-  그리움: '💭', 두려움: '😨', 답답함: '😤', 설렘: '💫', 기대감: '🌱',
-  안도감: '😮‍💨', 평온함: '😌', 즐거움: '😊',
-}
+// 감정 상수는 중앙 프로젝트에서 생성됨 (constants.generated.ts)
+export { ALLOWED_EMOTIONS, EMOTION_EMOJI } from './constants.generated'
+export type { AllowedEmotion } from './constants.generated'

@@ -1,15 +1,20 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { formatDistanceToNow } from 'date-fns'
-import { ko } from 'date-fns/locale'
-import { MessageCircle, ThumbsUp } from 'lucide-react'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import type { PostWithCounts } from '@/types/database'
-import { EMOTION_EMOJI } from '@/lib/constants'
+import Link from "next/link"
+import Image from "next/image"
+import { formatDistanceToNow } from "date-fns"
+import { ko } from "date-fns/locale"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import type { PostWithCounts } from "@/types/database"
+import { EMOTION_EMOJI } from "@/lib/constants"
 
 interface PostCardProps {
   post: PostWithCounts
+}
+
+/** 숫자 포맷 */
+function formatCount(n: number): string {
+  if (n >= 10000) return `${(n / 10000).toFixed(1)}만`
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}천`
+  return String(n)
 }
 
 export function PostCard({ post }: PostCardProps) {
@@ -19,25 +24,32 @@ export function PostCard({ post }: PostCardProps) {
   })
 
   const preview = post.content
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
     .trim()
     .slice(0, 140)
 
+  const likeCount = post.like_count ?? 0
+  const commentCount = post.comment_count ?? 0
+  const visibleEmotions = post.emotions?.slice(0, 2) ?? []
+  const moreEmotions = (post.emotions?.length ?? 0) - 2
+
   return (
     <Link href={`/post/${post.id}`} className="block group">
-      <Card className="card-hover border-border/60 group-hover:border-border">
+      <Card className="card-hover border-border/60 group-hover:border-border transition-all duration-200 active:scale-[0.98]">
         <CardHeader className="pb-2 space-y-1.5">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-medium text-muted-foreground">{post.display_name}</span>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-happy-50 text-happy-700 dark:bg-happy-900/40 dark:text-happy-300">
+              {post.display_name}
+            </span>
             <time className="text-xs text-muted-foreground/70 shrink-0">{timeAgo}</time>
           </div>
-          <h2 className="font-semibold text-[0.95rem] leading-snug line-clamp-2 group-hover:text-primary transition-colors">
+          <h2 className="font-semibold text-[0.95rem] leading-snug line-clamp-2 group-hover:text-happy-600 dark:group-hover:text-happy-400 transition-colors">
             {post.title}
           </h2>
         </CardHeader>
 
-        {(preview || post.image_url || post.emotions?.length) ? (
+        {(preview || post.image_url || visibleEmotions.length > 0) && (
           <CardContent className="pb-2 space-y-2.5">
             {preview && (
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
@@ -55,28 +67,38 @@ export function PostCard({ post }: PostCardProps) {
                 />
               </div>
             )}
-            {post.emotions && post.emotions.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {post.emotions.map((emotion) => (
-                  <Badge key={emotion} variant="secondary" className="text-xs gap-1 py-0">
-                    <span>{EMOTION_EMOJI[emotion] ?? '💬'}</span>
+            {visibleEmotions.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {visibleEmotions.map((emotion) => (
+                  <span
+                    key={emotion}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
+                  >
+                    <span>{EMOTION_EMOJI[emotion] ?? "💬"}</span>
                     {emotion}
-                  </Badge>
+                  </span>
                 ))}
+                {moreEmotions > 0 && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 text-xs text-muted-foreground">
+                    +{moreEmotions}
+                  </span>
+                )}
               </div>
             )}
           </CardContent>
-        ) : null}
+        )}
 
-        <CardFooter className="pt-1 gap-4">
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ThumbsUp size={13} />
-            <span className="tabular-nums">{post.like_count ?? 0}</span>
-          </span>
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <MessageCircle size={13} />
-            <span className="tabular-nums">{post.comment_count ?? 0}</span>
-          </span>
+        <CardFooter className="pt-1 gap-3">
+          {likeCount > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground tabular-nums">
+              👍 {formatCount(likeCount)}
+            </span>
+          )}
+          {commentCount > 0 && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground tabular-nums">
+              💬 {formatCount(commentCount)}
+            </span>
+          )}
         </CardFooter>
       </Card>
     </Link>

@@ -26,6 +26,8 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
+import { RefreshCw } from 'lucide-react'
+import { invokeAnalyzeOnDemand } from '../api/postsApi'
 
 interface PostDetailViewProps {
   postId: number
@@ -41,6 +43,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
   const canEdit = user?.id === post?.author_id
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isRetryingAnalysis, setIsRetryingAnalysis] = useState(false)
 
   const handleDelete = async () => {
     setIsDeleting(true)
@@ -59,6 +62,21 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     } finally {
       setIsDeleting(false)
       setDeleteDialogOpen(false)
+    }
+  }
+
+  const handleRetryAnalysis = async () => {
+    if (!post) return
+    setIsRetryingAnalysis(true)
+    try {
+      await invokeAnalyzeOnDemand(postId, post.content, post.title)
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['postAnalysis', postId] })
+      }, 3000)
+    } catch {
+      toast.error('분석 요청에 실패했습니다.')
+    } finally {
+      setIsRetryingAnalysis(false)
     }
   }
 
@@ -165,6 +183,18 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
           <time dateTime={post.created_at}>{timeAgo}</time>
         </div>
         <EmotionTags emotions={emotions} clickable />
+        {!hasEmotions && !analysis && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRetryAnalysis}
+            disabled={isRetryingAnalysis}
+            className="gap-1 text-xs text-muted-foreground"
+          >
+            <RefreshCw size={12} className={isRetryingAnalysis ? 'animate-spin' : ''} />
+            {isRetryingAnalysis ? '분석 중...' : '감정 분석 재시도'}
+          </Button>
+        )}
       </header>
 
       <Separator />

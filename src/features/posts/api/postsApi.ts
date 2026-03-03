@@ -89,10 +89,10 @@ export async function getPostAnalysis(postId: number) {
   return data?.[0] ?? null
 }
 
-export async function invokeAnalyzeOnDemand(postId: number) {
+export async function invokeAnalyzeOnDemand(postId: number, content?: string, title?: string) {
   const supabase = createClient()
   await supabase.functions.invoke('analyze-post-on-demand', {
-    body: { postId },
+    body: { postId, content, title },
   })
 }
 
