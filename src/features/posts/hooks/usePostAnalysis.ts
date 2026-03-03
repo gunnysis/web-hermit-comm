@@ -49,18 +49,23 @@ export function usePostAnalysis(postId: number) {
     }
     if (onDemandCalledRef.current) return
 
+    let innerTimer: ReturnType<typeof setTimeout> | undefined
+
     const timer = setTimeout(async () => {
       if (onDemandCalledRef.current) return
       onDemandCalledRef.current = true
       await invokeAnalyzeOnDemand(postId)
       // Realtime이 INSERT를 감지하여 자동으로 invalidate됨
       // 만약 Realtime이 놓칠 경우를 대비해 5초 후 수동 refetch
-      setTimeout(() => {
+      innerTimer = setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['postAnalysis', postId] })
       }, 5000)
     }, 15000)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(innerTimer)
+    }
   }, [postId, query.data, queryClient])
 
   return query

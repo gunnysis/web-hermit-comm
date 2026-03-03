@@ -62,8 +62,8 @@ export function EditPostForm({ postId }: EditPostFormProps) {
     try {
       await updatePost(postId, { title: values.title, content: values.content })
       queryClient.invalidateQueries({ queryKey: ['post', postId] })
-      queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
-      queryClient.invalidateQueries({ queryKey: ['groupPosts'] })
+      if (post.board_id) queryClient.invalidateQueries({ queryKey: ['boardPosts', post.board_id] })
+      if (post.group_id) queryClient.invalidateQueries({ queryKey: ['groupPosts', post.group_id] })
       toast.success('게시글이 수정됐습니다.')
       router.push(`/post/${postId}`)
     } catch {

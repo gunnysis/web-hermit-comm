@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input'
 import dynamic from 'next/dynamic'
 import { postSchema, type PostFormValues } from '@/lib/schemas'
 import { createPost } from '../api/postsApi'
-import { uploadPostImage } from '../api/uploadImage'
+import { uploadPostImage, validateImageFile, ImageValidationError } from '../api/uploadImage'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { resolveDisplayName } from '@/lib/anonymous'
 import { DEFAULT_PUBLIC_BOARD_ID } from '@/lib/constants'
@@ -42,6 +42,15 @@ export function CreatePostForm() {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
+    try {
+      validateImageFile(file)
+    } catch (err) {
+      if (err instanceof ImageValidationError) {
+        toast.error(err.message)
+      }
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
     setImageFile(file)
     setImagePreview(URL.createObjectURL(file))
   }

@@ -1,8 +1,10 @@
 import { createClient } from '@/utils/supabase/client'
 import type { PostWithCounts } from '@/types/database'
+import { ALLOWED_EMOTIONS } from '@/lib/constants'
 
 export async function searchPosts(query: string, options?: { boardId?: number; emotion?: string }): Promise<PostWithCounts[]> {
   if (!query.trim() && !options?.emotion) return []
+  if (options?.emotion && !(ALLOWED_EMOTIONS as readonly string[]).includes(options.emotion)) return []
   const supabase = createClient()
 
   let req = supabase

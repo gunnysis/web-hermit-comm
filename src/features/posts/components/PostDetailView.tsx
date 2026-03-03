@@ -50,8 +50,8 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       const groupId = post?.group_id
       router.push(groupId ? `/groups/${groupId}` : '/')
       queryClient.removeQueries({ queryKey: ['post', postId] })
-      queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
-      queryClient.invalidateQueries({ queryKey: ['groupPosts'] })
+      if (post?.board_id) queryClient.invalidateQueries({ queryKey: ['boardPosts', post.board_id] })
+      if (groupId) queryClient.invalidateQueries({ queryKey: ['groupPosts', groupId] })
     } catch (err: unknown) {
       console.error('deletePost error:', err)
       const msg = err instanceof Error ? err.message : (err as { message?: string })?.message
@@ -120,6 +120,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
             variant="ghost"
             size="icon"
             className="h-8 w-8"
+            aria-label="공유"
             onClick={async () => {
               const url = `${window.location.origin}/post/${postId}`
               if (navigator.share) {
@@ -135,7 +136,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
         {canEdit && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="더보기">
                 <MoreHorizontal size={16} />
               </Button>
             </DropdownMenuTrigger>

@@ -68,10 +68,15 @@ export async function updatePost(
 
 export async function deletePost(postId: number): Promise<void> {
   const supabase = createClient()
+
+  // 세션 유효성 확인 (만료된 토큰으로 RPC 호출 방지)
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('로그인 세션이 만료됐습니다. 페이지를 새로고침해 주세요.')
+
   const { error } = await supabase.rpc('soft_delete_post', {
     p_post_id: postId,
   })
-  if (error) throw error
+  if (error) throw new Error('게시글을 삭제할 수 없습니다. 권한이 없거나 이미 삭제된 게시글입니다.')
 }
 
 export async function getPostAnalysis(postId: number) {

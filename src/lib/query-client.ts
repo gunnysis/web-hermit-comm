@@ -9,7 +9,7 @@ function makeQueryClientOptions() {
         throwOnError: false,
         retry: (failureCount: number, error: unknown) => {
           // 4xx 에러는 재시도 안함
-          if (error instanceof Error && error.message.includes('4')) return false
+          if (error instanceof Error && /\b4\d{2}\b/.test(error.message)) return false
           return failureCount < 2
         },
       },

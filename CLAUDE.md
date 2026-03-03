@@ -46,17 +46,35 @@ Node.js 22 필수. nvm 사용 시: `export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/n
 
 ## 멀티프로젝트 관리
 
-이 웹 레포와 앱 레포(`C:\Users\Administrator\programming\apps\gns-hermit-comm`, Windows)가 동일 Supabase 백엔드를 공유.
+이 웹 레포, 앱 레포(`/mnt/c/Users/Administrator/programming/apps/gns-hermit-comm`), **중앙 Supabase 프로젝트**(`~/apps/supabase-hermit`)가 동일 Supabase 백엔드를 공유.
 
 ### 역할 경계
 
-- **Supabase 마이그레이션 원본**: 앱 레포. 마이그레이션은 앱에서만 생성.
+- **Supabase 마이그레이션 정본**: `~/apps/supabase-hermit`. 마이그레이션은 **여기서만** 생성/적용.
 - **Edge Functions**: 앱 레포의 `supabase/functions/`.
-- **웹 레포**: 마이그레이션 복사본 유지 (`scripts/sync-from-app.sh`로 동기화).
+- **웹 레포**: 마이그레이션 읽기 전용 복사본 (`scripts/sync-from-app.sh`로 동기화).
+- **앱 레포**: 마이그레이션 읽기 전용 복사본 (중앙에서 `scripts/sync-to-projects.sh`로 동기화).
+
+### DB 변경 워크플로
+
+```bash
+# 1. 중앙 프로젝트에서 마이그레이션 작성
+cd ~/apps/supabase-hermit
+vi supabase/migrations/YYYYMMDDNNNNNN_description.sql
+
+# 2. 적용
+bash scripts/db.sh push
+
+# 3. 앱/웹 동기화
+bash scripts/sync-to-projects.sh
+
+# 4. 웹 레포에서도 동기화 확인 가능
+cd ~/apps/web && bash scripts/sync-from-app.sh
+```
 
 ### 동기화 대상
 
-- `supabase/migrations/` — 앱에서 생성 후 이 레포에 복사
+- `supabase/migrations/` — 중앙에서 생성 후 앱/웹에 복사
 - `src/types/database.ts` ← 앱 `src/types/index.ts` (수동 검토 후 적용)
 - `src/lib/constants.ts`의 `VALIDATION`, `ALLOWED_EMOTIONS`, `EMOTION_EMOJI` — 앱과 값 동일하게 유지
 
@@ -64,4 +82,5 @@ Node.js 22 필수. nvm 사용 시: `export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/n
 
 - `src/lib/anonymous.ts` (별칭 해시 알고리즘·목록): **앱과 독립 유지**. 변경 시 기존 사용자 alias가 바뀜.
 - 상수 값 변경 시 앱 `src/shared/lib/constants.ts`도 함께 업데이트.
-- 동기화 스크립트: `scripts/sync-from-app.sh`
+- 동기화 스크립트: `scripts/sync-from-app.sh` (중앙 → 웹)
+- **앱/웹 레포에서 직접 마이그레이션 생성 금지** — 반드시 중앙 프로젝트에서

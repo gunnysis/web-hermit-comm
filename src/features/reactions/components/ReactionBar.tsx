@@ -31,6 +31,8 @@ export function ReactionBar({ postId, userId }: ReactionBarProps) {
             size="sm"
             disabled={isPending || !userId}
             onClick={() => toggle(type)}
+            aria-label={`${type} 반응${active ? ' 취소' : ''}`}
+            aria-pressed={active}
             className={cn(
               'gap-1 text-sm h-8 px-3 transition-all',
               active && 'border-primary bg-primary/10 text-primary reaction-active',

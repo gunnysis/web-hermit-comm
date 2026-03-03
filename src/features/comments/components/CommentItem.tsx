@@ -60,7 +60,7 @@ export function CommentItem({ comment, currentUserId, updateMutation, deleteMuta
         {canEdit && !isEditing && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
+              <Button variant="ghost" size="icon" className="h-6 w-6" aria-label="댓글 더보기">
                 <MoreHorizontal size={14} />
               </Button>
             </DropdownMenuTrigger>

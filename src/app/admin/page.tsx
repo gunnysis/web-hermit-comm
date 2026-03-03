@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { useIsAdmin } from '@/features/admin/hooks/useIsAdmin'
 import { useAdminGroups } from '@/features/admin/hooks/useAdminGroups'
@@ -28,6 +29,7 @@ export default function AdminPage() {
   const [newGroupDesc, setNewGroupDesc] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null)
 
   // 로딩 중
   if (adminLoading) {
@@ -69,10 +71,13 @@ export default function AdminPage() {
     }
   }
 
-  const handleDelete = (groupId: number, name: string) => {
-    if (!confirm(`'${name}' 그룹을 삭제할까요? 모든 게시글과 댓글이 삭제됩니다.`)) return
-    deleteMutation.mutate(groupId, {
-      onSuccess: () => toast.success('그룹이 삭제됐습니다.'),
+  const handleDelete = () => {
+    if (!deleteTarget) return
+    deleteMutation.mutate(deleteTarget.id, {
+      onSuccess: () => {
+        toast.success('그룹이 삭제됐습니다.')
+        setDeleteTarget(null)
+      },
       onError: () => toast.error('삭제에 실패했습니다.'),
     })
   }
@@ -170,6 +175,7 @@ export default function AdminPage() {
                     variant="ghost"
                     className="h-7 w-7"
                     onClick={() => handleCopyCode(group.invite_code!)}
+                    aria-label="초대 코드 복사"
                   >
                     <Copy size={13} />
                   </Button>
@@ -178,6 +184,7 @@ export default function AdminPage() {
                     variant="ghost"
                     className="h-7 w-7"
                     onClick={() => handleRegenerateCode(group.id)}
+                    aria-label="초대 코드 재생성"
                   >
                     <RefreshCw size={13} />
                   </Button>
@@ -186,7 +193,7 @@ export default function AdminPage() {
               <Button
                 size="sm"
                 variant="destructive"
-                onClick={() => handleDelete(group.id, group.name)}
+                onClick={() => setDeleteTarget({ id: group.id, name: group.name })}
                 disabled={deleteMutation.isPending}
               >
                 <Trash2 size={13} className="mr-1" /> 그룹 삭제
@@ -195,6 +202,16 @@ export default function AdminPage() {
           </Card>
         ))}
       </div>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
+        title={`'${deleteTarget?.name}' 그룹을 삭제할까요?`}
+        description="모든 게시글과 댓글이 삭제됩니다."
+        confirmLabel="삭제"
+        onConfirm={handleDelete}
+        isPending={deleteMutation.isPending}
+      />
     </div>
   )
 }

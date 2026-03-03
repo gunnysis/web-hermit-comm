@@ -41,8 +41,12 @@ export async function updateComment(commentId: number, content: string): Promise
 
 export async function deleteComment(commentId: number): Promise<void> {
   const supabase = createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('로그인 세션이 만료됐습니다. 페이지를 새로고침해 주세요.')
+
   const { error } = await supabase.rpc('soft_delete_comment', {
     p_comment_id: commentId,
   })
-  if (error) throw error
+  if (error) throw new Error('댓글을 삭제할 수 없습니다. 권한이 없거나 이미 삭제된 댓글입니다.')
 }

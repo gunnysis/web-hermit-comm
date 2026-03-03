@@ -34,6 +34,9 @@ yarn-error.log*
 .env*.local
 .env.local
 
+# supabase (중앙 프로젝트에서 관리)
+supabase/.temp/
+
 # claude code
 .claude/
 

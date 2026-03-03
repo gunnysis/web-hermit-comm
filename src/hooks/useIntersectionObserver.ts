@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface Options {
   threshold?: number
@@ -19,8 +19,9 @@ export function useIntersectionObserver(
     callbackRef.current = onIntersect
   })
 
-  const observe = useCallback(() => {
+  useEffect(() => {
     if (!enabled || !targetRef.current) return
+
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting) callbackRef.current()
@@ -28,10 +29,9 @@ export function useIntersectionObserver(
       { threshold, rootMargin },
     )
     observer.observe(targetRef.current)
+
     return () => observer.disconnect()
   }, [enabled, threshold, rootMargin])
-
-  useEffect(() => observe(), [observe])
 
   return targetRef
 }

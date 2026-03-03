@@ -13,33 +13,43 @@ export function useAuth() {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const data = await signInAnonymously()
-        setUser(data.user)
-        return
+        return data.user
       } catch {
         if (attempt < maxRetries) {
           await new Promise(r => setTimeout(r, attempt * 1000))
         }
       }
     }
+    return null
   }, [])
 
   useEffect(() => {
+    let cancelled = false
     const supabase = createClient()
 
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled) return
       if (session?.user) {
         setUser(session.user)
         setLoading(false)
       } else {
-        ensureAnonymousSession().finally(() => setLoading(false))
+        ensureAnonymousSession().then(u => {
+          if (!cancelled) {
+            if (u) setUser(u)
+            setLoading(false)
+          }
+        })
       }
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
+      if (!cancelled) setUser(session?.user ?? null)
     })
 
-    return () => subscription.unsubscribe()
+    return () => {
+      cancelled = true
+      subscription.unsubscribe()
+    }
   }, [ensureAnonymousSession])
 
   return { user, loading }
