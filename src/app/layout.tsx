@@ -40,6 +40,13 @@ export const metadata: Metadata = {
     title: "은둔마을",
     description: "마음이 쉬어갈 수 있는 익명 커뮤니티",
   },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon.png", type: "image/png", sizes: "48x48" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
   alternates: {
     types: {
       "application/rss+xml": "/feed.xml",
