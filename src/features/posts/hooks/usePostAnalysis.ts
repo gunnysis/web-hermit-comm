@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { createClient } from '@/utils/supabase/client'
 import { getPostAnalysis, invokeAnalyzeOnDemand } from '../api/postsApi'
 
@@ -67,5 +67,16 @@ export function usePostAnalysis(postId: number) {
     }
   }, [postId, query.data, queryClient])
 
-  return query
+  // 수동 재시도 — 15초 자동 폴백과 중복 방지
+  const retryAnalysis = useCallback(async () => {
+    onDemandCalledRef.current = true
+    const post = queryClient.getQueryData<{ content?: string; title?: string }>(['post', postId])
+    await invokeAnalyzeOnDemand(postId, post?.content, post?.title)
+    // Realtime이 감지 못할 경우 대비 5초 후 수동 refetch
+    setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: ['postAnalysis', postId] })
+    }, 5000)
+  }, [postId, queryClient])
+
+  return { ...query, retryAnalysis }
 }

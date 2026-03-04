@@ -91,9 +91,10 @@ export async function getPostAnalysis(postId: number) {
 
 export async function invokeAnalyzeOnDemand(postId: number, content?: string, title?: string) {
   const supabase = createClient()
-  await supabase.functions.invoke('analyze-post-on-demand', {
+  const { error } = await supabase.functions.invoke('analyze-post-on-demand', {
     body: { postId, content, title },
   })
+  if (error) throw error
 }
 
 export async function getEmotionTrend(days = 7) {

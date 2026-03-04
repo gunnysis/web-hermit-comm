@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
@@ -27,7 +27,6 @@ import { useAuthContext } from '@/features/auth/AuthProvider'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { RefreshCw } from 'lucide-react'
-import { invokeAnalyzeOnDemand } from '../api/postsApi'
 
 interface PostDetailViewProps {
   postId: number
@@ -38,12 +37,13 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
   const { user } = useAuthContext()
   const queryClient = useQueryClient()
   const { data: post, isLoading, isError } = usePostDetail(postId)
-  const { data: analysis } = usePostAnalysis(postId)
+  const { data: analysis, retryAnalysis } = usePostAnalysis(postId)
 
   const canEdit = user?.id === post?.author_id
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isRetryingAnalysis, setIsRetryingAnalysis] = useState(false)
+  const spinnerTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   const handleDelete = async () => {
     setIsDeleting(true)
@@ -65,20 +65,35 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     }
   }
 
-  const handleRetryAnalysis = async () => {
+  const handleRetryAnalysis = useCallback(async () => {
     if (!post) return
     setIsRetryingAnalysis(true)
     try {
-      await invokeAnalyzeOnDemand(postId, post.content, post.title)
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['postAnalysis', postId] })
-      }, 3000)
+      await retryAnalysis()
+      // 스피너는 데이터 도착(useEffect) 또는 타임아웃(5초)까지 유지
+      spinnerTimeoutRef.current = setTimeout(() => {
+        setIsRetryingAnalysis(false)
+      }, 5000)
     } catch {
       toast.error('분석 요청에 실패했습니다.')
-    } finally {
       setIsRetryingAnalysis(false)
     }
-  }
+  }, [post, retryAnalysis])
+
+  // 분석 데이터 도착 시 스피너 해제
+  const emotions = analysis?.emotions ?? post?.emotions
+  const hasEmotions = (emotions?.length ?? 0) > 0
+
+  useEffect(() => {
+    if (hasEmotions && isRetryingAnalysis) {
+      setIsRetryingAnalysis(false)
+      clearTimeout(spinnerTimeoutRef.current)
+    }
+  }, [hasEmotions, isRetryingAnalysis])
+
+  useEffect(() => {
+    return () => clearTimeout(spinnerTimeoutRef.current)
+  }, [])
 
   if (isLoading) {
     return (
@@ -111,9 +126,6 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     addSuffix: true,
     locale: ko,
   })
-
-  const emotions = analysis?.emotions ?? post.emotions
-  const hasEmotions = (emotions?.length ?? 0) > 0
 
   return (
     <article className="space-y-6 animate-fade-in">
@@ -198,7 +210,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
           )}
         </div>
         <EmotionTags emotions={emotions} clickable />
-        {!hasEmotions && !analysis && (
+        {!hasEmotions && (
           <Button
             variant="ghost"
             size="sm"
