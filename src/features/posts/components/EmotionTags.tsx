@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { EMOTION_EMOJI } from "@/lib/constants"
+import { getEmotionClassName } from "@/lib/emotion-category"
 
 interface EmotionTagsProps {
   emotions: string[] | null | undefined
@@ -67,7 +68,7 @@ export function EmotionTags({
               key={emotion}
               className={cn(
                 "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium",
-                "bg-secondary text-secondary-foreground",
+                getEmotionClassName(emotion),
                 "transition-colors duration-150",
                 clickable && "cursor-pointer hover:bg-accent active:scale-95",
               )}

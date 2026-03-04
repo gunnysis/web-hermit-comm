@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useBoardPosts } from '../hooks/useBoardPosts'
 import { useRealtimePosts } from '@/hooks/useRealtimePosts'
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver'
@@ -8,7 +8,6 @@ import { PostCard } from './PostCard'
 import { PostCardSkeleton } from './PostCardSkeleton'
 import { EmotionTrend } from './EmotionTrend'
 import { DEFAULT_PUBLIC_BOARD_ID } from '@/lib/constants'
-import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FileText } from 'lucide-react'
@@ -27,27 +26,41 @@ export function PublicFeed() {
   )
 
   const posts = data?.pages.flat() ?? []
+  const latestRef = useRef<HTMLButtonElement>(null)
+  const popularRef = useRef<HTMLButtonElement>(null)
+  const [indicatorStyle, setIndicatorStyle] = useState<{ left: number; width: number }>({ left: 3, width: 0 })
+
+  const updateIndicator = useCallback(() => {
+    const el = sortOrder === 'latest' ? latestRef.current : popularRef.current
+    if (el) setIndicatorStyle({ left: el.offsetLeft, width: el.offsetWidth })
+  }, [sortOrder])
+
+  useEffect(() => { updateIndicator() }, [updateIndicator])
 
   return (
     <div className="space-y-4 animate-fade-in">
       <EmotionTrend />
       <Separator />
 
-      <div className="flex gap-2">
-        <Button
-          variant={sortOrder === 'latest' ? 'default' : 'ghost'}
-          size="sm"
+      <div className="sort-tabs-container">
+        <div
+          className="sort-tab-indicator"
+          style={{ left: indicatorStyle.left, width: indicatorStyle.width || 'auto' }}
+        />
+        <button
+          ref={latestRef}
+          className={`sort-tab ${sortOrder === 'latest' ? 'sort-tab-active' : ''}`}
           onClick={() => setSortOrder('latest')}
         >
           최신순
-        </Button>
-        <Button
-          variant={sortOrder === 'popular' ? 'default' : 'ghost'}
-          size="sm"
+        </button>
+        <button
+          ref={popularRef}
+          className={`sort-tab ${sortOrder === 'popular' ? 'sort-tab-active' : ''}`}
           onClick={() => setSortOrder('popular')}
         >
           인기순
-        </Button>
+        </button>
       </div>
 
       {isError && (

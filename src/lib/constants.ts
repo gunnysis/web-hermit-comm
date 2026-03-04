@@ -18,6 +18,6 @@ export const ANIMALS = [
   '거북이', '다람쥐', '고슴도치', '수달', '판다',
 ]
 
-// 감정 상수는 중앙 프로젝트에서 생성됨 (constants.generated.ts)
-export { ALLOWED_EMOTIONS, EMOTION_EMOJI } from './constants.generated'
-export type { AllowedEmotion } from './constants.generated'
+// 감정·디자인 토큰 상수는 중앙 프로젝트에서 생성됨 (constants.generated.ts)
+export { ALLOWED_EMOTIONS, EMOTION_EMOJI, REACTION_COLOR_MAP, SHARED_PALETTE } from './constants.generated'
+export type { AllowedEmotion, ReactionColorKey } from './constants.generated'

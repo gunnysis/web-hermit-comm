@@ -85,13 +85,13 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       <div className="space-y-4 animate-fade-in">
         <div className="flex justify-between">
           <Skeleton className="h-8 w-16" />
-          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-8 w-8 rounded-full shimmer-delay-1" />
         </div>
-        <Skeleton className="h-8 w-4/5" />
-        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-8 w-4/5 shimmer-delay-1" />
+        <Skeleton className="h-4 w-32 shimmer-delay-2" />
         <div className="space-y-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className={`h-4 ${i % 3 === 2 ? 'w-3/4' : 'w-full'}`} />
+            <Skeleton key={i} className={`h-4 ${i % 3 === 2 ? 'w-3/4' : 'w-full'} shimmer-delay-${Math.min(i + 1, 4)}`} />
           ))}
         </div>
       </div>
@@ -177,10 +177,25 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       {/* 제목 및 메타 */}
       <header className="space-y-2">
         <h1 className="text-2xl font-bold leading-tight tracking-tight">{post.title}</h1>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
           <span className="font-medium">{post.display_name}</span>
           <span aria-hidden>·</span>
           <time dateTime={post.created_at}>{timeAgo}</time>
+          {((post.like_count ?? 0) > 0 || (post.comment_count ?? 0) > 0) && (
+            <>
+              <span aria-hidden>·</span>
+              {(post.like_count ?? 0) > 0 && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs bg-happy-50 text-happy-700 dark:bg-happy-900/40 dark:text-happy-300">
+                  👍 {post.like_count}
+                </span>
+              )}
+              {(post.comment_count ?? 0) > 0 && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs bg-lavender-50 text-lavender-700 dark:bg-lavender-900/40 dark:text-lavender-300">
+                  💬 {post.comment_count}
+                </span>
+              )}
+            </>
+          )}
         </div>
         <EmotionTags emotions={emotions} clickable />
         {!hasEmotions && !analysis && (

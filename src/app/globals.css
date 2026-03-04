@@ -113,6 +113,8 @@
 
 :root {
   --radius: 0.625rem;
+  --input-focus-border: #FFCF33;
+  --input-focus-bg: #FFF9E6;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -147,6 +149,8 @@
 }
 
 .dark {
+  --input-focus-border: #CC9C00;
+  --input-focus-bg: oklch(0.22 0.02 85);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -217,7 +221,7 @@
 
   /* 카드 호버 효과 */
   .card-hover {
-    @apply transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+    @apply shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
   }
 
   /* 반응 버튼 활성 애니메이션 */
@@ -248,4 +252,92 @@
 @keyframes scale-in {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* 시머 로딩 효과 */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--accent) 25%,
+    var(--muted) 50%,
+    var(--accent) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.shimmer-delay-1 { animation-delay: 0.1s; }
+.shimmer-delay-2 { animation-delay: 0.2s; }
+.shimmer-delay-3 { animation-delay: 0.3s; }
+.shimmer-delay-4 { animation-delay: 0.4s; }
+
+/* 감정 카테고리 색상 */
+.emotion-positive {
+  background-color: var(--color-mint-50);
+  color: var(--color-mint-800);
+}
+.emotion-negative {
+  background-color: var(--color-lavender-50);
+  color: var(--color-lavender-800);
+}
+.emotion-neutral {
+  background-color: var(--color-peach-50);
+  color: var(--color-peach-800);
+}
+
+.dark .emotion-positive {
+  background-color: oklch(0.25 0.04 165);
+  color: var(--color-mint-300);
+}
+.dark .emotion-negative {
+  background-color: oklch(0.25 0.04 290);
+  color: var(--color-lavender-300);
+}
+.dark .emotion-neutral {
+  background-color: oklch(0.25 0.04 60);
+  color: var(--color-peach-300);
+}
+
+/* SortTabs 슬라이딩 인디케이터 */
+.sort-tabs-container {
+  position: relative;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 9999px;
+  background-color: var(--muted);
+}
+.sort-tab {
+  position: relative;
+  z-index: 1;
+  padding: 4px 16px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  user-select: none;
+}
+.sort-tab-active {
+  color: var(--color-happy-800);
+}
+.dark .sort-tab-active {
+  color: var(--color-happy-300);
+}
+.sort-tab-indicator {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  border-radius: 9999px;
+  background-color: var(--color-happy-50);
+  transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.dark .sort-tab-indicator {
+  background-color: var(--color-happy-900);
 }

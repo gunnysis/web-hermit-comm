@@ -53,9 +53,6 @@ export async function getCommentsServer(postId: number) {
 
 export async function getReactionsServer(postId: number) {
   const supabase = await createClient()
-  const { data } = await supabase
-    .from('reactions')
-    .select('*')
-    .eq('post_id', postId)
+  const { data } = await supabase.rpc('get_post_reactions', { p_post_id: postId })
   return data ?? []
 }

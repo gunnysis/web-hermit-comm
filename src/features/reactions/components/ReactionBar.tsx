@@ -88,9 +88,11 @@ export function ReactionBar({ postId, userId }: ReactionBarProps) {
                       backgroundColor: colors.bg,
                       borderColor: colors.border,
                       color: colors.text,
-                      boxShadow: `0 4px 12px ${colors.shadow}33`,
+                      boxShadow: `0 4px 14px ${colors.shadow}40, 0 0 0 2px ${colors.shadow}20`,
                     }
-                  : undefined
+                  : hasCount
+                    ? { boxShadow: `0 2px 8px ${colors.shadow}15` }
+                    : undefined
               }
               className={cn(
                 "inline-flex items-center gap-1.5 min-h-[40px] px-3.5 py-2 rounded-2xl border-[1.5px] text-sm font-medium cursor-pointer",

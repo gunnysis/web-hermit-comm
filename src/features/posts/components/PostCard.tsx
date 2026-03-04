@@ -5,6 +5,7 @@ import { ko } from "date-fns/locale"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import type { PostWithCounts } from "@/types/database"
 import { EMOTION_EMOJI } from "@/lib/constants"
+import { getEmotionClassName } from "@/lib/emotion-category"
 
 interface PostCardProps {
   post: PostWithCounts
@@ -72,7 +73,7 @@ export function PostCard({ post }: PostCardProps) {
                 {visibleEmotions.map((emotion) => (
                   <span
                     key={emotion}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-secondary text-secondary-foreground"
+                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${getEmotionClassName(emotion)}`}
                   >
                     <span>{EMOTION_EMOJI[emotion] ?? "💬"}</span>
                     {emotion}
@@ -90,12 +91,12 @@ export function PostCard({ post }: PostCardProps) {
 
         <CardFooter className="pt-1 gap-3">
           {likeCount > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground tabular-nums">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-happy-50 text-happy-700 dark:bg-happy-900/40 dark:text-happy-300 tabular-nums">
               👍 {formatCount(likeCount)}
             </span>
           )}
           {commentCount > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground tabular-nums">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-lavender-50 text-lavender-700 dark:bg-lavender-900/40 dark:text-lavender-300 tabular-nums">
               💬 {formatCount(commentCount)}
             </span>
           )}
