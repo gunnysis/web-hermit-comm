@@ -56,9 +56,9 @@ describe('isComment', () => {
 })
 
 describe('REACTION_TYPES', () => {
-  it('contains expected emoji types', () => {
-    expect(REACTION_TYPES).toContain('👍')
-    expect(REACTION_TYPES).toContain('❤️')
+  it('contains expected named types', () => {
+    expect(REACTION_TYPES).toContain('like')
+    expect(REACTION_TYPES).toContain('heart')
   })
 
   it('is non-empty', () => {
