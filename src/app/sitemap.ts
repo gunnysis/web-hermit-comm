@@ -1,9 +1,10 @@
 import type { MetadataRoute } from 'next'
+import { createClient } from '@/utils/supabase/server'
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.eundunmaeul.store'
 
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -17,16 +18,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/create`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.5,
-    },
-    {
       url: `${baseUrl}/groups`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,
     },
   ]
+
+  const supabase = await createClient()
+  const { data: posts } = await supabase
+    .from('posts_with_like_count')
+    .select('id, created_at')
+    .order('created_at', { ascending: false })
+    .limit(500)
+
+  const postPages: MetadataRoute.Sitemap = (posts ?? []).map((post) => ({
+    url: `${baseUrl}/post/${post.id}`,
+    lastModified: new Date(post.created_at ?? Date.now()),
+    changeFrequency: 'weekly' as const,
+    priority: 0.6,
+  }))
+
+  return [...staticPages, ...postPages]
 }
