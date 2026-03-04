@@ -11,18 +11,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: '/naver9b168b65528d96867e517a90a9e9cb4e.html',
-          destination: '/api/naver-verify',
-        },
-      ],
-      afterFiles: [],
-      fallback: [],
-    }
-  },
 };
 
 export default withSentryConfig(nextConfig, {
