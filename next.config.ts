@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/naver9b168b65528d96867e517a90a9e9cb4e.html',
+        destination: '/api/naver-verify',
+      },
+    ]
+  },
 };
 
 export default withSentryConfig(nextConfig, {
