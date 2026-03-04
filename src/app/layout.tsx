@@ -21,8 +21,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "은둔마을",
-  description: "은둔마을 웹 클라이언트",
+  title: {
+    default: "은둔마을",
+    template: "%s | 은둔마을",
+  },
+  description: "마음이 쉬어갈 수 있는 익명 커뮤니티",
+  metadataBase: new URL("https://www.eundunmaeul.store"),
+  openGraph: {
+    title: "은둔마을",
+    description: "마음이 쉬어갈 수 있는 익명 커뮤니티",
+    url: "https://www.eundunmaeul.store",
+    siteName: "은둔마을",
+    locale: "ko_KR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "은둔마을",
+    description: "마음이 쉬어갈 수 있는 익명 커뮤니티",
+  },
 };
 
 export default function RootLayout({

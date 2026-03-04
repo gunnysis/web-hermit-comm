@@ -84,3 +84,27 @@ cd ~/apps/web && bash scripts/sync-from-app.sh
 - 상수 값 변경 시 앱 `src/shared/lib/constants.ts`도 함께 업데이트.
 - 동기화 스크립트: `scripts/sync-from-app.sh` (중앙 → 웹)
 - **앱/웹 레포에서 직접 마이그레이션 생성 금지** — 반드시 중앙 프로젝트에서
+
+## Vercel 배포
+
+### 배포 방식
+- **자동 배포**: `git push origin main` → Vercel GitHub 연동이 자동 빌드/배포.
+- **수동 배포**: 자동 배포 실패(Canceled 등) 시 `vercel deploy --prod` CLI 사용.
+- Hobby 플랜 동시 빌드 1개 제한 — 짧은 시간에 여러 커밋 연속 푸시 시 이전 빌드가 취소됨. **변경사항을 모아서 한 번에 푸시** 권장.
+
+### 배포 확인 절차
+```bash
+vercel ls web --scope jeonggeon-parks-projects   # 배포 목록 확인
+vercel inspect <deployment-url>                   # 개별 배포 상태 확인
+```
+- 배포 후 `dpl_` ID가 변경되었는지 curl 헤더로 확인: `curl -sI https://www.eundunmaeul.store | grep x-vercel`
+
+### 정적 파일 서빙 주의사항
+- `public/` 디렉토리의 정적 파일은 Vercel에서 루트 URL로 서빙됨.
+- 단, `src/proxy.ts`의 matcher가 가로챌 수 있으므로, **proxy를 거치지 않아야 할 파일은 proxy 함수 내에서 early return 처리**.
+- 외부 서비스 인증 파일(네이버, 구글 등)은 proxy에서 직접 응답하는 방식이 가장 확실함.
+
+### Vercel CLI 설정
+- 프로젝트: `jeonggeon-parks-projects/web`
+- 링크: `vercel link --yes --scope jeonggeon-parks-projects --project web`
+- `.vercel/project.json`이 깨졌을 때 위 명령으로 재연결.
