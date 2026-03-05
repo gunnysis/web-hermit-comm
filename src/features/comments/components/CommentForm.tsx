@@ -20,7 +20,7 @@ export function CommentForm({ userId, boardId = DEFAULT_PUBLIC_BOARD_ID, groupId
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!content.trim() || !userId) return
+    if (!content.trim() || content.length > 2000 || !userId) return
 
     const display_name = resolveDisplayName(userId, `${boardId}-comment`, true)
 
@@ -56,9 +56,13 @@ export function CommentForm({ userId, boardId = DEFAULT_PUBLIC_BOARD_ID, groupId
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={2}
+        maxLength={2000}
         className="text-sm resize-none"
       />
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between">
+        <span className={`text-xs ${content.length > 1800 ? 'text-destructive' : 'text-muted-foreground'}`}>
+          {content.length > 0 ? `${content.length}/2000` : ''}
+        </span>
         <Button
           type="submit"
           size="sm"

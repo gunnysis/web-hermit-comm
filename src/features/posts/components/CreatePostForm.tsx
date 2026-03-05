@@ -54,12 +54,18 @@ export function CreatePostForm() {
       return
     }
     setImageFile(file)
-    setImagePreview(URL.createObjectURL(file))
+    setImagePreview(prev => {
+      if (prev) URL.revokeObjectURL(prev)
+      return URL.createObjectURL(file)
+    })
   }
 
   const handleRemoveImage = () => {
     setImageFile(null)
-    setImagePreview(null)
+    setImagePreview(prev => {
+      if (prev) URL.revokeObjectURL(prev)
+      return null
+    })
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 

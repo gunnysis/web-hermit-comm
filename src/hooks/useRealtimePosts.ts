@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/utils/supabase/client'
+import { logger } from '@/lib/logger'
 
 export function useRealtimePosts(boardId: number) {
   const queryClient = useQueryClient()
@@ -24,7 +25,9 @@ export function useRealtimePosts(boardId: number) {
           queryClient.invalidateQueries({ queryKey: ['boardPosts', boardId] })
         },
       )
-      .subscribe()
+      .subscribe((status, err) => {
+        if (err) logger.error(`Realtime board-posts-${boardId} error:`, err)
+      })
 
     return () => {
       supabase.removeChannel(channel)

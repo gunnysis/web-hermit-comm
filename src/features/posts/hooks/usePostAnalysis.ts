@@ -3,6 +3,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import { logger } from '@/lib/logger'
 import { getPostAnalysis, invokeAnalyzeOnDemand } from '../api/postsApi'
 
 export function usePostAnalysis(postId: number) {
@@ -32,7 +33,9 @@ export function usePostAnalysis(postId: number) {
           queryClient.invalidateQueries({ queryKey: ['postAnalysis', postId] })
         },
       )
-      .subscribe()
+      .subscribe((status, err) => {
+        if (err) logger.error(`Realtime post-analysis-${postId} error:`, err)
+      })
 
     return () => {
       supabase.removeChannel(channel)

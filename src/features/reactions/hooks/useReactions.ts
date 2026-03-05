@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { createClient } from '@/utils/supabase/client'
+import { logger } from '@/lib/logger'
 import { getPostReactions, toggleReaction } from '../api/reactionsApi'
 import type { ReactionData } from '../api/reactionsApi'
 
@@ -25,7 +26,9 @@ export function useReactions(postId: number, userId: string | null) {
         { event: '*', schema: 'public', table: 'reactions', filter: `post_id=eq.${postId}` },
         () => queryClient.invalidateQueries({ queryKey: ['postReactions', postId] }),
       )
-      .subscribe()
+      .subscribe((status, err) => {
+        if (err) logger.error(`Realtime reactions-${postId} error:`, err)
+      })
     return () => { supabase.removeChannel(channel) }
   }, [postId, queryClient])
 
