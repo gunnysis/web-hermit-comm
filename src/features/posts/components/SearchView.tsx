@@ -39,8 +39,7 @@ export function SearchView() {
     queryKey: ['search', query, emotion],
     queryFn: async () => {
       if (query) {
-        const results = await searchPosts(query)
-        return results as unknown as PostWithCounts[]
+        return searchPosts(query) as Promise<PostWithCounts[]>
       }
       if (emotion) return getPostsByEmotion(emotion)
       return []
