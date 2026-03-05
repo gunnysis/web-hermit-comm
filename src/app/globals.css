@@ -112,6 +112,11 @@
 }
 
 :root {
+  --duration-fast: 150ms;
+  --duration-medium: 250ms;
+  --duration-slow: 400ms;
+  --easing-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --radius: 0.625rem;
   --input-focus-border: #FFCF33;
   --input-focus-bg: #FFF9E6;
@@ -340,4 +345,50 @@
 }
 .dark .sort-tab-indicator {
   background-color: var(--color-happy-900);
+}
+
+/* 스켈레톤 호흡 애니메이션 */
+@keyframes breathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+.skeleton-breathe { animation: breathe 2s ease-in-out infinite; }
+
+/* 리액션 타입별 애니메이션 */
+@keyframes reaction-pulse {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.3); }
+  60% { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+@keyframes reaction-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-12deg); }
+  75% { transform: rotate(12deg); }
+}
+@keyframes reaction-droop {
+  0% { transform: translateY(0); }
+  40% { transform: translateY(3px); }
+  100% { transform: translateY(0); }
+}
+@keyframes reaction-pop {
+  0% { transform: scale(0.5); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.reaction-anim-heart { animation: reaction-pulse 0.4s var(--easing-emphasized); }
+.reaction-anim-laugh { animation: reaction-wiggle 0.4s var(--easing-emphasized); }
+.reaction-anim-sad { animation: reaction-droop 0.4s var(--easing-emphasized); }
+.reaction-anim-surprise { animation: reaction-pop 0.3s var(--easing-emphasized); }
+.reaction-anim-like { animation: reaction-pulse 0.3s var(--easing-emphasized); }
+
+/* 감정 스트라이프 그라데이션 */
+.emotion-stripe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 999px 0 0 999px;
 }

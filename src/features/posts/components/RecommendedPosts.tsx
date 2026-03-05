@@ -13,9 +13,7 @@ interface RecommendedPostsProps {
 }
 
 export function RecommendedPosts({ postId, hasEmotions }: RecommendedPostsProps) {
-  const { data, isLoading } = useRecommendedPosts(postId, hasEmotions)
-
-  if (!hasEmotions) return null
+  const { data, isLoading } = useRecommendedPosts(postId)
 
   if (isLoading) {
     return (
@@ -32,9 +30,11 @@ export function RecommendedPosts({ postId, hasEmotions }: RecommendedPostsProps)
 
   if (!data?.length) return null
 
+  const headerText = hasEmotions ? '비슷한 감정의 글' : '다른 인기 글'
+
   return (
     <div className="space-y-2">
-      <p className="text-sm font-medium text-muted-foreground">비슷한 감정의 글</p>
+      <p className="text-sm font-medium text-muted-foreground">{headerText}</p>
       <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x">
         {(data as RecommendedPost[]).map((post) => (
           <Link
@@ -43,7 +43,7 @@ export function RecommendedPosts({ postId, hasEmotions }: RecommendedPostsProps)
             className="shrink-0 snap-start w-44 rounded-lg border bg-card p-3 hover:bg-accent/50 transition-colors space-y-1"
           >
             <div className="flex gap-1 flex-wrap">
-              {post.emotions.slice(0, 2).map(e => (
+              {post.emotions?.slice(0, 2).map(e => (
                 <span key={e} className="text-xs">{EMOTION_EMOJI[e] ?? '💬'} {e}</span>
               ))}
             </div>

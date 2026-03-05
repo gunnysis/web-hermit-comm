@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-import * as Sentry from '@sentry/nextjs'
+import { logger } from '@/lib/logger'
 
 export default function Error({
   error,
@@ -12,7 +12,7 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    Sentry.captureException(error)
+    logger.error(error)
   }, [error])
 
   return (

@@ -2,7 +2,7 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { makeQueryClient } from '@/lib/query-client'
 import { Header } from '@/components/layout/Header'
 import { PublicFeed } from '@/features/posts/components/PublicFeed'
-import { getBoardPostsServer, getEmotionTrendServer } from '@/features/posts/api/postsApi.server'
+import { getBoardPostsServer, getEmotionTrendServer, getTrendingPostsServer } from '@/features/posts/api/postsApi.server'
 import { DEFAULT_PUBLIC_BOARD_ID, PAGE_SIZE } from '@/lib/constants'
 import type { PostWithCounts } from '@/types/database'
 
@@ -21,6 +21,10 @@ export default async function HomePage() {
     queryClient.prefetchQuery({
       queryKey: ['emotionTrend', 7],
       queryFn: () => getEmotionTrendServer(),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ['trendingPosts'],
+      queryFn: () => getTrendingPostsServer(),
     }),
   ])
 

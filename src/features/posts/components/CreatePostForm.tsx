@@ -16,6 +16,7 @@ import { useAuthContext } from '@/features/auth/AuthProvider'
 import { resolveDisplayName } from '@/lib/anonymous'
 import { DEFAULT_PUBLIC_BOARD_ID } from '@/lib/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { MoodSelector } from './MoodSelector'
 
 const RichEditor = dynamic(() => import('./RichEditor').then(m => m.RichEditor), {
   ssr: false,
@@ -29,6 +30,7 @@ export function CreatePostForm() {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [initialEmotions, setInitialEmotions] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } =
@@ -79,6 +81,7 @@ export function CreatePostForm() {
         is_anonymous: true,
         display_name,
         image_url,
+        ...(initialEmotions.length > 0 ? { initial_emotions: initialEmotions } : {}),
       })
 
       queryClient.invalidateQueries({ queryKey: ['boardPosts', DEFAULT_PUBLIC_BOARD_ID] })
@@ -102,6 +105,9 @@ export function CreatePostForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* 감정 선택 */}
+      <MoodSelector value={initialEmotions} onChange={setInitialEmotions} />
+
       {/* 제목 */}
       <div className="space-y-1">
         <Input

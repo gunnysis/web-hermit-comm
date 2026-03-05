@@ -25,8 +25,10 @@ import { CommentSection } from '@/features/comments/components/CommentSection'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQueryClient, useQuery } from '@tanstack/react-query'
 import { RefreshCw } from 'lucide-react'
+import { EMOTION_COLOR_MAP } from '@/lib/constants'
+import { getSimilarFeelingCount } from '../api/postsApi'
 
 interface PostDetailViewProps {
   postId: number
@@ -83,6 +85,15 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
   // 분석 데이터 도착 시 스피너 해제
   const emotions = analysis?.emotions ?? post?.emotions
   const hasEmotions = (emotions?.length ?? 0) > 0
+  const primaryEmotion = emotions?.[0]
+  const emotionColors = primaryEmotion ? EMOTION_COLOR_MAP[primaryEmotion] : null
+
+  const { data: similarCount } = useQuery({
+    queryKey: ['similarFeeling', postId],
+    queryFn: () => getSimilarFeelingCount(postId),
+    enabled: hasEmotions,
+    staleTime: 5 * 60 * 1000,
+  })
 
   useEffect(() => {
     if (hasEmotions && isRetryingAnalysis) {
@@ -186,9 +197,26 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
         </div>
       </div>
 
+      {/* 감정 그라데이션 밴드 */}
+      {emotionColors && (
+        <div
+          className="rounded-xl px-5 py-4 -mx-1"
+          style={{ background: `linear-gradient(135deg, ${emotionColors.gradient[0]}, ${emotionColors.gradient[1]})` }}
+        >
+          <h1 className="text-2xl font-bold leading-tight tracking-tight">{post.title}</h1>
+          {(similarCount ?? 0) > 0 && (
+            <p className="text-sm text-muted-foreground mt-2">
+              지난 30일간 {similarCount}명이 비슷한 마음이었어요
+            </p>
+          )}
+        </div>
+      )}
+
       {/* 제목 및 메타 */}
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold leading-tight tracking-tight">{post.title}</h1>
+        {!emotionColors && (
+          <h1 className="text-2xl font-bold leading-tight tracking-tight">{post.title}</h1>
+        )}
         <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
           <span className="font-medium">{post.display_name}</span>
           <span aria-hidden>·</span>
@@ -252,12 +280,8 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       <ReactionBar postId={postId} userId={user?.id ?? null} />
 
       {/* 추천 게시글 */}
-      {hasEmotions && (
-        <>
-          <Separator />
-          <RecommendedPosts postId={postId} hasEmotions={hasEmotions} />
-        </>
-      )}
+      <Separator />
+      <RecommendedPosts postId={postId} hasEmotions={hasEmotions} />
 
       <Separator />
 

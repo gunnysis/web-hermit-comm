@@ -56,3 +56,12 @@ export async function getReactionsServer(postId: number) {
   const { data } = await supabase.rpc('get_post_reactions', { p_post_id: postId })
   return data ?? []
 }
+
+export async function getTrendingPostsServer(hours = 72, limit = 10) {
+  const supabase = await createClient()
+  const { data } = await supabase.rpc('get_trending_posts', {
+    p_hours: hours,
+    p_limit: limit,
+  })
+  return data ?? []
+}

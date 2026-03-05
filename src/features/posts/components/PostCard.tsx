@@ -4,7 +4,7 @@ import { formatDistanceToNow } from "date-fns"
 import { ko } from "date-fns/locale"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import type { PostWithCounts } from "@/types/database"
-import { EMOTION_EMOJI } from "@/lib/constants"
+import { EMOTION_EMOJI, EMOTION_COLOR_MAP } from "@/lib/constants"
 import { getEmotionClassName } from "@/lib/emotion-category"
 
 interface PostCardProps {
@@ -34,10 +34,18 @@ export function PostCard({ post }: PostCardProps) {
   const commentCount = post.comment_count ?? 0
   const visibleEmotions = post.emotions?.slice(0, 2) ?? []
   const moreEmotions = (post.emotions?.length ?? 0) - 2
+  const primaryEmotion = post.emotions?.[0]
+  const stripeColors = primaryEmotion ? EMOTION_COLOR_MAP[primaryEmotion] : null
 
   return (
     <Link href={`/post/${post.id}`} className="block group">
-      <Card className="card-hover border-border/60 group-hover:border-border transition-all duration-200 active:scale-[0.98]">
+      <Card className="card-hover border-border/60 group-hover:border-border transition-all duration-200 active:scale-[0.98] relative overflow-hidden">
+        {stripeColors && (
+          <div
+            className="emotion-stripe"
+            style={{ background: `linear-gradient(to bottom, ${stripeColors.gradient[0]}, ${stripeColors.gradient[1]})` }}
+          />
+        )}
         <CardHeader className="pb-2 space-y-1.5">
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-happy-50 text-happy-700 dark:bg-happy-900/40 dark:text-happy-300">

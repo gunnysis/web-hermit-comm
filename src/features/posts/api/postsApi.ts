@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/client'
 import type { PostWithCounts, CreatePostRequest, Post } from '@/types/database'
 import { PAGE_SIZE } from '@/lib/constants'
+import { addBreadcrumb } from '@/lib/logger'
 
 export async function getBoardPosts(
   boardId: number,
@@ -24,6 +25,7 @@ export async function getBoardPosts(
 
   const { data, error } = await query.range(from, to)
   if (error) throw error
+  addBreadcrumb('posts', 'getBoardPosts', { boardId, page, sortOrder, count: data?.length ?? 0 })
   return (data ?? []) as PostWithCounts[]
 }
 
@@ -48,6 +50,7 @@ export async function createPost(
     .select()
     .single()
   if (error) throw error
+  addBreadcrumb('posts', 'createPost', { postId: data.id })
   return data as Post
 }
 
@@ -77,6 +80,7 @@ export async function deletePost(postId: number): Promise<void> {
     p_post_id: postId,
   })
   if (error) throw new Error('게시글을 삭제할 수 없습니다. 권한이 없거나 이미 삭제된 게시글입니다.')
+  addBreadcrumb('posts', 'deletePost', { postId })
 }
 
 export async function getPostAnalysis(postId: number) {
@@ -97,6 +101,28 @@ export async function invokeAnalyzeOnDemand(postId: number, content?: string, ti
   if (error) throw error
 }
 
+export async function getPostsByEmotion(emotion: string, limit = 20, offset = 0): Promise<PostWithCounts[]> {
+  const supabase = createClient()
+  // RPC는 마이그레이션 push 후 gen-types로 타입 갱신 필요
+  const { data, error } = await supabase.rpc('get_posts_by_emotion', {
+    p_emotion: emotion,
+    p_limit: limit,
+    p_offset: offset,
+  })
+  if (error) throw error
+  return (data ?? []) as PostWithCounts[]
+}
+
+export async function getSimilarFeelingCount(postId: number, days = 30): Promise<number> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_similar_feeling_count', {
+    p_post_id: postId,
+    p_days: days,
+  })
+  if (error) throw error
+  return (data as number) ?? 0
+}
+
 export async function getEmotionTrend(days = 7) {
   const supabase = createClient()
   const { data, error } = await supabase.rpc('get_emotion_trend', { days })
@@ -108,6 +134,16 @@ export async function getRecommendedPosts(postId: number, limit = 10) {
   const supabase = createClient()
   const { data, error } = await supabase.rpc('get_recommended_posts_by_emotion', {
     p_post_id: postId,
+    p_limit: limit,
+  })
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getTrendingPosts(hours = 72, limit = 10) {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_trending_posts', {
+    p_hours: hours,
     p_limit: limit,
   })
   if (error) throw error

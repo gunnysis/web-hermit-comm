@@ -19,5 +19,8 @@ export const ANIMALS = [
 ]
 
 // 감정·디자인 토큰 상수는 중앙 프로젝트에서 생성됨 (constants.generated.ts)
-export { ALLOWED_EMOTIONS, EMOTION_EMOJI, REACTION_COLOR_MAP, SHARED_PALETTE } from './constants.generated'
+export {
+  ALLOWED_EMOTIONS, EMOTION_EMOJI, REACTION_COLOR_MAP, SHARED_PALETTE,
+  EMOTION_COLOR_MAP, MOTION, EMPTY_STATE_MESSAGES, GREETING_MESSAGES,
+} from './constants.generated'
 export type { AllowedEmotion, ReactionColorKey } from './constants.generated'
