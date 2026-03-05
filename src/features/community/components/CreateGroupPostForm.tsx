@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import dynamic from 'next/dynamic'
 import { postSchema, type PostFormValues } from '@/lib/schemas'
+import { MoodSelector } from '@/features/posts/components/MoodSelector'
 import { createGroupPost } from '../api/communityApi'
 import { uploadPostImage } from '@/features/posts/api/uploadImage'
 import { useAuthContext } from '@/features/auth/AuthProvider'
@@ -35,6 +36,7 @@ export function CreateGroupPostForm({ groupId }: CreateGroupPostFormProps) {
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [initialEmotions, setInitialEmotions] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const activeBoardId = selectedBoardId ?? boards?.[0]?.id ?? null
@@ -71,6 +73,7 @@ export function CreateGroupPostForm({ groupId }: CreateGroupPostFormProps) {
         is_anonymous: true,
         display_name,
         image_url,
+        initial_emotions: initialEmotions.length > 0 ? initialEmotions : undefined,
       })
 
       queryClient.invalidateQueries({ queryKey: ['groupPosts', groupId] })
@@ -113,6 +116,11 @@ export function CreateGroupPostForm({ groupId }: CreateGroupPostFormProps) {
       <div className="space-y-1">
         <RichEditor value={content} onChange={(html) => setValue('content', html, { shouldValidate: true })} placeholder="내용을 입력하세요..." />
         {errors.content && <p className="text-xs text-destructive">{errors.content.message}</p>}
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-sm font-medium text-muted-foreground">지금 어떤 마음인가요? (선택)</label>
+        <MoodSelector value={initialEmotions} onChange={setInitialEmotions} />
       </div>
 
       <div>
