@@ -28,7 +28,6 @@ export function CommentForm({ userId, boardId = DEFAULT_PUBLIC_BOARD_ID, groupId
       {
         request: {
           content: content.trim(),
-          author: display_name,
           author_id: userId,
           board_id: boardId,
           group_id: groupId,

@@ -65,7 +65,6 @@ export function CreateGroupPostForm({ groupId }: CreateGroupPostFormProps) {
       const post = await createGroupPost({
         title: values.title,
         content: values.content,
-        author: display_name,
         author_id: user.id,
         board_id: activeBoardId,
         group_id: groupId,

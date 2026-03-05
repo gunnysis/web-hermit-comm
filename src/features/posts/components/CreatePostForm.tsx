@@ -74,7 +74,6 @@ export function CreatePostForm() {
       const post = await createPost({
         title: values.title,
         content: values.content,
-        author: display_name,
         author_id: user.id,
         board_id: DEFAULT_PUBLIC_BOARD_ID,
         is_anonymous: true,
