@@ -11,6 +11,7 @@ import { PostCard } from './PostCard'
 import { PostCardSkeleton } from './PostCardSkeleton'
 import { EmptyState } from '@/components/ui/empty-state'
 import { searchPosts, getPostsByEmotion } from '../api/postsApi'
+import type { PostWithCounts } from '@/types/database'
 
 export function SearchView() {
   const searchParams = useSearchParams()
@@ -34,12 +35,15 @@ export function SearchView() {
     return () => clearTimeout(timer)
   }, [input, emotion, router])
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<PostWithCounts[]>({
     queryKey: ['search', query, emotion],
-    queryFn: () => {
-      if (query) return searchPosts(query)
+    queryFn: async () => {
+      if (query) {
+        const results = await searchPosts(query)
+        return results as unknown as PostWithCounts[]
+      }
       if (emotion) return getPostsByEmotion(emotion)
-      return Promise.resolve([])
+      return []
     },
     enabled: query.length > 0 || !!emotion,
     staleTime: 30 * 1000,
