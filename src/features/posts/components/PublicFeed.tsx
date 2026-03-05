@@ -57,7 +57,7 @@ export function PublicFeed() {
   }
 
   return (
-    <div className="space-y-4 animate-fade-in">
+    <div className="space-y-4 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
       <GreetingBanner />
       <CommunityPulse onEmotionSelect={handleEmotionSelect} selectedEmotion={emotionFilter} />
       <EmotionFilterBar selected={emotionFilter} onSelect={handleEmotionSelect} />

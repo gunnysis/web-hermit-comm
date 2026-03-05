@@ -29,6 +29,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query'
 import { RefreshCw } from 'lucide-react'
 import { EMOTION_COLOR_MAP } from '@/lib/constants'
 import { getSimilarFeelingCount } from '../api/postsApi'
+import { startViewTransition } from '@/lib/view-transition'
 
 interface PostDetailViewProps {
   postId: number
@@ -139,18 +140,20 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
   })
 
   return (
-    <article className="space-y-6 animate-fade-in">
+    <article className="space-y-6 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
       {/* 상단 내비게이션 */}
       <div className="flex items-center justify-between">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => {
-            if (window.history.length > 1) {
-              router.back()
-            } else {
-              router.push(post?.group_id ? `/groups/${post.group_id}` : '/')
-            }
+            startViewTransition(() => {
+              if (window.history.length > 1) {
+                router.back()
+              } else {
+                router.push(post?.group_id ? `/groups/${post.group_id}` : '/')
+              }
+            }, 'back')
           }}
           className="-ml-2"
         >

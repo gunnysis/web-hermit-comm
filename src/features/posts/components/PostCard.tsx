@@ -1,4 +1,6 @@
-import Link from "next/link"
+"use client"
+
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { formatDistanceToNow } from "date-fns"
 import { ko } from "date-fns/locale"
@@ -6,6 +8,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import type { PostWithCounts } from "@/types/database"
 import { EMOTION_EMOJI, EMOTION_COLOR_MAP } from "@/lib/constants"
 import { getEmotionClassName } from "@/lib/emotion-category"
+import { startViewTransition } from "@/lib/view-transition"
 
 interface PostCardProps {
   post: PostWithCounts
@@ -19,6 +22,7 @@ function formatCount(n: number): string {
 }
 
 export function PostCard({ post }: PostCardProps) {
+  const router = useRouter()
   const timeAgo = formatDistanceToNow(new Date(post.created_at), {
     addSuffix: true,
     locale: ko,
@@ -37,8 +41,14 @@ export function PostCard({ post }: PostCardProps) {
   const primaryEmotion = post.emotions?.[0]
   const stripeColors = primaryEmotion ? EMOTION_COLOR_MAP[primaryEmotion] : null
 
+  const handleClick = () => {
+    startViewTransition(() => {
+      router.push(`/post/${post.id}`)
+    })
+  }
+
   return (
-    <Link href={`/post/${post.id}`} className="block group">
+    <div onClick={handleClick} className="block group cursor-pointer" role="link" aria-label={post.title}>
       <Card className="card-hover border-border/60 group-hover:border-border transition-all duration-200 active:scale-[0.98] relative overflow-hidden">
         {stripeColors && (
           <div
@@ -110,6 +120,6 @@ export function PostCard({ post }: PostCardProps) {
           )}
         </CardFooter>
       </Card>
-    </Link>
+    </div>
   )
 }

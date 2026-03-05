@@ -392,3 +392,39 @@
   width: 3px;
   border-radius: 999px 0 0 999px;
 }
+
+/* ─── View Transitions (페이지 전환 애니메이션) ─── */
+
+/* 기본 페이지 전환: 부드러운 크로스페이드 + 미세한 슬라이드 */
+::view-transition-old(page-content) {
+  animation: vt-fade-out 0.25s var(--easing-standard) both;
+}
+::view-transition-new(page-content) {
+  animation: vt-fade-in 0.3s var(--easing-emphasized) both;
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes vt-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 뒤로 가기 전환: 반대 방향 */
+.vt-back::view-transition-old(page-content) {
+  animation: vt-back-out 0.25s var(--easing-standard) both;
+}
+.vt-back::view-transition-new(page-content) {
+  animation: vt-back-in 0.3s var(--easing-emphasized) both;
+}
+
+@keyframes vt-back-out {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(12px); }
+}
+@keyframes vt-back-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
