@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = post.title.replace(/<[^>]*>/g, '')
-  const description = post.content.replace(/<[^>]*>/g, '').slice(0, 160)
+  const description = (post.content ?? '').replace(/<[^>]*>/g, '').slice(0, 160)
 
   return {
     title: `${title} | 은둔마을`,

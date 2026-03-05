@@ -40,7 +40,7 @@ export function TrendingPosts() {
             <p className="text-xs text-muted-foreground truncate">{post.display_name}</p>
             {post.emotions && post.emotions.length > 0 && (
               <div className="flex gap-1 flex-wrap">
-                {post.emotions.slice(0, 2).map(e => (
+                {post.emotions?.slice(0, 2).map(e => (
                   <span key={e} className="text-xs">{EMOTION_EMOJI[e] ?? '💬'} {e}</span>
                 ))}
               </div>

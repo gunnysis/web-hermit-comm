@@ -28,7 +28,7 @@ export function PostCard({ post }: PostCardProps) {
     locale: ko,
   })
 
-  const preview = post.content
+  const preview = (post.content ?? '')
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim()
