@@ -10,7 +10,7 @@ import { EMOTION_EMOJI } from '@/lib/constants'
 import { PostCard } from './PostCard'
 import { PostCardSkeleton } from './PostCardSkeleton'
 import { EmptyState } from '@/components/ui/empty-state'
-import { searchPosts } from '../api/searchApi'
+import { searchPosts, getPostsByEmotion } from '../api/postsApi'
 
 export function SearchView() {
   const searchParams = useSearchParams()
@@ -36,20 +36,25 @@ export function SearchView() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['search', query, emotion],
-    queryFn: () => searchPosts(query, { emotion: emotion || undefined }),
+    queryFn: () => {
+      if (query) return searchPosts(query)
+      if (emotion) return getPostsByEmotion(emotion)
+      return Promise.resolve([])
+    },
     enabled: query.length > 0 || !!emotion,
     staleTime: 30 * 1000,
   })
 
   return (
     <div className="space-y-4">
-      <div className="relative">
+      <div className="relative" role="search">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="게시글 검색..."
           className="pl-9"
+          aria-label="게시글 검색"
           autoFocus
         />
       </div>
@@ -59,7 +64,7 @@ export function SearchView() {
           <Badge variant="secondary" className="text-xs gap-1">
             <span>{EMOTION_EMOJI[emotion] ?? '💬'}</span>
             {emotion}
-            <button onClick={() => router.replace('/search', { scroll: false })} className="ml-1 hover:text-foreground">
+            <button onClick={() => router.replace('/search', { scroll: false })} className="ml-1 hover:text-foreground" aria-label={`${emotion} 감정 필터 제거`}>
               <X size={12} />
             </button>
           </Badge>
@@ -76,7 +81,7 @@ export function SearchView() {
         <EmptyState icon={Search} title={`'${query}'에 대한 검색 결과가 없습니다`} description="다른 검색어로 시도해보세요." />
       )}
 
-      {!query && (
+      {!query && !emotion && (
         <EmptyState icon={Search} title="검색어를 입력하세요" />
       )}
 

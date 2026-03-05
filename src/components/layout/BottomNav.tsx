@@ -16,7 +16,7 @@ export function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <nav aria-label="메인 내비게이션" className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="flex h-16 items-center" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         {NAV_ITEMS.map(({ href, icon: Icon, label }) => {
           const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href)
@@ -24,6 +24,7 @@ export function BottomNav() {
             <Link
               key={href}
               href={href}
+              aria-current={isActive ? 'page' : undefined}
               className={cn(
                 'flex flex-1 flex-col items-center justify-center gap-1 py-2 text-xs transition-colors',
                 isActive
