@@ -149,3 +149,14 @@ export async function getTrendingPosts(hours = 72, limit = 10) {
   if (error) throw error
   return data ?? []
 }
+
+export async function searchPosts(query: string, limit = 20, offset = 0) {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('search_posts', {
+    p_query: query,
+    p_limit: limit,
+    p_offset: offset,
+  })
+  if (error) throw error
+  return data ?? []
+}

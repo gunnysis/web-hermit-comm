@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { makeQueryClient } from '@/lib/query-client'
 import { Header } from '@/components/layout/Header'
@@ -12,14 +13,28 @@ interface PageProps {
   params: Promise<{ id: string }>
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params
   const post = await getPostServer(parseInt(id, 10))
-  if (!post) return { title: '게시글 | 은둔마을' }
-  const plain = post.title.replace(/<[^>]+>/g, '')
+
+  if (!post) {
+    return {
+      title: '게시글 | 은둔마을',
+      description: '은둔마을에서 마음을 나눠보세요.',
+    }
+  }
+
+  const title = post.title.replace(/<[^>]*>/g, '')
+  const description = post.content.replace(/<[^>]*>/g, '').slice(0, 160)
+
   return {
-    title: `${plain} | 은둔마을`,
-    description: post.content.replace(/<[^>]+>/g, '').slice(0, 120),
+    title: `${title} | 은둔마을`,
+    description,
+    openGraph: {
+      title: `${title} | 은둔마을`,
+      description,
+      type: 'article',
+    },
   }
 }
 
