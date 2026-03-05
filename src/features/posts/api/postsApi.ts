@@ -56,7 +56,7 @@ export async function createPost(
 
 export async function updatePost(
   postId: number,
-  update: Partial<Pick<Post, 'title' | 'content' | 'image_url'>>,
+  update: Partial<Pick<Post, 'title' | 'content' | 'image_url' | 'initial_emotions'>>,
 ): Promise<Post> {
   const supabase = createClient()
   const { data, error } = await supabase

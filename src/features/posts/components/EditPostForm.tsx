@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import dynamic from 'next/dynamic'
 import { postSchema, type PostFormValues } from '@/lib/schemas'
+import { MoodSelector } from './MoodSelector'
 import { updatePost } from '../api/postsApi'
 import { usePostDetail } from '../hooks/usePostDetail'
 import { useAuthContext } from '@/features/auth/AuthProvider'
@@ -30,6 +31,7 @@ export function EditPostForm({ postId }: EditPostFormProps) {
   const queryClient = useQueryClient()
   const { data: post, isLoading } = usePostDetail(postId)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [initialEmotions, setInitialEmotions] = useState<string[]>([])
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } =
     useForm<PostFormValues>({
@@ -41,6 +43,7 @@ export function EditPostForm({ postId }: EditPostFormProps) {
   useEffect(() => {
     if (post) {
       reset({ title: post.title, content: post.content })
+      setInitialEmotions(post.initial_emotions ?? [])
     }
   }, [post, reset])
 
@@ -60,7 +63,11 @@ export function EditPostForm({ postId }: EditPostFormProps) {
   const onSubmit = async (values: PostFormValues) => {
     setIsSubmitting(true)
     try {
-      await updatePost(postId, { title: values.title, content: values.content })
+      await updatePost(postId, {
+        title: values.title,
+        content: values.content,
+        initial_emotions: initialEmotions.length > 0 ? initialEmotions : null,
+      })
       queryClient.invalidateQueries({ queryKey: ['post', postId] })
       if (post.board_id) queryClient.invalidateQueries({ queryKey: ['boardPosts', post.board_id] })
       if (post.group_id) queryClient.invalidateQueries({ queryKey: ['groupPosts', post.group_id] })
@@ -90,6 +97,11 @@ export function EditPostForm({ postId }: EditPostFormProps) {
           onChange={(html) => setValue('content', html, { shouldValidate: true })}
         />
         {errors.content && <p className="text-xs text-destructive">{errors.content.message}</p>}
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-sm font-medium text-muted-foreground">지금 어떤 마음인가요? (선택)</label>
+        <MoodSelector value={initialEmotions} onChange={setInitialEmotions} />
       </div>
 
       <div className="flex gap-2 justify-end">
