@@ -36,13 +36,50 @@ Node.js 22 필수. nvm 사용 시: `export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/n
 - 서버 전용: 접두어 없이 (`SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY` 등)
 - `.env.local` — git 제외. `.env.example` — 빈 템플릿으로 커밋.
 
+### 감정 시각화 컴포넌트
+`src/features/posts/components/`에 감정 관련 UI 컴포넌트:
+- `CommunityPulse.tsx` — 커뮤니티 감정 버블 시각화 (크기=비율)
+- `EmotionFilterBar.tsx` — 감정 필터 칩 가로 스크롤
+- `TrendingPosts.tsx` — 트렌딩 게시글 가로 스크롤 카드
+- `GreetingBanner.tsx` — 시간대별 인사 배너
+- `MoodSelector.tsx` — 글쓰기 감정 선택 (멀티 셀렉트, 최대 3개)
+- `EmotionCalendar.tsx` — 감정 캘린더 히트맵 (30일)
+- `EmotionWave.tsx` — 감정 타임라인 스택 차트 (7일)
+
+### 라우트 목록 (11개)
+| 라우트 | 설명 |
+|---|---|
+| `/` | 홈 (PublicFeed + SSR prefetch) |
+| `/my` | 나의 공간 (활동 요약 + 감정 캘린더 + 타임라인) |
+| `/create` | 글쓰기 |
+| `/post/[id]` | 게시글 상세 |
+| `/post/[id]/edit` | 게시글 수정 |
+| `/search` | 검색 |
+| `/groups` | 그룹 목록 |
+| `/groups/[groupId]` | 그룹 상세 |
+| `/groups/[groupId]/create` | 그룹 글쓰기 |
+| `/admin` | 관리자 대시보드 |
+| `/admin/login` | 관리자 로그인 |
+
 ### 디렉터리 확장 방향
 기능이 추가될 때 `src/features/`, `src/hooks/`, `src/types/`, `src/lib/validations/` 등을 단계적으로 도입. `src/app/`에는 라우트·레이아웃·페이지만 두고 비즈니스 로직은 분리.
 
 ### Sentry
 - `next.config.ts`: `withSentryConfig` 래핑. org: `gunnys`, project: `gns-hermit-comm`.
 - `sentry.client.config.ts` / `sentry.server.config.ts` / `sentry.edge.config.ts` 세 파일로 분리.
+- `src/instrumentation.ts`: Next.js 서버/엣지 런타임에서 Sentry 초기화 (`register()` + `onRequestError`).
+- `src/app/global-error.tsx`: 루트 레이아웃 에러 바운더리 (Sentry 캡처 + 재시도 버튼).
+- **PII 필터**: `beforeSend`에서 이메일 정규식 치환 + `email|password|author|display_name` 필드 `[redacted]` 처리.
+- **Replay**: 에러 발생 시 50% 샘플링 (maskAllText, blockAllMedia). 세션 리플레이 비활성화.
+- **Trace**: 프로덕션 10%, 개발 100%.
+- `src/lib/logger.ts`: Sentry 연동 로거 (dev=console, prod=Sentry captureException/captureMessage).
 - 빌드 시 소스맵 업로드에 `SENTRY_AUTH_TOKEN` 환경 변수 필요.
+
+### View Transitions
+- `src/lib/view-transition.ts`: 네이티브 View Transitions API 래퍼 (미지원 브라우저 폴백).
+- `PostCard` → `PostDetailView` 전환 시 `startViewTransition()` 사용.
+- `globals.css`에 `::view-transition-old/new(page-content)` 애니메이션 정의.
+- `.vt-back` 클래스로 뒤로가기 방향 전환.
 
 ## 멀티프로젝트 관리
 
