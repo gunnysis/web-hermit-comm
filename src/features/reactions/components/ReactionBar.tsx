@@ -1,8 +1,18 @@
 "use client"
 
+import { useState, useRef, useCallback } from "react"
 import { cn } from "@/lib/utils"
 import { useReactions } from "../hooks/useReactions"
 import { REACTION_COLOR_MAP, SHARED_PALETTE } from "@/lib/constants.generated"
+
+/** 리액션 타입별 CSS 애니메이션 클래스 */
+const REACTION_ANIM_CLASS: Record<string, string> = {
+  like: "reaction-anim-like",
+  heart: "reaction-anim-heart",
+  laugh: "reaction-anim-laugh",
+  sad: "reaction-anim-sad",
+  surprise: "reaction-anim-surprise",
+}
 
 /** 반응 타입 정의 — 앱과 동일한 named type 시스템 */
 const REACTION_TYPES = [
@@ -38,6 +48,8 @@ interface ReactionBarProps {
 
 export function ReactionBar({ postId, userId }: ReactionBarProps) {
   const { reactions, toggle, isPending } = useReactions(postId, userId)
+  const [animatingType, setAnimatingType] = useState<string | null>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
 
   const getCount = (type: string) =>
     reactions.find((r) => r.reaction_type === type)?.count ?? 0
@@ -54,6 +66,13 @@ export function ReactionBar({ postId, userId }: ReactionBarProps) {
     if (countA === 0 && countB > 0) return 1
     return countB - countA
   })
+
+  const handleToggle = useCallback((type: string) => {
+    toggle(type)
+    setAnimatingType(type)
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => setAnimatingType(null), 500)
+  }, [toggle])
 
   return (
     <div aria-label="반응 버튼 목록">
@@ -79,7 +98,7 @@ export function ReactionBar({ postId, userId }: ReactionBarProps) {
             <button
               key={type}
               disabled={isPending || !userId}
-              onClick={() => toggle(type)}
+              onClick={() => handleToggle(type)}
               aria-label={`${label} ${count}개, ${active ? "누르면 취소" : "누르면 추가"}`}
               aria-pressed={active}
               style={
@@ -99,6 +118,7 @@ export function ReactionBar({ postId, userId }: ReactionBarProps) {
                 "transition-all duration-200 active:scale-95",
                 "disabled:opacity-50 disabled:cursor-not-allowed",
                 !active && "bg-card border-border hover:bg-accent shadow-sm hover:shadow-md",
+                animatingType === type && REACTION_ANIM_CLASS[type],
               )}
             >
               <span className={hasCount ? "text-lg" : "text-base"}>{emoji}</span>
