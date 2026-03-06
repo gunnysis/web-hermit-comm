@@ -57,7 +57,7 @@ export function PublicFeed() {
   }
 
   return (
-    <div className="space-y-4 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
+    <div className="space-y-3 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
       <GreetingBanner />
       <CommunityPulse onEmotionSelect={handleEmotionSelect} selectedEmotion={emotionFilter} />
       <EmotionFilterBar selected={emotionFilter} onSelect={handleEmotionSelect} />
@@ -99,7 +99,7 @@ export function PublicFeed() {
         </p>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-2.5">
         {loading
           ? Array.from({ length: 5 }).map((_, i) => <PostCardSkeleton key={i} />)
           : posts.map((post) => <PostCard key={post.id} post={post} />)}

@@ -16,7 +16,7 @@ export function TrendingPosts() {
         <Skeleton className="h-4 w-28" />
         <div className="flex gap-3 overflow-x-auto pb-1">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="shrink-0 h-24 w-44 rounded-lg" />
+            <Skeleton key={i} className="shrink-0 h-24 w-40 rounded-lg" />
           ))}
         </div>
       </div>
@@ -34,7 +34,7 @@ export function TrendingPosts() {
           <Link
             key={post.id}
             href={`/post/${post.id}`}
-            className="shrink-0 snap-start w-44 rounded-lg border bg-card p-3 hover:bg-accent/50 transition-colors space-y-1"
+            className="shrink-0 snap-start w-40 rounded-lg border bg-card p-2.5 hover:bg-accent/50 transition-colors space-y-1"
           >
             <p className="text-xs font-medium line-clamp-2 leading-snug">{post.title}</p>
             <p className="text-xs text-muted-foreground truncate">{post.display_name}</p>

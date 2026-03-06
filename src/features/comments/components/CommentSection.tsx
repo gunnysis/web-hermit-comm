@@ -17,7 +17,7 @@ export function CommentSection({ postId, userId, boardId, groupId }: CommentSect
   const { query, createMutation, updateMutation, deleteMutation } = useComments(postId)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <h3 className="font-semibold">
         댓글 {query.data ? `${query.data.length}개` : ''}
       </h3>

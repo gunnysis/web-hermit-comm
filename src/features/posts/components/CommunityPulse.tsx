@@ -21,9 +21,9 @@ export function CommunityPulse({ onEmotionSelect, selectedEmotion }: CommunityPu
   const bubbles = useMemo(() => {
     if (!trends.length) return []
     const maxPct = Math.max(...trends.map((t) => t.pct ?? 0))
-    return trends.slice(0, 8).map((t) => {
+    return trends.slice(0, 5).map((t) => {
       const pct = t.pct ?? 0
-      const size = Math.max(36, Math.min(72, (pct / (maxPct || 1)) * 72))
+      const size = Math.max(32, Math.min(56, (pct / (maxPct || 1)) * 56))
       const colors = EMOTION_COLOR_MAP[t.emotion]
       return { ...t, size, colors }
     })

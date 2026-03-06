@@ -16,9 +16,9 @@ export function GreetingBanner() {
   const { greeting, message } = GREETING_MESSAGES[slot]
 
   return (
-    <div className="rounded-xl bg-gradient-to-r from-cream-50 to-happy-50 dark:from-stone-800 dark:to-stone-800/80 px-5 py-4 animate-fade-in">
-      <p className="text-base font-semibold text-foreground">{greeting}</p>
-      <p className="text-sm text-muted-foreground mt-0.5">{message}</p>
+    <div className="rounded-xl bg-gradient-to-r from-cream-50 to-happy-50 dark:from-stone-800 dark:to-stone-800/80 px-4 py-3 animate-fade-in">
+      <p className="text-sm font-semibold text-foreground">{greeting}</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{message}</p>
     </div>
   )
 }

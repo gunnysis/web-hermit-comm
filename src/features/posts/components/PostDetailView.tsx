@@ -142,7 +142,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
   })
 
   return (
-    <article className="space-y-6 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
+    <article className="space-y-4 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
       {/* 상단 내비게이션 */}
       <div className="flex items-center justify-between">
         <Button
@@ -205,12 +205,12 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       {/* 감정 그라데이션 밴드 */}
       {emotionColors && (
         <div
-          className="rounded-xl px-5 py-4 -mx-1"
+          className="rounded-xl px-4 py-3 -mx-1"
           style={{ background: `linear-gradient(135deg, ${emotionColors.gradient[0]}, ${emotionColors.gradient[1]})` }}
         >
           <h1 className="text-2xl font-bold leading-tight tracking-tight">{post.title}</h1>
           {(similarCount ?? 0) > 0 && (
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-sm text-muted-foreground mt-1">
               지난 30일간 {similarCount}명이 비슷한 마음이었어요
             </p>
           )}

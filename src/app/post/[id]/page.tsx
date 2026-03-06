@@ -61,7 +61,7 @@ export default async function PostPage({ params }: PageProps) {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <Header />
-      <main className="max-w-2xl mx-auto px-4 py-6 pb-24 md:pb-6">
+      <main className="max-w-2xl mx-auto px-4 py-4 pb-24 md:pb-6">
         <PostDetailView postId={postId} />
       </main>
     </HydrationBoundary>

@@ -21,7 +21,7 @@ export function RecommendedPosts({ postId, hasEmotions }: RecommendedPostsProps)
         <Skeleton className="h-4 w-24" />
         <div className="flex gap-3 overflow-x-auto pb-1">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="shrink-0 h-20 w-44 rounded-lg" />
+            <Skeleton key={i} className="shrink-0 h-20 w-40 rounded-lg" />
           ))}
         </div>
       </div>
@@ -40,7 +40,7 @@ export function RecommendedPosts({ postId, hasEmotions }: RecommendedPostsProps)
           <Link
             key={post.id}
             href={`/post/${post.id}`}
-            className="shrink-0 snap-start w-44 rounded-lg border bg-card p-3 hover:bg-accent/50 transition-colors space-y-1"
+            className="shrink-0 snap-start w-40 rounded-lg border bg-card p-2.5 hover:bg-accent/50 transition-colors space-y-1"
           >
             <div className="flex gap-1 flex-wrap">
               {post.emotions?.slice(0, 2).map(e => (
