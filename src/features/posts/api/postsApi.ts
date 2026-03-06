@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/client'
-import type { PostWithCounts, CreatePostRequest, Post } from '@/types/database'
+import type { PostWithCounts, CreatePostRequest, Post, SearchResult, SearchSort } from '@/types/database'
 import { PAGE_SIZE } from '@/lib/constants'
 import { addBreadcrumb } from '@/lib/logger'
 
@@ -150,13 +150,25 @@ export async function getTrendingPosts(hours = 72, limit = 10) {
   return data ?? []
 }
 
-export async function searchPosts(query: string, limit = 20, offset = 0) {
+export async function searchPosts(params: {
+  query: string
+  emotion?: string | null
+  sort?: SearchSort
+  limit?: number
+  offset?: number
+}): Promise<SearchResult[]> {
+  const { query, emotion, sort = 'relevance', limit = 20, offset = 0 } = params
+  const q = query.trim()
+  if (q.length < 2) return []
+
   const supabase = createClient()
-  const { data, error } = await supabase.rpc('search_posts', {
-    p_query: query,
+  const { data, error } = await supabase.rpc('search_posts_v2', {
+    p_query: q,
+    p_emotion: emotion ?? undefined,
+    p_sort: sort,
     p_limit: limit,
     p_offset: offset,
   })
   if (error) throw error
-  return data ?? []
+  return (data ?? []) as SearchResult[]
 }
