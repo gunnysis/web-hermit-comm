@@ -108,12 +108,15 @@ export default function AdminPage() {
               onChange={(e) => setNewGroupName(e.target.value)}
               required
             />
-            <Input
-              placeholder="비워두면 자동 생성됩니다"
-              value={newInviteCode}
-              onChange={(e) => setNewInviteCode(e.target.value)}
-              maxLength={50}
-            />
+            <div className="space-y-1">
+              <label className="text-sm text-muted-foreground">초대 코드 (선택)</label>
+              <Input
+                placeholder="비워두면 자동 생성됩니다"
+                value={newInviteCode}
+                onChange={(e) => setNewInviteCode(e.target.value)}
+                maxLength={50}
+              />
+            </div>
             <Textarea
               placeholder="설명 (선택)"
               value={newGroupDesc}
