@@ -14,7 +14,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { searchPosts, getPostsByEmotion } from '../api/postsApi'
 import type { SearchResult, SearchSort, PostWithCounts } from '@/types/database'
 
-const { PAGE_SIZE, DEBOUNCE_MS, STALE_TIME_MS } = SEARCH_CONFIG
+const { PAGE_SIZE, DEBOUNCE_MS, STALE_TIME_MS, MIN_QUERY_LENGTH } = SEARCH_CONFIG
 
 const SORT_OPTIONS: { value: SearchSort; label: string }[] = [
   { value: 'relevance', label: '관련도순' },
@@ -55,7 +55,7 @@ export function SearchView() {
     return () => clearTimeout(timer)
   }, [input, selectedEmotion, sort, router])
 
-  const hasTextQuery = query.length >= 2
+  const hasTextQuery = query.length >= MIN_QUERY_LENGTH
 
   // v2 검색 (텍스트 있을 때)
   const {
