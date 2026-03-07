@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, Fragment } from 'react'
+import { useState, useEffect, useCallback, useMemo, Fragment, memo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Search, X, Clock, Trash2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { ALLOWED_EMOTIONS, EMOTION_EMOJI, EMOTION_COLOR_MAP, EMPTY_STATE_MESSAGES } from '@/lib/constants'
+import { ALLOWED_EMOTIONS, EMOTION_EMOJI, EMOTION_COLOR_MAP, EMPTY_STATE_MESSAGES, SEARCH_CONFIG } from '@/lib/constants'
 import { HighlightText } from '@/lib/highlight'
 import { getRecentSearches, addRecentSearch, removeRecentSearch, clearAllRecentSearches } from '@/lib/recent-searches'
 import { PostCard } from './PostCard'
@@ -14,8 +14,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { searchPosts, getPostsByEmotion } from '../api/postsApi'
 import type { SearchResult, SearchSort, PostWithCounts } from '@/types/database'
 
-const PAGE_SIZE = 20
-const DEBOUNCE_MS = 400
+const { PAGE_SIZE, DEBOUNCE_MS, STALE_TIME_MS } = SEARCH_CONFIG
 
 const SORT_OPTIONS: { value: SearchSort; label: string }[] = [
   { value: 'relevance', label: '관련도순' },
@@ -79,7 +78,7 @@ export function SearchView() {
       lastPage.length === PAGE_SIZE ? allPages.flat().length : undefined,
     initialPageParam: 0,
     enabled: hasTextQuery,
-    staleTime: 30_000,
+    staleTime: STALE_TIME_MS,
   })
 
   // 감정 전용 (텍스트 없을 때)
@@ -347,7 +346,7 @@ export function SearchView() {
 
 // --- 검색 결과 카드 (하이라이트 포함) ---
 
-function SearchResultCard({ result }: { result: SearchResult }) {
+const SearchResultCard = memo(function SearchResultCard({ result }: { result: SearchResult }) {
   const router = useRouter()
   const emotions = result.emotions ?? []
 
@@ -395,4 +394,4 @@ function SearchResultCard({ result }: { result: SearchResult }) {
       </div>
     </button>
   )
-}
+})

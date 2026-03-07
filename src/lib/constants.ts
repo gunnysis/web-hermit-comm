@@ -23,5 +23,6 @@ export const ANIMALS = [
 export {
   ALLOWED_EMOTIONS, EMOTION_EMOJI, REACTION_COLOR_MAP, SHARED_PALETTE,
   EMOTION_COLOR_MAP, MOTION, EMPTY_STATE_MESSAGES, GREETING_MESSAGES,
+  SEARCH_HIGHLIGHT, SEARCH_CONFIG, ADMIN_CONSTANTS, CONFIRM_MESSAGES,
 } from './constants.generated'
 export type { AllowedEmotion, ReactionColorKey } from './constants.generated'
