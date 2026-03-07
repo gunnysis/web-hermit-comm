@@ -12,7 +12,6 @@ import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useAuthContext } from '@/features/auth/AuthProvider'
-import { useIsAdmin } from '@/features/admin/hooks/useIsAdmin'
 import { useAdminGroups } from '@/features/admin/hooks/useAdminGroups'
 import { createGroupWithBoard, regenerateInviteCode } from '@/features/admin/api/adminApi'
 import { signOut } from '@/features/auth/auth'
@@ -22,47 +21,26 @@ export default function AdminPage() {
   const router = useRouter()
   const { user } = useAuthContext()
   const queryClient = useQueryClient()
-  const { data: isAdmin, isLoading: adminLoading } = useIsAdmin(user?.id ?? null)
   const { query: groupsQuery, deleteMutation } = useAdminGroups(user?.id ?? null)
 
   const [newGroupName, setNewGroupName] = useState('')
   const [newGroupDesc, setNewGroupDesc] = useState('')
+  const [newInviteCode, setNewInviteCode] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null)
-
-  // 로딩 중
-  if (adminLoading) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-8 space-y-4">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-32 w-full" />
-      </div>
-    )
-  }
-
-  // 관리자 아님 → 로그인 페이지로
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-muted-foreground">관리자 권한이 없습니다.</p>
-          <Button onClick={() => router.push('/admin/login')}>관리자 로그인</Button>
-        </div>
-      </div>
-    )
-  }
 
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newGroupName.trim() || !user) return
     setIsCreating(true)
     try {
-      await createGroupWithBoard(newGroupName.trim(), newGroupDesc.trim(), user.id)
+      await createGroupWithBoard(newGroupName.trim(), newGroupDesc.trim(), user.id, newInviteCode.trim() || undefined)
       queryClient.invalidateQueries({ queryKey: ['admin', 'myManagedGroups'] })
       toast.success('그룹이 생성됐습니다.')
       setNewGroupName('')
       setNewGroupDesc('')
+      setNewInviteCode('')
       setShowCreateForm(false)
     } catch {
       toast.error('그룹 생성에 실패했습니다.')
@@ -89,7 +67,7 @@ export default function AdminPage() {
 
   const handleRegenerateCode = async (groupId: number) => {
     try {
-      const newCode = await regenerateInviteCode(groupId)
+      const newCode = await regenerateInviteCode(groupId, user!.id)
       queryClient.invalidateQueries({ queryKey: ['admin', 'myManagedGroups'] })
       navigator.clipboard.writeText(newCode)
       toast.success(`새 코드: ${newCode} (클립보드에 복사됨)`)
@@ -100,7 +78,7 @@ export default function AdminPage() {
 
   const handleSignOut = async () => {
     await signOut()
-    router.push('/')
+    router.replace('/')
   }
 
   return (
@@ -129,6 +107,12 @@ export default function AdminPage() {
               value={newGroupName}
               onChange={(e) => setNewGroupName(e.target.value)}
               required
+            />
+            <Input
+              placeholder="비워두면 자동 생성됩니다"
+              value={newInviteCode}
+              onChange={(e) => setNewInviteCode(e.target.value)}
+              maxLength={50}
             />
             <Textarea
               placeholder="설명 (선택)"
@@ -207,7 +191,7 @@ export default function AdminPage() {
         open={!!deleteTarget}
         onOpenChange={(open) => { if (!open) setDeleteTarget(null) }}
         title={`'${deleteTarget?.name}' 그룹을 삭제할까요?`}
-        description="모든 게시글과 댓글이 삭제됩니다."
+        description="그룹의 모든 게시글과 댓글이 함께 삭제됩니다."
         confirmLabel="삭제"
         onConfirm={handleDelete}
         isPending={deleteMutation.isPending}

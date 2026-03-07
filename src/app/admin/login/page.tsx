@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
     setIsLoading(true)
     try {
       await signInWithPassword(email, password)
-      router.push('/admin')
+      router.replace('/admin')
     } catch {
       toast.error('이메일 또는 비밀번호가 올바르지 않습니다.')
     } finally {

@@ -12,7 +12,7 @@ export function useAdminGroups(userId: string | null) {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (groupId: number) => deleteGroup(groupId),
+    mutationFn: (groupId: number) => deleteGroup(groupId, userId!),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'myManagedGroups', userId] }),
   })
 
