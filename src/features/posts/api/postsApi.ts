@@ -164,7 +164,7 @@ export async function searchPosts(params: {
   const supabase = createClient()
   const { data, error } = await supabase.rpc('search_posts_v2', {
     p_query: q,
-    p_emotion: emotion ?? undefined,
+    p_emotion: emotion || undefined,
     p_sort: sort,
     p_limit: limit,
     p_offset: offset,

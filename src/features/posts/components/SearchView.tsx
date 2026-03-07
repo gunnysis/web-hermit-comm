@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, Fragment, memo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment, memo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Search, X, Clock, Trash2 } from 'lucide-react'
@@ -58,13 +58,7 @@ export function SearchView() {
   const hasTextQuery = query.length >= MIN_QUERY_LENGTH
 
   // v2 검색 (텍스트 있을 때)
-  const {
-    data: searchPages,
-    isLoading: searchLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
+  const searchQuery = useInfiniteQuery({
     queryKey: ['search', query, selectedEmotion, sort],
     queryFn: ({ pageParam = 0 }) =>
       searchPosts({
@@ -79,14 +73,18 @@ export function SearchView() {
     initialPageParam: 0,
     enabled: hasTextQuery,
     staleTime: STALE_TIME_MS,
+    retry: 1,
   })
+  const { data: searchPages, isLoading: searchLoading, error: searchError,
+          fetchNextPage, hasNextPage, isFetchingNextPage } = searchQuery
 
   // 감정 전용 (텍스트 없을 때)
-  const { data: emotionPosts, isLoading: emotionLoading } = useQuery({
+  const emotionQuery = useQuery({
     queryKey: ['postsByEmotion', selectedEmotion],
     queryFn: () => getPostsByEmotion(selectedEmotion, 50, 0),
     enabled: selectedEmotion.length > 0 && !hasTextQuery,
   })
+  const { data: emotionPosts, isLoading: emotionLoading, error: emotionError } = emotionQuery
 
   // 검색 성공 시 최근 검색어 저장
   useEffect(() => {
@@ -102,6 +100,9 @@ export function SearchView() {
   const isEmotionOnlyMode = selectedEmotion.length > 0 && !hasTextQuery
   const hasActiveFilter = hasTextQuery || selectedEmotion.length > 0
   const showInitial = !hasActiveFilter
+
+  const error = isSearchMode ? searchError : isEmotionOnlyMode ? emotionError : null
+  const refetch = isSearchMode ? searchQuery.refetch : emotionQuery.refetch
 
   const isLoading = isSearchMode ? searchLoading : isEmotionOnlyMode ? emotionLoading : false
   const displayCount = isSearchMode ? searchResults.length : isEmotionOnlyMode ? (emotionPosts?.length ?? 0) : 0
@@ -130,6 +131,19 @@ export function SearchView() {
     clearAllRecentSearches()
     setRecentSearches([])
   }, [])
+
+  const loadMoreRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!loadMoreRef.current || !hasNextPage) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !isFetchingNextPage) {
+        fetchNextPage()
+      }
+    }, { threshold: 0.1 })
+    observer.observe(loadMoreRef.current)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   return (
     <div className="space-y-4">
@@ -295,6 +309,20 @@ export function SearchView() {
         </div>
       )}
 
+      {/* 에러 상태 */}
+      {error && !isLoading && (
+        <div className="flex flex-col items-center justify-center py-16">
+          <p className="text-base font-semibold mb-1">검색 중 문제가 발생했어요</p>
+          <p className="text-sm text-muted-foreground mb-4">잠시 후 다시 시도해주세요</p>
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
       {/* 빈 상태 */}
       {isEmpty && (
         <EmptyState
@@ -320,15 +348,8 @@ export function SearchView() {
           {searchResults.map((result) => (
             <SearchResultCard key={result.id} result={result} />
           ))}
-          {hasNextPage && (
-            <button
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              className="w-full py-3 rounded-xl bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-colors disabled:opacity-50"
-            >
-              {isFetchingNextPage ? '불러오는 중...' : '더 보기'}
-            </button>
-          )}
+          {hasNextPage && <div ref={loadMoreRef} className="h-10" />}
+          {isFetchingNextPage && <PostCardSkeleton />}
         </div>
       )}
 

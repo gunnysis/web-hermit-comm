@@ -30,7 +30,7 @@ import { RefreshCw } from 'lucide-react'
 import { EMOTION_COLOR_MAP } from '@/lib/constants'
 import { getSimilarFeelingCount } from '../api/postsApi'
 import { startViewTransition } from '@/lib/view-transition'
-import { sanitizeHtml } from '@/lib/sanitize'
+import { PostContent } from './PostContent'
 import { logger } from '@/lib/logger'
 
 interface PostDetailViewProps {
@@ -274,10 +274,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       )}
 
       {/* 본문 — prose 스타일 */}
-      <div
-        className="post-content"
-        dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
-      />
+      <PostContent html={post.content} />
 
       <Separator />
 
