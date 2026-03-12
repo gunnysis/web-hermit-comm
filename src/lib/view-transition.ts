@@ -27,7 +27,7 @@ export function startViewTransition(
     document.documentElement.classList.add('vt-back')
   }
 
-  const transition = (document as any).startViewTransition(callback)
+  const transition = document.startViewTransition(callback)
   transition.finished.then(() => {
     document.documentElement.classList.remove('vt-back')
   })
