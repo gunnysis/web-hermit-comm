@@ -12,7 +12,7 @@ function getTimeSlot(): keyof typeof GREETING_MESSAGES {
 }
 
 export function GreetingBanner() {
-  const slot = useMemo(getTimeSlot, [])
+  const slot = useMemo(() => getTimeSlot(), [])
   const { greeting, message } = GREETING_MESSAGES[slot]
 
   return (

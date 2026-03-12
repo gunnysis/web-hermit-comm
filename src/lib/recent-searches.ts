@@ -14,11 +14,13 @@ export function getRecentSearches(): string[] {
   }
 }
 
-export function addRecentSearch(query: string): void {
-  if (!query.trim()) return
+export function addRecentSearch(query: string): string[] {
+  if (!query.trim()) return getRecentSearches()
   const recent = getRecentSearches().filter((q) => q !== query)
   recent.unshift(query.trim())
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(recent.slice(0, SEARCH_CONFIG.RECENT_MAX)))
+  const updated = recent.slice(0, SEARCH_CONFIG.RECENT_MAX)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated))
+  return updated
 }
 
 export function removeRecentSearch(query: string): string[] {

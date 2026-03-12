@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, useRef, Fragment, memo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
-import { Search, X, Clock, Trash2 } from 'lucide-react'
+import { Search, X, Clock } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { ALLOWED_EMOTIONS, EMOTION_EMOJI, EMOTION_COLOR_MAP, EMPTY_STATE_MESSAGES, SEARCH_CONFIG } from '@/lib/constants'
 import { HighlightText } from '@/lib/highlight'
@@ -12,7 +12,7 @@ import { PostCard } from './PostCard'
 import { PostCardSkeleton } from './PostCardSkeleton'
 import { EmptyState } from '@/components/ui/empty-state'
 import { searchPosts, getPostsByEmotion } from '../api/postsApi'
-import type { SearchResult, SearchSort, PostWithCounts } from '@/types/database'
+import type { SearchResult, SearchSort } from '@/types/database'
 
 const { PAGE_SIZE, DEBOUNCE_MS, STALE_TIME_MS, MIN_QUERY_LENGTH } = SEARCH_CONFIG
 
@@ -34,11 +34,7 @@ export function SearchView() {
   const [query, setQuery] = useState(initialQ)
   const [selectedEmotion, setSelectedEmotion] = useState(initialEmotion)
   const [sort, setSort] = useState<SearchSort>(initialSort)
-  const [recentSearches, setRecentSearches] = useState<string[]>([])
-
-  useEffect(() => {
-    setRecentSearches(getRecentSearches())
-  }, [])
+  const [recentSearches, setRecentSearches] = useState(() => getRecentSearches())
 
   // 디바운스 + URL 동기화
   useEffect(() => {
@@ -86,13 +82,13 @@ export function SearchView() {
   })
   const { data: emotionPosts, isLoading: emotionLoading, error: emotionError } = emotionQuery
 
-  // 검색 성공 시 최근 검색어 저장
+  // 검색 성공 시 최근 검색어 localStorage 저장 (state 갱신은 초기화면 복귀 시)
+  const searchPagesList = searchPages?.pages
   useEffect(() => {
-    if (hasTextQuery && searchPages?.pages?.[0] !== undefined) {
+    if (hasTextQuery && searchPagesList?.[0] !== undefined) {
       addRecentSearch(query)
-      setRecentSearches(getRecentSearches())
     }
-  }, [hasTextQuery, query, searchPages?.pages?.length])
+  }, [hasTextQuery, query, searchPagesList])
 
   const searchResults = useMemo(() => searchPages?.pages.flat() ?? [], [searchPages])
 
@@ -116,6 +112,7 @@ export function SearchView() {
   const handleClearQuery = useCallback(() => {
     setInput('')
     setQuery('')
+    setRecentSearches(getRecentSearches())
   }, [])
 
   const handleRecentPress = useCallback((q: string) => {
