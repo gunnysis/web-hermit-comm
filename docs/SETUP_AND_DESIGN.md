@@ -220,7 +220,7 @@ bash scripts/db.sh push
 bash scripts/sync-to-projects.sh
 
 # 4. 웹 레포에서도 동기화 확인 가능
-cd ~/apps/web && bash scripts/sync-from-app.sh
+cd ~/apps/web-hermit-comm && bash scripts/sync-from-app.sh
 ```
 
 ### 동기화 주의사항

@@ -83,7 +83,7 @@ Node.js 22 필수. nvm 사용 시: `export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/n
 
 ## 멀티프로젝트 관리
 
-이 웹 레포, 앱 레포(`/mnt/c/Users/Administrator/programming/apps/gns-hermit-comm`), **중앙 Supabase 프로젝트**(`~/apps/supabase-hermit`)가 동일 Supabase 백엔드를 공유.
+이 웹 레포(`~/apps/web-hermit-comm`), 앱 레포(`/mnt/c/Users/Administrator/programming/apps/gns-hermit-comm`), **중앙 Supabase 프로젝트**(`~/apps/supabase-hermit`)가 동일 Supabase 백엔드를 공유.
 
 ### 역할 경계
 
@@ -106,7 +106,7 @@ bash scripts/db.sh push
 bash scripts/sync-to-projects.sh
 
 # 4. 웹 레포에서도 동기화 확인 가능
-cd ~/apps/web && bash scripts/sync-from-app.sh
+cd ~/apps/web-hermit-comm && bash scripts/sync-from-app.sh
 ```
 
 ### 동기화 대상
