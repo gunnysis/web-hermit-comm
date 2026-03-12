@@ -59,18 +59,21 @@ export function EmotionCalendar({ userId, days = 30 }: EmotionCalendarProps) {
               const primaryEmotion = day.emotions?.[0]
               const colors = primaryEmotion ? EMOTION_COLOR_MAP[primaryEmotion] : null
               const bg = colors ? colors.gradient[0] : undefined
+              const label = `${day.day} — ${day.post_count}개 글${
+                day.emotions?.length > 0
+                  ? ` (${day.emotions.map((e: string) => `${EMOTION_EMOJI[e] ?? ''} ${e}`).join(', ')})`
+                  : ''
+              }`
               return (
                 <div
                   key={day.day}
+                  role="img"
+                  aria-label={label}
                   className={`w-4 h-4 rounded-sm transition-colors group relative cursor-default ${
                     day.post_count === 0 ? 'bg-muted' : ''
                   }`}
                   style={bg ? { backgroundColor: bg } : undefined}
-                  title={`${day.day} — ${day.post_count}개 글${
-                    day.emotions?.length > 0
-                      ? ` (${day.emotions.map((e: string) => `${EMOTION_EMOJI[e] ?? ''} ${e}`).join(', ')})`
-                      : ''
-                  }`}
+                  title={label}
                 />
               )
             })}

@@ -393,6 +393,15 @@
   border-radius: 999px 0 0 999px;
 }
 
+/* 스크롤바 숨김 유틸리티 */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* ─── View Transitions (페이지 전환 애니메이션) ─── */
 
 /* 기본 페이지 전환: 부드러운 크로스페이드 + 미세한 슬라이드 */
@@ -427,4 +436,19 @@
 @keyframes vt-back-in {
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── 접근성: 모션 감소 선호 ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  ::view-transition-old(page-content),
+  ::view-transition-new(page-content),
+  .vt-back::view-transition-old(page-content),
+  .vt-back::view-transition-new(page-content) {
+    animation: none !important;
+  }
 }

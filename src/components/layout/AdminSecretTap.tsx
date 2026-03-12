@@ -28,8 +28,14 @@ export function AdminSecretTap({ children }: { children: React.ReactNode }) {
   }, [isAdmin, router])
 
   return (
-    <span onClick={handleClick} style={{ cursor: 'pointer', userSelect: 'none' }}>
+    <button
+      type="button"
+      onClick={handleClick}
+      className="cursor-pointer select-none appearance-none bg-transparent border-none p-0 m-0 text-inherit font-inherit text-left"
+      aria-hidden="true"
+      tabIndex={-1}
+    >
       {children}
-    </span>
+    </button>
   )
 }

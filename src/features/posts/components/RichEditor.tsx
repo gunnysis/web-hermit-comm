@@ -53,6 +53,8 @@ export function RichEditor({ value, onChange, placeholder, className }: RichEdit
               key={label}
               type="button"
               onClick={action}
+              aria-label={title}
+              aria-pressed={active}
               title={title}
               className={cn(
                 'px-2 py-0.5 text-xs border rounded hover:bg-accent',

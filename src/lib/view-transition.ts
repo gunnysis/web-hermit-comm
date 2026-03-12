@@ -10,6 +10,10 @@ function supportsViewTransitions(): boolean {
   return typeof document !== 'undefined' && 'startViewTransition' in document
 }
 
+function prefersReducedMotion(): boolean {
+  return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
 /**
  * View Transition으로 콜백을 감싸 실행.
  * 미지원 브라우저에서는 콜백만 즉시 실행.
@@ -18,7 +22,7 @@ export function startViewTransition(
   callback: () => void | Promise<void>,
   direction: TransitionDirection = 'forward',
 ) {
-  if (!supportsViewTransitions()) {
+  if (!supportsViewTransitions() || prefersReducedMotion()) {
     callback()
     return
   }
