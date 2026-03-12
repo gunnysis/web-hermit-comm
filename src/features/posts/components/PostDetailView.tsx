@@ -55,11 +55,9 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     try {
       await deletePost(postId)
       toast.success('게시글이 삭제됐습니다.')
-      const groupId = post?.group_id
-      router.push(groupId ? `/groups/${groupId}` : '/')
+      router.push('/')
       queryClient.removeQueries({ queryKey: ['post', postId] })
       if (post?.board_id) queryClient.invalidateQueries({ queryKey: ['boardPosts', post.board_id] })
-      if (groupId) queryClient.invalidateQueries({ queryKey: ['groupPosts', groupId] })
     } catch (err: unknown) {
       logger.error('deletePost error:', err)
       const msg = err instanceof Error ? err.message : (err as { message?: string })?.message
@@ -153,7 +151,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
               if (window.history.length > 1) {
                 router.back()
               } else {
-                router.push(post?.group_id ? `/groups/${post.group_id}` : '/')
+                router.push('/')
               }
             }, 'back')
           }}
@@ -292,7 +290,6 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
         postId={postId}
         userId={user?.id ?? null}
         boardId={post.board_id ?? undefined}
-        groupId={post.group_id ?? undefined}
       />
       <ConfirmDialog
         open={deleteDialogOpen}

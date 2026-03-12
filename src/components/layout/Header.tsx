@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { PenSquare, Search, Users } from 'lucide-react'
+import { PenSquare, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AdminSecretTap } from './AdminSecretTap'
 
@@ -16,11 +16,6 @@ export function Header() {
           <Button asChild size="icon" variant="ghost">
             <Link href="/search" aria-label="검색">
               <Search size={18} />
-            </Link>
-          </Button>
-          <Button asChild size="icon" variant="ghost">
-            <Link href="/groups" aria-label="그룹">
-              <Users size={18} />
             </Link>
           </Button>
           <Button asChild size="sm" variant="outline">

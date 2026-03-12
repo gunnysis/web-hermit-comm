@@ -46,7 +46,6 @@ export function useComments(postId: number) {
         content: request.content,
         author_id: request.author_id,
         board_id: request.board_id ?? null,
-        group_id: request.group_id ?? null,
         is_anonymous: request.is_anonymous ?? true,
         display_name: request.display_name ?? '익명',
         created_at: new Date().toISOString(),

@@ -104,7 +104,6 @@ apps/web/
 │   │   ├── create/        # 게시글 작성
 │   │   ├── post/[id]/     # 게시글 상세·수정
 │   │   ├── search/        # 검색
-│   │   ├── groups/        # 그룹 목록·상세·작성
 │   │   └── admin/         # 관리자 대시보드·로그인
 │   ├── components/
 │   │   ├── layout/        # Header, BottomNav, ScrollToTop
@@ -115,8 +114,7 @@ apps/web/
 │   │   ├── posts/         # API, hooks, PostCard, PostDetailView, CreatePostForm, RichEditor
 │   │   ├── comments/      # API, hooks, CommentSection, CommentItem, CommentForm
 │   │   ├── reactions/     # API, hooks, ReactionBar
-│   │   ├── community/     # communityApi, useMyGroups, GroupCard, GroupPostFeed
-│   │   └── admin/         # adminApi, useIsAdmin, useAdminGroups
+│   │   └── admin/         # adminApi, useIsAdmin
 │   ├── hooks/             # useRealtimePosts 등 공통 훅
 │   ├── lib/               # constants, schemas, query-client, anonymous, utils
 │   ├── types/             # database.ts (DB 타입)
@@ -138,9 +136,6 @@ apps/web/
 | `/create` | 게시글 작성 (TipTap + 이미지 업로드) |
 | `/post/[id]` | 게시글 상세 (감정태그, 반응바, 댓글, AI분석) |
 | `/post/[id]/edit` | 게시글 수정 |
-| `/groups` | 내 그룹 목록 + 초대코드 참여 |
-| `/groups/[groupId]` | 그룹 게시판 탭 + 게시글 피드 |
-| `/groups/[groupId]/create` | 그룹 게시글 작성 |
 | `/admin` | 관리자 대시보드 |
 | `/admin/login` | 관리자 이메일 로그인 |
 
@@ -155,7 +150,7 @@ apps/web/
 - `reactions` — 집계 카운트 (reaction_type: `'like' 'heart' 'laugh' 'sad' 'surprise'`)
 - `user_reactions` — 개인 반응 기록 (토글용)
 - `post_analysis` — 감정 분석 결과 (emotions TEXT[])
-- `boards`, `groups`, `group_members`, `app_admin`
+- `boards`, `app_admin`
 
 ---
 

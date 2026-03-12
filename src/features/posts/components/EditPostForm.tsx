@@ -70,7 +70,6 @@ export function EditPostForm({ postId }: EditPostFormProps) {
       })
       queryClient.invalidateQueries({ queryKey: ['post', postId] })
       if (post.board_id) queryClient.invalidateQueries({ queryKey: ['boardPosts', post.board_id] })
-      if (post.group_id) queryClient.invalidateQueries({ queryKey: ['groupPosts', post.group_id] })
       toast.success('게시글이 수정됐습니다.')
       router.push(`/post/${postId}`)
     } catch {

@@ -2,13 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Search, Users, PenLine } from 'lucide-react'
+import { Home, Search, PenLine } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
   { href: '/', icon: Home, label: '홈' },
   { href: '/search', icon: Search, label: '검색' },
-  { href: '/groups', icon: Users, label: '그룹' },
   { href: '/create', icon: PenLine, label: '글쓰기' },
 ]
 

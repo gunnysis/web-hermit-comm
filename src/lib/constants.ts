@@ -1,4 +1,4 @@
-/** 공개 게시판 기본 ID. 자유게시판 (visibility='public', group_id=NULL) */
+/** 공개 게시판 기본 ID. 자유게시판 (visibility='public') */
 export const DEFAULT_PUBLIC_BOARD_ID = 12
 export const PAGE_SIZE = 20
 
@@ -23,6 +23,6 @@ export const ANIMALS = [
 export {
   ALLOWED_EMOTIONS, EMOTION_EMOJI, REACTION_COLOR_MAP, SHARED_PALETTE,
   EMOTION_COLOR_MAP, MOTION, EMPTY_STATE_MESSAGES, GREETING_MESSAGES,
-  SEARCH_HIGHLIGHT, SEARCH_CONFIG, ADMIN_CONSTANTS, CONFIRM_MESSAGES,
+  SEARCH_HIGHLIGHT, SEARCH_CONFIG, ADMIN_CONSTANTS,
 } from './constants.generated'
 export type { AllowedEmotion, ReactionColorKey } from './constants.generated'
