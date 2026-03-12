@@ -74,6 +74,8 @@ export function PublicFeed() {
             ref={latestRef}
             className={`sort-tab ${sortOrder === 'latest' ? 'sort-tab-active' : ''}`}
             onClick={() => setSortOrder('latest')}
+            aria-label="최신순 정렬"
+            aria-pressed={sortOrder === 'latest'}
           >
             최신순
           </button>
@@ -81,6 +83,8 @@ export function PublicFeed() {
             ref={popularRef}
             className={`sort-tab ${sortOrder === 'popular' ? 'sort-tab-active' : ''}`}
             onClick={() => setSortOrder('popular')}
+            aria-label="인기순 정렬"
+            aria-pressed={sortOrder === 'popular'}
           >
             인기순
           </button>
