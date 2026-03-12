@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/client'
 import type { PostWithCounts, CreatePostRequest, Post, SearchResult, SearchSort } from '@/types/database'
 import { PAGE_SIZE } from '@/lib/constants'
-import { addBreadcrumb } from '@/lib/logger'
+import { addBreadcrumb, logger } from '@/lib/logger'
 
 export async function getBoardPosts(
   boardId: number,
@@ -24,7 +24,10 @@ export async function getBoardPosts(
   }
 
   const { data, error } = await query.range(from, to)
-  if (error) throw error
+  if (error) {
+    logger.error('[API] getBoardPosts 에러:', error.message, { code: error.code })
+    throw error
+  }
   addBreadcrumb('posts', 'getBoardPosts', { boardId, page, sortOrder, count: data?.length ?? 0 })
   return (data ?? []) as PostWithCounts[]
 }
@@ -36,7 +39,10 @@ export async function getPost(postId: number): Promise<PostWithCounts | null> {
     .select('*')
     .eq('id', postId)
     .limit(1)
-  if (error) throw error
+  if (error) {
+    logger.error('[API] getPost 에러:', error.message, { code: error.code })
+    throw error
+  }
   return (data?.[0] as PostWithCounts) ?? null
 }
 
@@ -49,7 +55,10 @@ export async function createPost(
     .insert(request)
     .select()
     .single()
-  if (error) throw error
+  if (error) {
+    logger.error('[API] createPost 에러:', error.message, { code: error.code })
+    throw error
+  }
   addBreadcrumb('posts', 'createPost', { postId: data.id })
   return data as Post
 }
@@ -65,7 +74,10 @@ export async function updatePost(
     .eq('id', postId)
     .select()
     .single()
-  if (error) throw error
+  if (error) {
+    logger.error('[API] updatePost 에러:', error.message, { code: error.code })
+    throw error
+  }
   return data as Post
 }
 
@@ -79,7 +91,10 @@ export async function deletePost(postId: number): Promise<void> {
   const { error } = await supabase.rpc('soft_delete_post', {
     p_post_id: postId,
   })
-  if (error) throw new Error('게시글을 삭제할 수 없습니다. 권한이 없거나 이미 삭제된 게시글입니다.')
+  if (error) {
+    logger.error('[API] deletePost 에러:', error.message, { code: error.code })
+    throw new Error('게시글을 삭제할 수 없습니다. 권한이 없거나 이미 삭제된 게시글입니다.')
+  }
   addBreadcrumb('posts', 'deletePost', { postId })
 }
 
@@ -98,18 +113,23 @@ export async function invokeAnalyzeOnDemand(postId: number, content?: string, ti
   const { error } = await supabase.functions.invoke('analyze-post-on-demand', {
     body: { postId, content, title },
   })
-  if (error) throw error
+  if (error) {
+    logger.error('[API] invokeAnalyzeOnDemand 에러:', error.message)
+    throw error
+  }
 }
 
 export async function getPostsByEmotion(emotion: string, limit = 20, offset = 0): Promise<PostWithCounts[]> {
   const supabase = createClient()
-  // RPC는 마이그레이션 push 후 gen-types로 타입 갱신 필요
   const { data, error } = await supabase.rpc('get_posts_by_emotion', {
     p_emotion: emotion,
     p_limit: limit,
     p_offset: offset,
   })
-  if (error) throw error
+  if (error) {
+    logger.error('[API] getPostsByEmotion 에러:', error.message, { code: error.code })
+    throw error
+  }
   return (data ?? []) as PostWithCounts[]
 }
 
@@ -119,14 +139,20 @@ export async function getSimilarFeelingCount(postId: number, days = 30): Promise
     p_post_id: postId,
     p_days: days,
   })
-  if (error) throw error
+  if (error) {
+    logger.error('[API] getSimilarFeelingCount 에러:', error.message, { code: error.code })
+    throw error
+  }
   return (data as number) ?? 0
 }
 
 export async function getEmotionTrend(days = 7) {
   const supabase = createClient()
   const { data, error } = await supabase.rpc('get_emotion_trend', { days })
-  if (error) throw error
+  if (error) {
+    logger.error('[API] getEmotionTrend 에러:', error.message, { code: error.code })
+    throw error
+  }
   return data ?? []
 }
 
@@ -136,7 +162,10 @@ export async function getRecommendedPosts(postId: number, limit = 10) {
     p_post_id: postId,
     p_limit: limit,
   })
-  if (error) throw error
+  if (error) {
+    logger.error('[API] getRecommendedPosts 에러:', error.message, { code: error.code })
+    throw error
+  }
   return data ?? []
 }
 
@@ -146,7 +175,10 @@ export async function getTrendingPosts(hours = 72, limit = 10) {
     p_hours: hours,
     p_limit: limit,
   })
-  if (error) throw error
+  if (error) {
+    logger.error('[API] getTrendingPosts 에러:', error.message, { code: error.code })
+    throw error
+  }
   return data ?? []
 }
 
@@ -169,6 +201,9 @@ export async function searchPosts(params: {
     p_limit: limit,
     p_offset: offset,
   })
-  if (error) throw error
+  if (error) {
+    logger.error('[API] searchPosts 에러:', error.message, { code: error.code })
+    throw error
+  }
   return (data ?? []) as SearchResult[]
 }
