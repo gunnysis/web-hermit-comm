@@ -14,7 +14,7 @@ Sentry.init({
     }
     if (event.extra && typeof event.extra === 'object') {
       for (const k of Object.keys(event.extra)) {
-        if (/email|password|author|display_name/i.test(k)) {
+        if (/email|password|author|display_name|userId/i.test(k)) {
           (event.extra as Record<string, unknown>)[k] = '[redacted]';
         }
       }
