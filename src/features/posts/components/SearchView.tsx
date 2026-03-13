@@ -306,7 +306,7 @@ export function SearchView() {
 
       {/* 에러 상태 */}
       {error && !isLoading && (
-        <div className="flex flex-col items-center justify-center py-16">
+        <div className="flex flex-col items-center justify-center py-8">
           <p className="text-base font-semibold mb-1">검색 중 문제가 발생했어요</p>
           <p className="text-sm text-muted-foreground mb-4">잠시 후 다시 시도해주세요</p>
           <button
