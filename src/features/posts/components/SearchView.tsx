@@ -162,30 +162,32 @@ export function SearchView() {
         )}
       </div>
 
-      {/* 감정 필터 칩 */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-        {ALLOWED_EMOTIONS.map((emotion) => {
-          const isActive = selectedEmotion === emotion
-          const emoji = EMOTION_EMOJI[emotion] ?? ''
-          const colors = EMOTION_COLOR_MAP[emotion]
+      {/* 감정 필터 칩 — 검색/감정 필터 활성 시에만 표시 */}
+      {hasActiveFilter && (
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+          {ALLOWED_EMOTIONS.map((emotion) => {
+            const isActive = selectedEmotion === emotion
+            const emoji = EMOTION_EMOJI[emotion] ?? ''
+            const colors = EMOTION_COLOR_MAP[emotion]
 
-          return (
-            <button
-              key={emotion}
-              onClick={() => handleEmotionPress(emotion)}
-              style={isActive && colors ? { backgroundColor: colors.gradient[0] } : undefined}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-xs transition-all ${
-                isActive
-                  ? 'font-semibold border border-border'
-                  : 'bg-muted hover:bg-muted/80'
-              }`}
-              aria-label={`${emotion} 필터${isActive ? ' (선택됨)' : ''}`}
-            >
-              {emoji} {emotion}
-            </button>
-          )
-        })}
-      </div>
+            return (
+              <button
+                key={emotion}
+                onClick={() => handleEmotionPress(emotion)}
+                style={isActive && colors ? { backgroundColor: colors.gradient[0] } : undefined}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs transition-all ${
+                  isActive
+                    ? 'font-semibold border border-border'
+                    : 'bg-muted hover:bg-muted/80'
+                }`}
+                aria-label={`${emotion} 필터${isActive ? ' (선택됨)' : ''}`}
+              >
+                {emoji} {emotion}
+              </button>
+            )
+          })}
+        </div>
+      )}
 
       {/* 정렬 + 필터 상태 바 */}
       {hasActiveFilter && (
