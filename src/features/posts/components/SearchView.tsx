@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { Search, X, Clock } from 'lucide-react'
 import { Input } from '@/components/ui/input'
-import { ALLOWED_EMOTIONS, EMOTION_EMOJI, EMOTION_COLOR_MAP, EMPTY_STATE_MESSAGES, SEARCH_CONFIG } from '@/lib/constants'
+import { ALLOWED_EMOTIONS, EMOTION_EMOJI, EMOTION_COLOR_MAP, EMPTY_STATE_MESSAGES, SEARCH_CONFIG, SEARCH_SORT_OPTIONS } from '@/lib/constants'
 import { HighlightText } from '@/lib/highlight'
 import { getRecentSearches, addRecentSearch, removeRecentSearch, clearAllRecentSearches } from '@/lib/recent-searches'
 import { PostCard } from './PostCard'
@@ -16,11 +16,7 @@ import type { SearchResult, SearchSort } from '@/types/database'
 
 const { PAGE_SIZE, DEBOUNCE_MS, STALE_TIME_MS, MIN_QUERY_LENGTH } = SEARCH_CONFIG
 
-const SORT_OPTIONS: { value: SearchSort; label: string }[] = [
-  { value: 'relevance', label: '관련도순' },
-  { value: 'recent', label: '최신순' },
-  { value: 'popular', label: '인기순' },
-]
+// 정렬 옵션: 중앙 상수 SEARCH_SORT_OPTIONS 사용
 
 export function SearchView() {
   const searchParams = useSearchParams()
@@ -77,7 +73,7 @@ export function SearchView() {
   // 감정 전용 (텍스트 없을 때)
   const emotionQuery = useQuery({
     queryKey: ['postsByEmotion', selectedEmotion],
-    queryFn: () => getPostsByEmotion(selectedEmotion, 50, 0),
+    queryFn: () => getPostsByEmotion(selectedEmotion, SEARCH_CONFIG.EMOTION_ONLY_LIMIT, 0),
     enabled: selectedEmotion.length > 0 && !hasTextQuery,
   })
   const { data: emotionPosts, isLoading: emotionLoading, error: emotionError } = emotionQuery
@@ -196,13 +192,13 @@ export function SearchView() {
         <div className="space-y-2">
           {isSearchMode && (
             <div className="flex gap-1.5">
-              {SORT_OPTIONS.map((opt) => (
+              {SEARCH_SORT_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   onClick={() => setSort(opt.value)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     sort === opt.value
-                      ? 'bg-primary text-primary-foreground'
+                      ? 'bg-happy-500 text-white dark:bg-happy-600'
                       : 'bg-muted text-muted-foreground hover:bg-muted/80'
                   }`}
                   aria-label={`${opt.label} 정렬`}
@@ -229,10 +225,10 @@ export function SearchView() {
             {selectedEmotion && (
               <button
                 onClick={() => setSelectedEmotion('')}
-                className="text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded-full bg-muted transition-colors"
+                className="p-1.5 rounded-full bg-muted text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="감정 필터 해제"
               >
-                필터 해제
+                <X size={12} />
               </button>
             )}
           </div>
@@ -287,7 +283,7 @@ export function SearchView() {
                   <button
                     key={emotion}
                     onClick={() => handleEmotionPress(emotion)}
-                    className="rounded-xl bg-muted px-3 py-2 text-sm text-muted-foreground hover:bg-muted/80 border border-border/50 transition-colors"
+                    className="rounded-full bg-muted px-3 py-1.5 text-xs text-muted-foreground hover:bg-muted/80 border border-border/50 transition-colors"
                     aria-label={`${emotion} 감정 검색`}
                   >
                     {emoji} {emotion}
@@ -326,15 +322,17 @@ export function SearchView() {
           icon={Search}
           title={
             selectedEmotion && !hasTextQuery
-              ? `'${selectedEmotion}' 감정의 글이 없어요`
+              ? EMPTY_STATE_MESSAGES.search_emotion.title
               : selectedEmotion && hasTextQuery
                 ? `'${query}' + ${selectedEmotion} 결과가 없어요`
                 : EMPTY_STATE_MESSAGES.search.title
           }
           description={
-            selectedEmotion
-              ? '다른 감정이나 검색어를 시도해보세요.'
-              : EMPTY_STATE_MESSAGES.search.description
+            selectedEmotion && !hasTextQuery
+              ? EMPTY_STATE_MESSAGES.search_emotion.description
+              : selectedEmotion
+                ? '다른 감정이나 검색어를 시도해보세요.'
+                : EMPTY_STATE_MESSAGES.search.description
           }
         />
       )}
