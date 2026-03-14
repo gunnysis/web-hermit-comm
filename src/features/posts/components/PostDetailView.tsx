@@ -241,7 +241,10 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
           )}
         </div>
         <EmotionTags emotions={emotions} clickable />
-        {!hasEmotions && (
+        {!hasEmotions && analysis?.error_reason === 'content_too_short' && (
+          <p className="text-xs text-muted-foreground">글이 짧아 감정을 분석하지 못했어요</p>
+        )}
+        {!hasEmotions && analysis?.error_reason !== 'content_too_short' && (
           <Button
             variant="ghost"
             size="sm"
