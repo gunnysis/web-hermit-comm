@@ -192,7 +192,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
               {isOwnPost && (
                 <>
                   <DropdownMenuItem onClick={() => {
-                    if ((post as any).post_type === 'daily') {
+                    if (post.post_type === 'daily') {
                       router.push(`/create?type=daily&edit=${postId}`)
                     } else {
                       router.push(`/post/${postId}/edit`)
@@ -229,7 +229,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
         </div>
       </div>
 
-      {(post as any).post_type === 'daily' ? (
+      {post.post_type === 'daily' ? (
         /* Daily 전용 렌더링 */
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -241,7 +241,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
 
           {/* 감정 칩 (크게) */}
           <div className="flex flex-wrap gap-2">
-            {(analysis?.emotions ?? (post as any).initial_emotions ?? []).map((emotion: string) => {
+            {(analysis?.emotions ?? post.initial_emotions ?? []).map((emotion: string) => {
               const colors = EMOTION_COLOR_MAP[emotion]
               return (
                 <span key={emotion} className="rounded-full px-4 py-2 text-sm font-semibold"
@@ -253,9 +253,9 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
           </div>
 
           {/* 활동 태그 */}
-          {((post as any).activities ?? []).length > 0 && (
+          {(post.activities ?? []).length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {((post as any).activities as string[]).map((act: string) => {
+              {(post.activities ?? []).map((act: string) => {
                 const preset = ACTIVITY_PRESETS.find((p) => p.id === act)
                 return (
                   <span key={act} className="rounded-full px-3 py-1.5 text-xs border border-border text-muted-foreground">
@@ -280,8 +280,8 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
 
           <SameMoodDailies
             postId={postId}
-            emotions={analysis?.emotions ?? (post as any).initial_emotions ?? []}
-            postType={(post as any).post_type}
+            emotions={analysis?.emotions ?? post.initial_emotions ?? []}
+            postType={post.post_type}
           />
         </div>
       ) : (
@@ -386,8 +386,8 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       <ConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        title={(post as any).post_type === 'daily' ? '오늘의 하루를 삭제할까요?' : '게시글을 삭제할까요?'}
-        description={(post as any).post_type === 'daily'
+        title={post.post_type === 'daily' ? '오늘의 하루를 삭제할까요?' : '게시글을 삭제할까요?'}
+        description={post.post_type === 'daily'
           ? '삭제하면 오늘 다시 나눌 수 있어요.'
           : '삭제한 게시글은 복구할 수 없습니다.'}
         confirmLabel="삭제"

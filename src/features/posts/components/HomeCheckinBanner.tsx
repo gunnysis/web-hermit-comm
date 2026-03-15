@@ -25,8 +25,8 @@ export function HomeCheckinBanner() {
   }
 
   if (todayDaily) {
-    const emotions = todayDaily.emotions ?? (todayDaily as any).initial_emotions ?? []
-    const likeCount = (todayDaily as any).like_count ?? 0
+    const emotions = todayDaily.emotions ?? todayDaily.initial_emotions ?? []
+    const likeCount = todayDaily.like_count ?? 0
     return (
       <div
         className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between transition-colors hover:opacity-90"

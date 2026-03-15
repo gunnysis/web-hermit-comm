@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { blockUser, getBlockedAliases } from '../api/blocksApi'
+import { logger } from '@/lib/logger'
 
 export function useBlockedAliases() {
   return useQuery({
@@ -13,6 +14,12 @@ export function useBlockUser() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: blockUser,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['blockedAliases'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['blockedAliases'] })
+      qc.invalidateQueries({ queryKey: ['boardPosts'] })
+    },
+    onError: (error) => {
+      logger.error('[useBlockUser]', error)
+    },
   })
 }

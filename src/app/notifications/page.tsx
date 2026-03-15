@@ -5,11 +5,12 @@ import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
 import { Header } from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
-import { useNotifications, useMarkAllRead } from '@/features/notifications/hooks/useNotifications'
+import { useNotifications, useMarkAllRead, useMarkRead } from '@/features/notifications/hooks/useNotifications'
 
 export default function NotificationsPage() {
   const { data: notifications = [] } = useNotifications()
   const { mutate: markAllRead } = useMarkAllRead()
+  const { mutate: markRead } = useMarkRead()
 
   const getLabel = (n: { type: string; actor_alias: string | null }) => {
     const actor = n.actor_alias ?? '누군가'
@@ -25,14 +26,20 @@ export default function NotificationsPage() {
       <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold">알림</h1>
-          <Button variant="ghost" size="sm" onClick={() => markAllRead()}>모두 읽음</Button>
+          {notifications.some(n => !n.read) && (
+            <Button variant="ghost" size="sm" onClick={() => markAllRead()}>모두 읽음</Button>
+          )}
         </div>
         {notifications.length === 0 ? (
           <p className="text-center text-muted-foreground py-12">아직 알림이 없어요</p>
         ) : (
           <div className="space-y-1">
             {notifications.map((n) => (
-              <Link key={n.id} href={n.post_id ? `/post/${n.post_id}` : '#'}>
+              <Link
+                key={n.id}
+                href={n.post_id ? `/post/${n.post_id}` : '#'}
+                onClick={() => { if (!n.read) markRead([n.id]) }}
+              >
                 <div className={`rounded-lg px-4 py-3 transition-colors ${
                   n.read ? 'hover:bg-muted/50' : 'bg-muted/30 hover:bg-muted/50'
                 }`}>

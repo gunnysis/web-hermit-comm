@@ -25,7 +25,20 @@ export async function getUnreadCount(): Promise<number> {
   return (data as number) ?? 0
 }
 
+export async function markNotificationsRead(ids: number[]): Promise<void> {
+  const supabase = createClient()
+  const { error } = await supabase.rpc('mark_notifications_read', { p_ids: ids })
+  if (error) {
+    logger.error('[markNotificationsRead]', error.message, { code: error.code })
+    throw error
+  }
+}
+
 export async function markAllRead(): Promise<void> {
   const supabase = createClient()
-  await supabase.rpc('mark_all_notifications_read')
+  const { error } = await supabase.rpc('mark_all_notifications_read')
+  if (error) {
+    logger.error('[markAllRead]', error.message, { code: error.code })
+    throw error
+  }
 }
