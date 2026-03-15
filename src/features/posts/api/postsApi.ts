@@ -272,7 +272,7 @@ export async function getDailyInsights(days = 30): Promise<DailyInsightsResult> 
     logger.error('[API] getDailyInsights 에러:', error.message, { code: error.code })
     throw error
   }
-  return data as DailyInsightsResult
+  return data as unknown as DailyInsightsResult
 }
 
 export interface YesterdayDailyReactions {
