@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/utils/supabase/client'
 import { useAuthContext } from '@/features/auth/AuthProvider'
+import { DailyInsights } from '@/features/my/components/DailyInsights'
 import { EmotionCalendar } from '@/features/posts/components/EmotionCalendar'
 import { EmotionWave } from '@/features/posts/components/EmotionWave'
 import { Button } from '@/components/ui/button'
@@ -68,6 +69,9 @@ export default function MySpacePage() {
           </Card>
         ))}
       </div>
+
+      {/* 나의 패턴 */}
+      <DailyInsights enabled={!!user} />
 
       <Separator />
 

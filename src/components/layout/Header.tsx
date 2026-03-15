@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { PenSquare, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AdminSecretTap } from './AdminSecretTap'
+import { NotificationBell } from './NotificationBell'
 
 export function Header() {
   return (
@@ -12,18 +13,21 @@ export function Header() {
             은둔마을
           </Link>
         </AdminSecretTap>
-        <div className="hidden md:flex items-center gap-1">
-          <Button asChild size="icon" variant="ghost">
-            <Link href="/search" aria-label="검색">
-              <Search size={18} />
-            </Link>
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/create">
-              <PenSquare size={15} />
-              글쓰기
-            </Link>
-          </Button>
+        <div className="flex items-center gap-1">
+          <NotificationBell />
+          <div className="hidden md:flex items-center gap-1">
+            <Button asChild size="icon" variant="ghost">
+              <Link href="/search" aria-label="검색">
+                <Search size={18} />
+              </Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/create">
+                <PenSquare size={15} />
+                글쓰기
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </header>

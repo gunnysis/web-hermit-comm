@@ -33,9 +33,9 @@ export function useComments(postId: number) {
   }, [postId, queryClient])
 
   const createMutation = useMutation({
-    mutationFn: (args: { request: CreateCommentRequest & { author_id: string } }) =>
-      createComment(postId, args.request),
-    onMutate: async ({ request }) => {
+    mutationFn: (args: { request: CreateCommentRequest & { author_id: string }; parentId?: number | null }) =>
+      createComment(postId, args.request, args.parentId),
+    onMutate: async ({ request, parentId }) => {
       await queryClient.cancelQueries({ queryKey: ['comments', postId] })
       const prev = queryClient.getQueryData<Comment[]>(['comments', postId])
 
@@ -51,6 +51,7 @@ export function useComments(postId: number) {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         deleted_at: null,
+        parent_id: parentId ?? null,
       }
 
       queryClient.setQueryData<Comment[]>(['comments', postId], old =>

@@ -11,7 +11,10 @@ import { CommunityPulse } from './CommunityPulse'
 import { EmotionFilterBar } from './EmotionFilterBar'
 import { TrendingPosts } from './TrendingPosts'
 import { GreetingBanner } from './GreetingBanner'
+import { HomeCheckinBanner } from './HomeCheckinBanner'
+import { YesterdayReactionBanner } from './YesterdayReactionBanner'
 import { DEFAULT_PUBLIC_BOARD_ID, EMPTY_STATE_MESSAGES } from '@/lib/constants'
+import { useBlockedAliases } from '@/features/blocks/hooks/useBlocks'
 import { Separator } from '@/components/ui/separator'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FileText } from 'lucide-react'
@@ -38,7 +41,9 @@ export function PublicFeed() {
     { enabled: hasNextPage && !isFetchingNextPage && !emotionFilter },
   )
 
-  const posts = emotionFilter ? (filteredPosts ?? []) : (data?.pages.flat() ?? [])
+  const { data: blockedAliases = [] } = useBlockedAliases()
+  const allPosts = emotionFilter ? (filteredPosts ?? []) : (data?.pages.flat() ?? [])
+  const posts = allPosts.filter(p => !blockedAliases.includes(p.display_name))
   const loading = emotionFilter ? isFilterLoading : isLoading
 
   const latestRef = useRef<HTMLButtonElement>(null)
@@ -59,6 +64,8 @@ export function PublicFeed() {
   return (
     <div className="space-y-3 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
       <GreetingBanner />
+      <YesterdayReactionBanner />
+      <HomeCheckinBanner />
       <CommunityPulse onEmotionSelect={handleEmotionSelect} selectedEmotion={emotionFilter} />
       <EmotionFilterBar selected={emotionFilter} onSelect={handleEmotionSelect} />
       <TrendingPosts />

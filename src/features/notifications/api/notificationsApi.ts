@@ -1,0 +1,31 @@
+import { createClient } from '@/utils/supabase/client'
+import { logger } from '@/lib/logger'
+
+export interface Notification {
+  id: number
+  type: 'reaction' | 'comment' | 'reply'
+  post_id: number | null
+  comment_id: number | null
+  actor_alias: string | null
+  read: boolean
+  created_at: string
+}
+
+export async function getNotifications(limit = 20, offset = 0): Promise<Notification[]> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_notifications', { p_limit: limit, p_offset: offset })
+  if (error) { logger.error('[getNotifications]', error); throw error }
+  return (data ?? []) as Notification[]
+}
+
+export async function getUnreadCount(): Promise<number> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_unread_notification_count')
+  if (error) return 0
+  return (data as number) ?? 0
+}
+
+export async function markAllRead(): Promise<void> {
+  const supabase = createClient()
+  await supabase.rpc('mark_all_notifications_read')
+}

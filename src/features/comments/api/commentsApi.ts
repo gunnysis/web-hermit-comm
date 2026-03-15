@@ -16,11 +16,12 @@ export async function getComments(postId: number): Promise<Comment[]> {
 export async function createComment(
   postId: number,
   request: CreateCommentRequest & { author_id: string },
+  parentId?: number | null,
 ): Promise<Comment> {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('comments')
-    .insert({ post_id: postId, ...request })
+    .insert({ post_id: postId, ...request, parent_id: parentId ?? null })
     .select()
     .single()
   if (error) throw error

@@ -207,3 +207,145 @@ export async function searchPosts(params: {
   }
   return (data ?? []) as SearchResult[]
 }
+
+export async function createDailyPost(data: {
+  emotions: string[]
+  activities?: string[]
+  content?: string
+}): Promise<Post> {
+  const supabase = createClient()
+  const { data: result, error } = await supabase.rpc('create_daily_post', {
+    p_emotions: data.emotions,
+    p_activities: data.activities ?? [],
+    p_content: data.content ?? '',
+  })
+  if (error) {
+    logger.error('[API] createDailyPost 에러:', error.message, { code: error.code })
+    throw error
+  }
+  return result as unknown as Post
+}
+
+export async function updateDailyPost(data: {
+  postId: number
+  emotions: string[]
+  activities?: string[]
+  content?: string
+}): Promise<Post> {
+  const supabase = createClient()
+  const { data: result, error } = await supabase.rpc('update_daily_post', {
+    p_post_id: data.postId,
+    p_emotions: data.emotions,
+    p_activities: data.activities ?? [],
+    p_content: data.content ?? '',
+  })
+  if (error) {
+    logger.error('[API] updateDailyPost 에러:', error.message, { code: error.code })
+    throw error
+  }
+  return result as unknown as Post
+}
+
+export async function getTodayDaily(): Promise<Post | null> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_today_daily')
+  if (error) {
+    logger.error('[API] getTodayDaily 에러:', error.message, { code: error.code })
+    throw error
+  }
+  return data as Post | null
+}
+
+export interface DailyInsightsResult {
+  total_dailies: number
+  activity_emotion_map: {
+    activity: string
+    count: number
+    emotions: { emotion: string; pct: number }[]
+  }[]
+}
+
+export async function getDailyInsights(days = 30): Promise<DailyInsightsResult> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_daily_activity_insights', { p_days: days })
+  if (error) {
+    logger.error('[API] getDailyInsights 에러:', error.message, { code: error.code })
+    throw error
+  }
+  return data as DailyInsightsResult
+}
+
+export interface YesterdayDailyReactions {
+  post_id: number
+  like_count: number
+  comment_count: number
+}
+
+export async function getYesterdayDailyReactions(): Promise<YesterdayDailyReactions | null> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+
+  const now = new Date()
+  const kstOffset = 9 * 60 * 60 * 1000
+  const kstNow = new Date(now.getTime() + kstOffset)
+  const kstToday = new Date(kstNow.getFullYear(), kstNow.getMonth(), kstNow.getDate())
+  const kstYesterday = new Date(kstToday.getTime() - 24 * 60 * 60 * 1000)
+
+  const yesterdayStart = new Date(kstYesterday.getTime() - kstOffset).toISOString()
+  const yesterdayEnd = new Date(kstToday.getTime() - kstOffset).toISOString()
+
+  const { data, error } = await supabase
+    .from('posts_with_like_count')
+    .select('id, like_count, comment_count')
+    .eq('author_id', user.id)
+    .eq('post_type', 'daily')
+    .gte('created_at', yesterdayStart)
+    .lt('created_at', yesterdayEnd)
+    .limit(1)
+    .maybeSingle()
+
+  if (error || !data) return null
+  if (data.like_count === 0 && data.comment_count === 0) return null
+
+  return { post_id: data.id!, like_count: data.like_count ?? 0, comment_count: data.comment_count ?? 0 }
+}
+
+export interface SameMoodDaily {
+  id: number
+  content: string
+  emotions: string[]
+  activities: string[]
+}
+
+export async function getMyAlias(): Promise<string | null> {
+  const supabase = createClient()
+  const { data } = await supabase.rpc('get_my_alias')
+  return data as string | null
+}
+
+export async function getSameMoodDailies(postId: number, emotions: string[]): Promise<SameMoodDaily[]> {
+  if (!emotions.length) return []
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const now = new Date()
+  const kstOffset = 9 * 60 * 60 * 1000
+  const kstNow = new Date(now.getTime() + kstOffset)
+  const kstToday = new Date(kstNow.getFullYear(), kstNow.getMonth(), kstNow.getDate())
+  const todayStart = new Date(kstToday.getTime() - kstOffset).toISOString()
+
+  const { data, error } = await supabase
+    .from('posts_with_like_count')
+    .select('id, content, emotions, activities')
+    .eq('post_type', 'daily')
+    .gte('created_at', todayStart)
+    .neq('author_id', user.id)
+    .neq('id', postId)
+    .overlaps('emotions', emotions)
+    .limit(3)
+
+  if (error || !data) return []
+  return data as SameMoodDaily[]
+}

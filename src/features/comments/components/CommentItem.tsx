@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { MoreHorizontal, Pencil, Trash2, Reply } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -22,9 +22,11 @@ interface CommentItemProps {
   currentUserId: string | null
   updateMutation: ReturnType<typeof useComments>['updateMutation']
   deleteMutation: ReturnType<typeof useComments>['deleteMutation']
+  onReply?: (commentId: number, displayName: string) => void
+  isReply?: boolean
 }
 
-export function CommentItem({ comment, currentUserId, updateMutation, deleteMutation }: CommentItemProps) {
+export function CommentItem({ comment, currentUserId, updateMutation, deleteMutation, onReply, isReply }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editContent, setEditContent] = useState(comment.content)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -57,26 +59,39 @@ export function CommentItem({ comment, currentUserId, updateMutation, deleteMuta
           <span className="text-sm font-medium">{comment.display_name}</span>
           <span className="text-xs text-muted-foreground">{timeAgo}</span>
         </div>
-        {canEdit && !isEditing && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6" aria-label="댓글 더보기">
-                <MoreHorizontal size={14} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                <Pencil size={14} className="mr-2" /> 수정
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setDeleteDialogOpen(true)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 size={14} className="mr-2" /> 삭제
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        <div className="flex items-center gap-1">
+          {!isReply && currentUserId && !isEditing && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-xs text-muted-foreground"
+              onClick={() => onReply?.(comment.id, comment.display_name)}
+            >
+              <Reply size={12} className="mr-1" />
+              답글
+            </Button>
+          )}
+          {canEdit && !isEditing && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6" aria-label="댓글 더보기">
+                  <MoreHorizontal size={14} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                  <Pencil size={14} className="mr-2" /> 수정
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setDeleteDialogOpen(true)}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 size={14} className="mr-2" /> 삭제
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       </div>
 
       {isEditing ? (
