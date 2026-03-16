@@ -1,15 +1,8 @@
 import { createClient } from '@/utils/supabase/client'
 import { logger } from '@/lib/logger'
+import type { Notification } from '@/types/database'
 
-export interface Notification {
-  id: number
-  type: 'reaction' | 'comment' | 'reply'
-  post_id: number | null
-  comment_id: number | null
-  actor_alias: string | null
-  read: boolean
-  created_at: string
-}
+export type { Notification }
 
 export async function getNotifications(limit = 20, offset = 0): Promise<Notification[]> {
   const supabase = createClient()

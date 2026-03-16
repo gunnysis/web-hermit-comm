@@ -23,7 +23,7 @@ function formatCount(n: number): string {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  if ((post as any).post_type === 'daily') {
+  if (post.post_type === 'daily') {
     return <DailyPostCard post={post} />
   }
 

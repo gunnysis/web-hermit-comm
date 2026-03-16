@@ -50,14 +50,14 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
         { emotions, activities, content: note },
         {
           onSuccess: () => {
-            const summary = queryClient.getQueryData<any>(['myActivity'])
-            if (!summary || summary.post_count <= 1) {
+            const summary = queryClient.getQueryData<{ post_count?: number }>(['myActivity'])
+            if (!summary || (summary.post_count ?? 0) <= 1) {
               toast('🌱 첫 하루를 나눴어요')
             }
             router.push('/')
           },
-          onError: (err: any) => {
-            if (err?.code === 'P0002') {
+          onError: (err: Error & { code?: string }) => {
+            if (err.code === 'P0002') {
               alert('오늘은 이미 나눴어요. 하루에 한 번만 나눌 수 있어요.')
             } else {
               alert('잠시 후 다시 시도해주세요.')

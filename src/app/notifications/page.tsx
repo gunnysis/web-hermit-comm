@@ -6,13 +6,14 @@ import { ko } from 'date-fns/locale'
 import { Header } from '@/components/layout/Header'
 import { Button } from '@/components/ui/button'
 import { useNotifications, useMarkAllRead, useMarkRead } from '@/features/notifications/hooks/useNotifications'
+import type { Notification } from '@/types/database'
 
 export default function NotificationsPage() {
   const { data: notifications = [] } = useNotifications()
   const { mutate: markAllRead } = useMarkAllRead()
   const { mutate: markRead } = useMarkRead()
 
-  const getLabel = (n: { type: string; actor_alias: string | null }) => {
+  const getLabel = (n: Notification) => {
     const actor = n.actor_alias ?? '누군가'
     if (n.type === 'reaction') return `${actor}가 공감했어요`
     if (n.type === 'comment') return `${actor}가 댓글을 남겼어요`
