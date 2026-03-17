@@ -56,7 +56,7 @@ export function CommentItem({ comment, currentUserId, updateMutation, deleteMuta
     <div className="py-3 border-b last:border-0">
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">{comment.display_name}</span>
+          <span className="text-sm font-medium truncate max-w-[60%]">{comment.display_name}</span>
           <span className="text-xs text-muted-foreground">{timeAgo}</span>
         </div>
         <div className="flex items-center gap-1">

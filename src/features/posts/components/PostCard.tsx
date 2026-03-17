@@ -63,7 +63,7 @@ export function PostCard({ post }: PostCardProps) {
         )}
         <CardHeader className="pb-2 space-y-1.5">
           <div className="flex items-center justify-between gap-2">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-happy-50 text-happy-700 dark:bg-happy-900/40 dark:text-happy-300">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-happy-50 text-happy-700 dark:bg-happy-900/40 dark:text-happy-300 truncate max-w-[60%]">
               {post.display_name}
             </span>
             <time className="text-xs text-muted-foreground/70 shrink-0">{timeAgo}</time>
