@@ -65,11 +65,23 @@ export function EmotionCalendar({ userId, days = 30 }: EmotionCalendarProps) {
     )
   }
 
+  // Collect unique emotions that appear in the calendar for legend
+  const usedEmotions = useMemo(() => {
+    const set = new Set<string>()
+    for (const day of calendarData) {
+      if (day.emotions?.length > 0) set.add(day.emotions[0])
+    }
+    return [...set]
+  }, [calendarData])
+
   if (!weeks.length) return null
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-sm font-semibold">감정 캘린더</h3>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold">감정 캘린더</h3>
+        <span className="text-[10px] text-muted-foreground">최근 {days}일</span>
+      </div>
       <div className="flex gap-1">
         {weeks.map((week, wi) => (
           <div key={wi} className="flex flex-col gap-1">
@@ -98,6 +110,23 @@ export function EmotionCalendar({ userId, days = 30 }: EmotionCalendarProps) {
           </div>
         ))}
       </div>
+      {/* Color Legend */}
+      {usedEmotions.length > 0 && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1">
+          {usedEmotions.map((emotion) => {
+            const colors = EMOTION_COLOR_MAP[emotion]
+            return (
+              <span key={emotion} className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                <span
+                  className="w-2.5 h-2.5 rounded-sm inline-block"
+                  style={{ backgroundColor: colors?.gradient[0] ?? '#e5e5e5' }}
+                />
+                {EMOTION_EMOJI[emotion]} {emotion}
+              </span>
+            )
+          })}
+        </div>
+      )}
     </div>
   )
 }

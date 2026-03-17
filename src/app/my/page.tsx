@@ -26,60 +26,75 @@ export default function MySpacePage() {
   if (authLoading || !user) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-4">
-        <Skeleton className="h-8 w-32" />
-        <Skeleton className="h-16 w-full" />
-        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-28 w-full rounded-2xl" />
+        <div className="grid grid-cols-3 gap-3">
+          <Skeleton className="h-20 rounded-xl" />
+          <Skeleton className="h-20 rounded-xl" />
+          <Skeleton className="h-20 rounded-xl" />
+        </div>
+        <Skeleton className="h-24 w-full rounded-xl" />
       </div>
     )
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6 animate-fade-in">
-      <h1 className="text-xl font-bold">나의 공간</h1>
+    <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
+      {/* 프로필 히어로 */}
+      <section className="animate-fade-in">
+        <ProfileSection user={user} />
+      </section>
 
-      {/* 프로필 */}
-      <ProfileSection enabled={!!user} />
-
-      {/* 활동 요약 */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { label: '작성한 글', value: summary?.post_count ?? 0, emoji: '📝' },
-          { label: '작성한 댓글', value: summary?.comment_count ?? 0, emoji: '💬' },
-          { label: '보낸 반응', value: summary?.reaction_count ?? 0, emoji: '💛' },
-          { label: '연속 기록', value: `${summary?.streak ?? 0}일`, emoji: '🔥' },
-        ].map((stat) => (
-          <Card key={stat.label}>
-            <CardContent className="pt-4 pb-3 text-center">
-              {isLoading ? (
-                <Skeleton className="h-8 w-12 mx-auto" />
-              ) : (
-                <>
-                  <p className="text-2xl font-bold">{stat.emoji} {stat.value}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{stat.label}</p>
-                </>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* 활동 요약 — 3 cards (streak moved to hero) */}
+      <section className="animate-slide-up" style={{ animationDelay: '50ms', animationFillMode: 'backwards' }}>
+        <h2 className="text-sm font-semibold mb-2 text-muted-foreground">활동</h2>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            { label: '작성한 글', value: summary?.post_count ?? 0, emoji: '📝' },
+            { label: '작성한 댓글', value: summary?.comment_count ?? 0, emoji: '💬' },
+            { label: '보낸 반응', value: summary?.reaction_count ?? 0, emoji: '💛' },
+          ].map((stat) => (
+            <Card key={stat.label} className="border-0 shadow-sm">
+              <CardContent className="pt-3 pb-2 text-center">
+                {isLoading ? (
+                  <Skeleton className="h-7 w-10 mx-auto" />
+                ) : (
+                  <>
+                    <p className="text-lg font-bold">{stat.emoji} {stat.value}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{stat.label}</p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
 
       {/* 나의 패턴 */}
-      <DailyInsights enabled={!!user} />
+      <section className="animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
+        <DailyInsights enabled={!!user} />
+      </section>
 
       <Separator />
 
       {/* 감정 캘린더 */}
-      <EmotionCalendar userId={user.id} />
+      <section className="animate-slide-up" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
+        <EmotionCalendar userId={user.id} />
+      </section>
 
       <Separator />
 
       {/* 커뮤니티 감정 타임라인 */}
-      <EmotionWave />
+      <section className="animate-slide-up" style={{ animationDelay: '200ms', animationFillMode: 'backwards' }}>
+        <EmotionWave />
+      </section>
 
       <Separator />
 
-      {/* 차단 관리 */}
-      <BlockedUsersSection enabled={!!user} />
+      {/* 설정 */}
+      <section className="animate-slide-up" style={{ animationDelay: '250ms', animationFillMode: 'backwards' }}>
+        <h2 className="text-sm font-semibold mb-3 text-muted-foreground">설정</h2>
+        <BlockedUsersSection enabled={!!user} />
+      </section>
     </div>
   )
 }

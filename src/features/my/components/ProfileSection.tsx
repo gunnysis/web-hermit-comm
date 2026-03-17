@@ -1,15 +1,35 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMyAlias } from '../hooks/useMyAlias'
+import { useActivitySummary } from '../hooks/useActivitySummary'
+import { useTodayDaily } from '../hooks/useTodayDaily'
 import { signOut } from '@/features/auth/auth'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { EMOTION_EMOJI, EMOTION_COLOR_MAP } from '@/lib/constants'
 import { Skeleton } from '@/components/ui/skeleton'
+import type { User } from '@supabase/supabase-js'
 
-export function ProfileSection({ enabled = true }: { enabled?: boolean }) {
+function getDaysSince(dateStr: string): number {
+  const created = new Date(dateStr)
+  const now = new Date()
+  return Math.max(1, Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)))
+}
+
+export function ProfileSection({ user }: { user: User }) {
   const router = useRouter()
-  const { data: alias, isLoading } = useMyAlias(enabled)
+  const { data: alias, isLoading: aliasLoading } = useMyAlias(true)
+  const { data: summary, isLoading: summaryLoading } = useActivitySummary(true)
+  const { data: todayDaily } = useTodayDaily(true)
+
+  const daysSince = useMemo(() => getDaysSince(user.created_at), [user.created_at])
+  const streak = summary?.streak ?? 0
+
+  const todayEmotions: string[] = useMemo(() => {
+    if (!todayDaily) return []
+    const raw = (todayDaily as { emotions?: string[] }).emotions
+    return Array.isArray(raw) ? raw : []
+  }, [todayDaily])
 
   const handleSignOut = async () => {
     await signOut()
@@ -17,25 +37,66 @@ export function ProfileSection({ enabled = true }: { enabled?: boolean }) {
   }
 
   return (
-    <Card>
-      <CardContent className="pt-4 pb-3 flex items-center justify-between">
+    <div className="rounded-2xl bg-gradient-to-br from-cream-50 to-happy-50 dark:from-card dark:to-card border p-5 space-y-4">
+      {/* Alias + Member Since */}
+      <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-lg">
-            {isLoading ? <Skeleton className="w-10 h-10 rounded-full" /> : '🙂'}
+          <div className="w-12 h-12 rounded-full bg-white dark:bg-muted flex items-center justify-center text-xl shadow-sm">
+            {aliasLoading ? <Skeleton className="w-12 h-12 rounded-full" /> : '🙂'}
           </div>
           <div>
-            {isLoading ? (
-              <Skeleton className="h-5 w-24" />
+            {aliasLoading ? (
+              <Skeleton className="h-5 w-28" />
             ) : (
-              <p className="text-sm font-semibold">{alias ?? '익명'}</p>
+              <p className="text-base font-bold">{alias ?? '익명'}</p>
             )}
-            <p className="text-xs text-muted-foreground mt-0.5">나의 별칭</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              함께한 지 {daysSince}일째
+            </p>
           </div>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleSignOut}>
+        <button
+          onClick={handleSignOut}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+        >
           로그아웃
-        </Button>
-      </CardContent>
-    </Card>
+        </button>
+      </div>
+
+      {/* Streak + Today's Emotion */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {/* Streak Badge */}
+        {summaryLoading ? (
+          <Skeleton className="h-7 w-28 rounded-full" />
+        ) : streak > 0 ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 dark:bg-muted px-3 py-1 text-xs font-medium shadow-sm">
+            🔥 연속 {streak}일 기록 중
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 dark:bg-muted px-3 py-1 text-xs text-muted-foreground">
+            오늘 하루를 나눠보세요
+          </span>
+        )}
+
+        {/* Today's Emotions */}
+        {todayEmotions.length > 0 && (
+          <div className="flex items-center gap-1">
+            {todayEmotions.map((emotion) => {
+              const color = EMOTION_COLOR_MAP[emotion]
+              return (
+                <span
+                  key={emotion}
+                  className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                  style={{ backgroundColor: color?.gradient[0] ?? '#f5f5f4' }}
+                  title={emotion}
+                >
+                  {EMOTION_EMOJI[emotion]} {emotion}
+                </span>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </div>
   )
 }
