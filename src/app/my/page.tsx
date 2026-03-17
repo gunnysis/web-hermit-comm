@@ -6,6 +6,7 @@ import { useAuthContext } from '@/features/auth/AuthProvider'
 import { useActivitySummary } from '@/features/my/hooks/useActivitySummary'
 import { ProfileSection } from '@/features/my/components/ProfileSection'
 import { DailyInsights } from '@/features/my/components/DailyInsights'
+import { WeeklySummary } from '@/features/my/components/WeeklySummary'
 import { BlockedUsersSection } from '@/features/my/components/BlockedUsersSection'
 import { EmotionCalendar } from '@/features/posts/components/EmotionCalendar'
 import { EmotionWave } from '@/features/posts/components/EmotionWave'
@@ -69,8 +70,13 @@ export default function MySpacePage() {
         </div>
       </section>
 
-      {/* 나의 패턴 */}
+      {/* 주간 회고 */}
       <section className="animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
+        <WeeklySummary enabled={!!user} />
+      </section>
+
+      {/* 나의 패턴 */}
+      <section className="animate-slide-up" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
         <DailyInsights enabled={!!user} />
       </section>
 
