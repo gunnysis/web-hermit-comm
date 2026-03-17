@@ -208,15 +208,15 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
                   </DropdownMenuItem>
                 </>
               )}
-              {!isOwnPost && (
+              {!isOwnPost && post.display_name && post.display_name !== '익명' && (
                 <DropdownMenuItem
                   onClick={() => {
-                    if (post.display_name) {
-                      blockMutation.mutate(post.display_name, {
-                        onSuccess: () => toast.success('차단했습니다.'),
-                        onError: () => toast.error('차단에 실패했습니다.'),
-                      })
-                    }
+                    blockMutation.mutate(post.display_name, {
+                      onSuccess: () => toast.success('차단했습니다.'),
+                      onError: (err: Error & { code?: string }) => {
+                        toast.error(err.code === 'P0002' ? '차단할 수 없는 사용자입니다.' : '차단에 실패했습니다.')
+                      },
+                    })
                   }}
                   className="text-destructive focus:text-destructive"
                 >
