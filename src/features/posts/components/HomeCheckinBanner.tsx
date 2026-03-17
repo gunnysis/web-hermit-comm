@@ -27,30 +27,40 @@ export function HomeCheckinBanner() {
   if (todayDaily) {
     const emotions = todayDaily.emotions ?? todayDaily.initial_emotions ?? []
     const likeCount = todayDaily.like_count ?? 0
+    const commentCount = (todayDaily as unknown as { comment_count?: number }).comment_count ?? 0
+    const hasReactions = likeCount > 0 || commentCount > 0
     return (
       <div
-        className="rounded-xl px-4 py-3 mb-4 flex items-center justify-between transition-colors hover:opacity-90"
+        className="rounded-xl px-4 py-3 mb-4 space-y-1.5 transition-colors hover:opacity-90"
         style={{
           backgroundColor: `var(--daily-bg, ${SHARED_PALETTE.cream[50]})`,
           border: `1px solid var(--daily-border, ${SHARED_PALETTE.cream[200]})`,
         }}
+        aria-label={`오늘의 하루 - 좋아요 ${likeCount}개, 댓글 ${commentCount}개`}
       >
-        <Link href={`/post/${todayDaily.id}`} className="flex-1 min-w-0">
-          <span className="text-xs text-muted-foreground">
-            오늘의 하루: {emotions.map((e: string) => `${EMOTION_EMOJI[e] ?? ''} ${e}`).join(' ')}
-          </span>
-        </Link>
-        <div className="flex items-center gap-2 shrink-0">
-          {likeCount > 0 && (
-            <span className="text-xs text-muted-foreground">{likeCount}명이 공감</span>
-          )}
+        <div className="flex items-center justify-between">
+          <Link href={`/post/${todayDaily.id}`} className="flex-1 min-w-0">
+            <span className="text-xs text-muted-foreground truncate">
+              오늘의 하루: {emotions.map((e: string) => `${EMOTION_EMOJI[e] ?? ''} ${e}`).join(' ')}
+            </span>
+          </Link>
           <Link
             href={`/create?type=daily&edit=${todayDaily.id}`}
-            className="text-xs text-muted-foreground hover:text-foreground"
+            className="text-xs text-muted-foreground hover:text-foreground shrink-0 ml-2"
           >
             수정
           </Link>
         </div>
+        {hasReactions && (
+          <div className="flex items-center gap-3">
+            {likeCount > 0 && (
+              <span className="text-xs text-muted-foreground">❤️ {likeCount}명이 공감</span>
+            )}
+            {commentCount > 0 && (
+              <span className="text-xs text-muted-foreground">💬 {commentCount}개 댓글</span>
+            )}
+          </div>
+        )}
       </div>
     )
   }
