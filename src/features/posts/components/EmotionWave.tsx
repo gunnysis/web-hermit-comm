@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/utils/supabase/client'
 import { EMOTION_COLOR_MAP, EMOTION_EMOJI } from '@/lib/constants'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { EmotionTimelineEntry } from '@/types/database'
 
 async function getEmotionTimeline(days = 7): Promise<EmotionTimelineEntry[]> {
@@ -18,7 +19,7 @@ interface EmotionWaveProps {
 }
 
 export function EmotionWave({ days = 7 }: EmotionWaveProps) {
-  const { data: timeline = [] } = useQuery({
+  const { data: timeline = [], isLoading } = useQuery({
     queryKey: ['emotionTimeline', days],
     queryFn: () => getEmotionTimeline(days),
     staleTime: 5 * 60 * 1000,
@@ -61,6 +62,19 @@ export function EmotionWave({ days = 7 }: EmotionWaveProps) {
 
     return { dayLabels, topEmotions, bars }
   }, [timeline])
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold">감정 타임라인</h3>
+        <div className="flex items-end gap-1 h-24">
+          {Array.from({ length: 7 }).map((_, i) => (
+            <Skeleton key={i} className="flex-1 rounded-t-sm" style={{ height: `${30 + Math.random() * 60}%` }} />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   if (!bars.length) return null
 

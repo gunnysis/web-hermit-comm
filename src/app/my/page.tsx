@@ -2,23 +2,16 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { createClient } from '@/utils/supabase/client'
 import { useAuthContext } from '@/features/auth/AuthProvider'
+import { useActivitySummary } from '@/features/my/hooks/useActivitySummary'
+import { ProfileSection } from '@/features/my/components/ProfileSection'
 import { DailyInsights } from '@/features/my/components/DailyInsights'
+import { BlockedUsersSection } from '@/features/my/components/BlockedUsersSection'
 import { EmotionCalendar } from '@/features/posts/components/EmotionCalendar'
 import { EmotionWave } from '@/features/posts/components/EmotionWave'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Skeleton } from '@/components/ui/skeleton'
-
-async function getMyActivitySummary() {
-  const supabase = createClient()
-  const { data, error } = await supabase.rpc('get_my_activity_summary')
-  if (error) throw error
-  return data as { post_count: number; comment_count: number; reaction_count: number; streak: number }
-}
 
 export default function MySpacePage() {
   const router = useRouter()
@@ -28,16 +21,13 @@ export default function MySpacePage() {
     if (!authLoading && !user) router.push('/login')
   }, [authLoading, user, router])
 
-  const { data: summary, isLoading } = useQuery({
-    queryKey: ['myActivity'],
-    queryFn: getMyActivitySummary,
-    enabled: !!user,
-  })
+  const { data: summary, isLoading } = useActivitySummary(!!user)
 
   if (authLoading || !user) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-4">
         <Skeleton className="h-8 w-32" />
+        <Skeleton className="h-16 w-full" />
         <Skeleton className="h-24 w-full" />
       </div>
     )
@@ -46,6 +36,9 @@ export default function MySpacePage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 space-y-6 animate-fade-in">
       <h1 className="text-xl font-bold">나의 공간</h1>
+
+      {/* 프로필 */}
+      <ProfileSection enabled={!!user} />
 
       {/* 활동 요약 */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -83,9 +76,10 @@ export default function MySpacePage() {
       {/* 커뮤니티 감정 타임라인 */}
       <EmotionWave />
 
-      <div className="pt-4">
-        <Button variant="outline" onClick={() => router.push('/')}>홈으로 돌아가기</Button>
-      </div>
+      <Separator />
+
+      {/* 차단 관리 */}
+      <BlockedUsersSection enabled={!!user} />
     </div>
   )
 }

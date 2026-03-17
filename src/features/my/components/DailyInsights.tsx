@@ -1,12 +1,22 @@
 'use client'
 
 import { useDailyInsights } from '../hooks/useDailyInsights'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ACTIVITY_PRESETS, EMOTION_EMOJI, EMOTION_COLOR_MAP, DAILY_INSIGHTS_CONFIG } from '@/lib/constants'
 
 export function DailyInsights({ enabled = true }: { enabled?: boolean }) {
   const { data, isLoading } = useDailyInsights(30, enabled)
 
-  if (isLoading || !data) return null
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold">나의 패턴</h3>
+        <Skeleton className="h-20 w-full rounded-xl" />
+      </div>
+    )
+  }
+
+  if (!data) return null
 
   const { total_dailies, activity_emotion_map } = data
 

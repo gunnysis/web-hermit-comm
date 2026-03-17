@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { PenSquare, Search } from 'lucide-react'
+import { PenSquare, Search, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { AdminSecretTap } from './AdminSecretTap'
 import { NotificationBell } from './NotificationBell'
@@ -25,6 +25,11 @@ export function Header() {
               <Link href="/create">
                 <PenSquare size={15} />
                 글쓰기
+              </Link>
+            </Button>
+            <Button asChild size="icon" variant="ghost">
+              <Link href="/my" aria-label="나의 공간">
+                <User size={18} />
               </Link>
             </Button>
           </div>

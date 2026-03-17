@@ -50,7 +50,7 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
         { emotions, activities, content: note },
         {
           onSuccess: () => {
-            const summary = queryClient.getQueryData<{ post_count?: number }>(['myActivity'])
+            const summary = queryClient.getQueryData<{ post_count?: number }>(['activitySummary'])
             if (!summary || (summary.post_count ?? 0) <= 1) {
               toast('🌱 첫 하루를 나눴어요')
             }

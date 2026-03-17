@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/utils/supabase/client'
 import { EMOTION_COLOR_MAP, EMOTION_EMOJI } from '@/lib/constants'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { EmotionCalendarDay } from '@/types/database'
 
 async function getUserEmotionCalendar(userId: string, days = 30): Promise<EmotionCalendarDay[]> {
@@ -25,7 +26,7 @@ interface EmotionCalendarProps {
 }
 
 export function EmotionCalendar({ userId, days = 30 }: EmotionCalendarProps) {
-  const { data: calendarData = [] } = useQuery({
+  const { data: calendarData = [], isLoading } = useQuery({
     queryKey: ['emotionCalendar', userId, days],
     queryFn: () => getUserEmotionCalendar(userId, days),
     staleTime: 5 * 60 * 1000,
@@ -46,6 +47,23 @@ export function EmotionCalendar({ userId, days = 30 }: EmotionCalendarProps) {
     if (week.length > 0) result.push(week)
     return result
   }, [calendarData])
+
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold">감정 캘린더</h3>
+        <div className="flex gap-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-1">
+              {Array.from({ length: 7 }).map((_, j) => (
+                <Skeleton key={j} className="w-4 h-4 rounded-sm" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   if (!weeks.length) return null
 

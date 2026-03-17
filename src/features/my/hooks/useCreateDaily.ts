@@ -8,7 +8,8 @@ export function useCreateDaily() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todayDaily'] })
       queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
-      queryClient.invalidateQueries({ queryKey: ['myActivity'] })
+      queryClient.invalidateQueries({ queryKey: ['activitySummary'] })
+      queryClient.invalidateQueries({ queryKey: ['dailyInsights'] })
     },
   })
 }
@@ -20,7 +21,8 @@ export function useUpdateDaily() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['todayDaily'] })
       queryClient.invalidateQueries({ queryKey: ['boardPosts'] })
-      queryClient.invalidateQueries({ queryKey: ['myActivity'] })
+      queryClient.invalidateQueries({ queryKey: ['activitySummary'] })
+      queryClient.invalidateQueries({ queryKey: ['dailyInsights'] })
     },
   })
 }
