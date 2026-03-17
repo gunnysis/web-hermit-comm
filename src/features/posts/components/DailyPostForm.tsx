@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'motion/react'
 import { ALLOWED_EMOTIONS, EMOTION_EMOJI, EMOTION_COLOR_MAP, DAILY_CONFIG, SHARED_PALETTE } from '@/lib/constants'
 import { ActivityTagSelector } from './ActivityTagSelector'
 import { useCreateDaily, useUpdateDaily } from '@/features/my/hooks/useCreateDaily'
@@ -75,29 +74,14 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
 
   if (showSuccess) {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-        className="max-w-lg mx-auto flex flex-col items-center justify-center py-20"
-      >
-        <motion.span
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.1, type: 'spring', stiffness: 300 }}
-          className="text-5xl mb-4"
-        >
+      <div className="max-w-lg mx-auto flex flex-col items-center justify-center py-20 animate-in fade-in zoom-in duration-300">
+        <span className="text-5xl mb-4 animate-in zoom-in duration-300 delay-100">
           ✨
-        </motion.span>
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-lg font-bold"
-        >
+        </span>
+        <p className="text-lg font-bold animate-in fade-in slide-in-from-bottom-2 duration-300 delay-200">
           기록 완료!
-        </motion.p>
-      </motion.div>
+        </p>
+      </div>
     )
   }
 
@@ -113,28 +97,20 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
             const isActive = emotions.includes(emotion)
             const colors = EMOTION_COLOR_MAP[emotion]
             return (
-              <motion.button
+              <button
                 key={emotion}
                 type="button"
                 onClick={() => toggleEmotion(emotion)}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{
-                  opacity: 1,
-                  scale: isActive ? 1.05 : 1,
-                  backgroundColor: isActive ? (colors?.gradient[0] ?? '#E7D7FF') : 'var(--muted)',
-                }}
-                whileTap={{ scale: 0.95 }}
-                transition={{
-                  opacity: { delay: index * 0.02 },
-                  scale: { type: 'spring', stiffness: 300, damping: 25 },
-                }}
-                className={`rounded-full px-3 py-1.5 text-xs ${isActive ? 'font-semibold' : ''}`}
+                className={`rounded-full px-3 py-1.5 text-xs transition-all duration-200 active:scale-95 ${
+                  isActive ? 'font-semibold scale-105' : 'bg-muted hover:bg-muted/80'
+                }`}
+                style={isActive ? { backgroundColor: colors?.gradient[0] ?? '#E7D7FF' } : undefined}
                 aria-label={`감정: ${emotion}`}
                 role="checkbox"
                 aria-checked={isActive}
               >
                 {EMOTION_EMOJI[emotion]} {emotion}
-              </motion.button>
+              </button>
             )
           })}
         </div>
@@ -159,7 +135,7 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
       </div>
 
       {/* 나누기 / 수정 */}
-      <motion.div whileTap={{ scale: 0.98 }}>
+      <div className="active:scale-[0.98] transition-transform">
         <Button
           onClick={handleSubmit}
           disabled={isPending || emotions.length === 0}
@@ -173,7 +149,7 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
             ? (mode === 'edit' ? '수정 중...' : '나누는 중...')
             : (mode === 'edit' ? '수정하기' : '나누기')}
         </Button>
-      </motion.div>
+      </div>
     </div>
   )
 }
