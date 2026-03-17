@@ -8,6 +8,7 @@ import { ProfileSection } from '@/features/my/components/ProfileSection'
 import { DailyInsights } from '@/features/my/components/DailyInsights'
 import { WeeklySummary } from '@/features/my/components/WeeklySummary'
 import { StreakBadge } from '@/features/my/components/StreakBadge'
+import { EmotionTrendChart } from '@/features/my/components/EmotionTrendChart'
 import { BlockedUsersSection } from '@/features/my/components/BlockedUsersSection'
 import { EmotionCalendar } from '@/features/posts/components/EmotionCalendar'
 import { EmotionWave } from '@/features/posts/components/EmotionWave'
@@ -79,6 +80,11 @@ export default function MySpacePage() {
       {/* 주간 회고 */}
       <section className="animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
         <WeeklySummary enabled={!!user} />
+      </section>
+
+      {/* 감정 흐름 */}
+      <section className="animate-slide-up" style={{ animationDelay: '120ms', animationFillMode: 'backwards' }}>
+        <EmotionTrendChart enabled={!!user} />
       </section>
 
       {/* 나의 패턴 */}
