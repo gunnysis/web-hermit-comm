@@ -283,32 +283,11 @@ export interface YesterdayDailyReactions {
 
 export async function getYesterdayDailyReactions(): Promise<YesterdayDailyReactions | null> {
   const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
-
-  const now = new Date()
-  const kstOffset = 9 * 60 * 60 * 1000
-  const kstNow = new Date(now.getTime() + kstOffset)
-  const kstToday = new Date(kstNow.getFullYear(), kstNow.getMonth(), kstNow.getDate())
-  const kstYesterday = new Date(kstToday.getTime() - 24 * 60 * 60 * 1000)
-
-  const yesterdayStart = new Date(kstYesterday.getTime() - kstOffset).toISOString()
-  const yesterdayEnd = new Date(kstToday.getTime() - kstOffset).toISOString()
-
-  const { data, error } = await supabase
-    .from('posts_with_like_count')
-    .select('id, like_count, comment_count')
-    .eq('author_id', user.id)
-    .eq('post_type', 'daily')
-    .gte('created_at', yesterdayStart)
-    .lt('created_at', yesterdayEnd)
-    .limit(1)
-    .maybeSingle()
-
+  const { data, error } = await supabase.rpc('get_yesterday_daily_reactions')
   if (error || !data) return null
-  if (data.like_count === 0 && data.comment_count === 0) return null
-
-  return { post_id: data.id!, like_count: data.like_count ?? 0, comment_count: data.comment_count ?? 0 }
+  const result = data as unknown as YesterdayDailyReactions
+  if (!result?.post_id) return null
+  return result
 }
 
 export interface SameMoodDaily {
@@ -321,25 +300,30 @@ export interface SameMoodDaily {
 export async function getSameMoodDailies(postId: number, emotions: string[]): Promise<SameMoodDaily[]> {
   if (!emotions.length) return []
   const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
-
-  const now = new Date()
-  const kstOffset = 9 * 60 * 60 * 1000
-  const kstNow = new Date(now.getTime() + kstOffset)
-  const kstToday = new Date(kstNow.getFullYear(), kstNow.getMonth(), kstNow.getDate())
-  const todayStart = new Date(kstToday.getTime() - kstOffset).toISOString()
-
-  const { data, error } = await supabase
-    .from('posts_with_like_count')
-    .select('id, content, emotions, activities')
-    .eq('post_type', 'daily')
-    .gte('created_at', todayStart)
-    .neq('author_id', user.id)
-    .neq('id', postId)
-    .overlaps('emotions', emotions)
-    .limit(3)
-
+  const { data, error } = await supabase.rpc('get_same_mood_dailies', {
+    p_post_id: postId,
+    p_emotions: emotions,
+  })
   if (error || !data) return []
-  return data as SameMoodDaily[]
+  return (Array.isArray(data) ? data : []) as unknown as SameMoodDaily[]
+}
+
+export interface WeeklyEmotionSummary {
+  week_start: string
+  week_end: string
+  days_logged: number
+  top_emotions: { emotion: string; count: number }[] | null
+  top_activity: string | null
+}
+
+export async function getWeeklyEmotionSummary(weekOffset = 0): Promise<WeeklyEmotionSummary | null> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_weekly_emotion_summary', {
+    p_week_offset: weekOffset,
+  })
+  if (error) {
+    logger.error('[API] getWeeklyEmotionSummary 에러:', error.message)
+    return null
+  }
+  return data as unknown as WeeklyEmotionSummary | null
 }
