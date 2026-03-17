@@ -73,10 +73,16 @@ function DailyPostCardInner({ post }: DailyPostCardProps) {
         )}
 
         {/* 리액션 */}
-        <div className="flex items-center gap-3 mt-1">
-          <span className="text-xs text-muted-foreground">{post.like_count}</span>
-          <span className="text-xs text-muted-foreground">{post.comment_count}</span>
-        </div>
+        {(post.like_count > 0 || post.comment_count > 0) && (
+          <div className="flex items-center gap-3 mt-1" aria-label={`좋아요 ${post.like_count}개, 댓글 ${post.comment_count}개`}>
+            {post.like_count > 0 && (
+              <span className="text-xs text-muted-foreground">❤️ {post.like_count}</span>
+            )}
+            {post.comment_count > 0 && (
+              <span className="text-xs text-muted-foreground">💬 {post.comment_count}</span>
+            )}
+          </div>
+        )}
       </div>
     </Link>
   )
