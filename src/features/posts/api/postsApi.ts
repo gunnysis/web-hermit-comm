@@ -316,6 +316,24 @@ export interface WeeklyEmotionSummary {
   top_activity: string | null
 }
 
+export interface StreakData {
+  current_streak: number
+  total_days: number
+  longest_streak: number
+  completed_today: boolean
+  new_milestone: number
+}
+
+export async function getMyStreak(): Promise<StreakData> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_my_streak')
+  if (error) {
+    logger.error('[API] getMyStreak 에러:', error.message)
+    throw error
+  }
+  return data as unknown as StreakData
+}
+
 export async function getWeeklyEmotionSummary(weekOffset = 0): Promise<WeeklyEmotionSummary | null> {
   const supabase = createClient()
   const { data, error } = await supabase.rpc('get_weekly_emotion_summary', {

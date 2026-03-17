@@ -7,6 +7,7 @@ import { useActivitySummary } from '@/features/my/hooks/useActivitySummary'
 import { ProfileSection } from '@/features/my/components/ProfileSection'
 import { DailyInsights } from '@/features/my/components/DailyInsights'
 import { WeeklySummary } from '@/features/my/components/WeeklySummary'
+import { StreakBadge } from '@/features/my/components/StreakBadge'
 import { BlockedUsersSection } from '@/features/my/components/BlockedUsersSection'
 import { EmotionCalendar } from '@/features/posts/components/EmotionCalendar'
 import { EmotionWave } from '@/features/posts/components/EmotionWave'
@@ -45,7 +46,12 @@ export default function MySpacePage() {
         <ProfileSection user={user} />
       </section>
 
-      {/* 활동 요약 — 3 cards (streak moved to hero) */}
+      {/* 스트릭 */}
+      <section className="animate-slide-up" style={{ animationDelay: '40ms', animationFillMode: 'backwards' }}>
+        <StreakBadge enabled={!!user} />
+      </section>
+
+      {/* 활동 요약 — 3 cards */}
       <section className="animate-slide-up" style={{ animationDelay: '50ms', animationFillMode: 'backwards' }}>
         <h2 className="text-sm font-semibold mb-2 text-muted-foreground">활동</h2>
         <div className="grid grid-cols-3 gap-3">
