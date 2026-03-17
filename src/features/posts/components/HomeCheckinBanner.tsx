@@ -11,17 +11,20 @@ export function HomeCheckinBanner() {
   const { data: todayDaily } = useTodayDaily(!!user)
   const [dismissed, setDismissed] = useState(false)
 
+  // 사용자별 dismiss 키 (공유 기기 대응)
+  const dismissKey = user ? `daily_banner_dismissed_${user.id}` : 'daily_banner_dismissed'
+
   useEffect(() => {
-    const key = 'daily_banner_dismissed'
-    const stored = localStorage.getItem(key)
+    if (!user) return
+    const stored = localStorage.getItem(dismissKey)
     if (stored === new Date().toISOString().slice(0, 10)) setDismissed(true)
-  }, [])
+  }, [user, dismissKey])
 
   if (!user || dismissed) return null
 
   const handleDismiss = () => {
     setDismissed(true)
-    localStorage.setItem('daily_banner_dismissed', new Date().toISOString().slice(0, 10))
+    localStorage.setItem(dismissKey, new Date().toISOString().slice(0, 10))
   }
 
   if (todayDaily) {
