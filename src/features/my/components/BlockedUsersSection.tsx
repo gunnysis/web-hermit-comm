@@ -2,6 +2,7 @@
 
 import { useBlockedAliases, useUnblockUser } from '@/features/blocks/hooks/useBlocks'
 import { Skeleton } from '@/components/ui/skeleton'
+import { toast } from 'sonner'
 
 export function BlockedUsersSection({ enabled = true }: { enabled?: boolean }) {
   const { data: blockedAliases = [], isLoading } = useBlockedAliases(enabled)
@@ -38,7 +39,7 @@ export function BlockedUsersSection({ enabled = true }: { enabled?: boolean }) {
               <button
                 className="text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
                 disabled={isPending}
-                onClick={() => unblock(alias)}
+                onClick={() => unblock(alias, { onError: () => toast.error('차단 해제에 실패했어요') })}
               >
                 해제
               </button>

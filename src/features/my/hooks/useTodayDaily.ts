@@ -6,6 +6,6 @@ export function useTodayDaily(enabled = true) {
     queryKey: ['todayDaily'],
     queryFn: getTodayDaily,
     enabled,
-    staleTime: 0,
+    staleTime: 60_000,
   })
 }

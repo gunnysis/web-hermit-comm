@@ -36,7 +36,7 @@ export function DailyInsights({ enabled = true }: { enabled?: boolean }) {
           <p className="text-xs text-muted-foreground/60 mt-1">
             하루를 나눌수록 더 잘 보여요 :) ({total_dailies}/{DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS}일)
           </p>
-          <div className="mt-2 h-1.5 rounded-full bg-muted-foreground/10">
+          <div className="mt-2 h-1.5 rounded-full bg-muted-foreground/10" role="progressbar" aria-valuenow={total_dailies} aria-valuemax={DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS} aria-label={`패턴 수집 진행률 ${total_dailies}/${DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS}일`}>
             <div
               className="h-1.5 rounded-full bg-yellow-400"
               style={{ width: `${Math.min((total_dailies / DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS) * 100, 100)}%` }}
@@ -47,7 +47,18 @@ export function DailyInsights({ enabled = true }: { enabled?: boolean }) {
     )
   }
 
-  if (!activity_emotion_map || activity_emotion_map.length === 0) return null
+  if (!activity_emotion_map || activity_emotion_map.length === 0) {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-sm font-semibold">나의 패턴 (최근 30일)</h3>
+        <div className="rounded-xl px-4 py-4 bg-muted">
+          <p className="text-xs text-muted-foreground">
+            활동 데이터를 모으는 중이에요. 오늘의 하루를 기록할 때 활동 태그를 선택하면 패턴이 보여요.
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   const topActivity = activity_emotion_map[0]
   const topEmotion = topActivity?.emotions?.[0]

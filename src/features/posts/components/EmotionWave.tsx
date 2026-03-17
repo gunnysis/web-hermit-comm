@@ -120,7 +120,7 @@ export function EmotionWave({ days = 7 }: EmotionWaveProps) {
 
               {/* Tooltip */}
               {hoveredIndex === i && bar.total > 0 && (
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 bg-popover border shadow-lg rounded-lg px-3 py-2 min-w-[120px] pointer-events-none animate-fade-in">
+                <div role="tooltip" aria-label={`${bar.weekday} 감정 분포`} className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10 bg-popover border shadow-lg rounded-lg px-3 py-2 min-w-[120px] pointer-events-none animate-fade-in">
                   <p className="text-[10px] font-medium mb-1.5">
                     {new Date(bar.day + 'T00:00:00').toLocaleDateString('ko-KR', { month: 'short', day: 'numeric', weekday: 'short' })}
                   </p>

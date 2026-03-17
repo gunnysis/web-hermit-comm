@@ -318,12 +318,6 @@ export interface SameMoodDaily {
   activities: string[]
 }
 
-export async function getMyAlias(): Promise<string | null> {
-  const supabase = createClient()
-  const { data } = await supabase.rpc('get_my_alias')
-  return data as string | null
-}
-
 export async function getSameMoodDailies(postId: number, emotions: string[]): Promise<SameMoodDaily[]> {
   if (!emotions.length) return []
   const supabase = createClient()

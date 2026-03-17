@@ -2,23 +2,10 @@
 
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { createClient } from '@/utils/supabase/client'
+import { getUserEmotionCalendar } from '@/features/my/api/myApi'
 import { EMOTION_COLOR_MAP, EMOTION_EMOJI } from '@/lib/constants'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { EmotionCalendarDay } from '@/types/database'
-
-async function getUserEmotionCalendar(userId: string, days = 30): Promise<EmotionCalendarDay[]> {
-  const supabase = createClient()
-  const start = new Date()
-  start.setDate(start.getDate() - days)
-  const { data, error } = await supabase.rpc('get_user_emotion_calendar', {
-    p_user_id: userId,
-    p_start: start.toISOString().slice(0, 10),
-    p_end: new Date().toISOString().slice(0, 10),
-  })
-  if (error) throw error
-  return (data ?? []) as EmotionCalendarDay[]
-}
 
 interface EmotionCalendarProps {
   userId: string
