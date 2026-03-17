@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/client'
 import type { Comment, CreateCommentRequest } from '@/types/database'
 
-export async function getComments(postId: number): Promise<Comment[]> {
+export async function getComments(postId: number, limit = 100): Promise<Comment[]> {
   const supabase = createClient()
   const { data, error } = await supabase
     .from('comments')
@@ -9,6 +9,7 @@ export async function getComments(postId: number): Promise<Comment[]> {
     .eq('post_id', postId)
     .is('deleted_at', null)
     .order('created_at', { ascending: true })
+    .limit(limit)
   if (error) throw error
   return (data ?? []) as Comment[]
 }
