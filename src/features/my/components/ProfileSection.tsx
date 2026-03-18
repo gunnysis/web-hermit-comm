@@ -68,13 +68,15 @@ export function ProfileSection({ user }: { user: User }) {
             </p>
           </div>
         </div>
-        <button
-          onClick={handleSignOut}
-          disabled={signingOut}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 disabled:opacity-50"
-        >
-          {signingOut ? '로그아웃 중...' : '로그아웃'}
-        </button>
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            onClick={handleSignOut}
+            disabled={signingOut}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 disabled:opacity-50"
+          >
+            {signingOut ? '로그아웃 중...' : '🔧 로그아웃 (개발용)'}
+          </button>
+        )}
       </div>
 
       {/* Streak + Today's Emotion */}
