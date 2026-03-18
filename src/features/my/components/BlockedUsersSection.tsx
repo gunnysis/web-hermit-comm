@@ -1,11 +1,20 @@
 'use client'
 
+import { useState } from 'react'
 import { useBlockedAliases, useUnblockUser } from '@/features/blocks/hooks/useBlocks'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function BlockedUsersSection({ enabled = true }: { enabled?: boolean }) {
   const { data: blockedAliases = [], isLoading } = useBlockedAliases(enabled)
-  const { mutate: unblock, isPending } = useUnblockUser()
+  const { mutate: unblock } = useUnblockUser()
+  const [unblockingAlias, setUnblockingAlias] = useState<string | null>(null)
+
+  const handleUnblock = (alias: string) => {
+    setUnblockingAlias(alias)
+    unblock(alias, {
+      onSettled: () => setUnblockingAlias(null),
+    })
+  }
 
   if (isLoading) {
     return (
@@ -37,8 +46,8 @@ export function BlockedUsersSection({ enabled = true }: { enabled?: boolean }) {
               <span className="text-sm">{alias}</span>
               <button
                 className="text-xs text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-                disabled={isPending}
-                onClick={() => unblock(alias)}
+                disabled={unblockingAlias === alias}
+                onClick={() => handleUnblock(alias)}
               >
                 해제
               </button>

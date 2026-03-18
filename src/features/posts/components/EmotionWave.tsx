@@ -78,8 +78,11 @@ export function EmotionWave({ days = 7 }: EmotionWaveProps) {
             <div
               key={bar.day}
               className="flex-1 flex flex-col justify-end h-full relative"
+              tabIndex={bar.total > 0 ? 0 : undefined}
               onMouseEnter={() => setHoveredIndex(i)}
               onMouseLeave={() => setHoveredIndex(null)}
+              onFocus={() => setHoveredIndex(i)}
+              onBlur={() => setHoveredIndex(null)}
             >
               {/* Bar */}
               <div
