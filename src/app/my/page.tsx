@@ -10,6 +10,7 @@ import { WeeklySummary } from '@/features/my/components/WeeklySummary'
 import { StreakBadge } from '@/features/my/components/StreakBadge'
 import { EmotionTrendChart } from '@/features/my/components/EmotionTrendChart'
 import { BlockedUsersSection } from '@/features/my/components/BlockedUsersSection'
+import { SectionErrorBoundary } from '@/features/my/components/SectionErrorBoundary'
 import { EmotionCalendar } from '@/features/posts/components/EmotionCalendar'
 import { EmotionWave } from '@/features/posts/components/EmotionWave'
 import { Card, CardContent } from '@/components/ui/card'
@@ -44,74 +45,92 @@ export default function MySpacePage() {
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-5">
       {/* 프로필 히어로 */}
       <section className="animate-fade-in">
-        <ProfileSection user={user} />
+        <SectionErrorBoundary sectionName="프로필">
+          <ProfileSection user={user} />
+        </SectionErrorBoundary>
       </section>
 
       {/* 스트릭 */}
       <section className="animate-slide-up" style={{ animationDelay: '40ms', animationFillMode: 'backwards' }}>
-        <StreakBadge enabled={!!user} />
+        <SectionErrorBoundary sectionName="스트릭">
+          <StreakBadge enabled={!!user} />
+        </SectionErrorBoundary>
       </section>
 
       {/* 활동 요약 — 3 cards */}
       <section className="animate-slide-up" style={{ animationDelay: '50ms', animationFillMode: 'backwards' }}>
-        <h2 className="text-sm font-semibold mb-2 text-muted-foreground">활동</h2>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: '작성한 글', value: summary?.post_count ?? 0, emoji: '📝' },
-            { label: '작성한 댓글', value: summary?.comment_count ?? 0, emoji: '💬' },
-            { label: '보낸 반응', value: summary?.reaction_count ?? 0, emoji: '💛' },
-          ].map((stat) => (
-            <Card key={stat.label} className="border-0 shadow-sm">
-              <CardContent className="pt-3 pb-2 text-center">
-                {isLoading ? (
-                  <Skeleton className="h-7 w-10 mx-auto" />
-                ) : (
-                  <>
-                    <p className="text-lg font-bold">{stat.emoji} {stat.value}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{stat.label}</p>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <SectionErrorBoundary sectionName="활동 요약">
+          <h2 className="text-sm font-semibold mb-2 text-muted-foreground">활동</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: '작성한 글', value: summary?.post_count ?? 0, emoji: '📝' },
+              { label: '작성한 댓글', value: summary?.comment_count ?? 0, emoji: '💬' },
+              { label: '보낸 반응', value: summary?.reaction_count ?? 0, emoji: '💛' },
+            ].map((stat) => (
+              <Card key={stat.label} className="border-0 shadow-sm">
+                <CardContent className="pt-3 pb-2 text-center">
+                  {isLoading ? (
+                    <Skeleton className="h-7 w-10 mx-auto" />
+                  ) : (
+                    <>
+                      <p className="text-lg font-bold">{stat.emoji} {stat.value}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{stat.label}</p>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </SectionErrorBoundary>
       </section>
 
       {/* 주간 회고 */}
       <section className="animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
-        <WeeklySummary enabled={!!user} />
+        <SectionErrorBoundary sectionName="주간 회고">
+          <WeeklySummary enabled={!!user} />
+        </SectionErrorBoundary>
       </section>
 
       {/* 감정 흐름 */}
       <section className="animate-slide-up" style={{ animationDelay: '120ms', animationFillMode: 'backwards' }}>
-        <EmotionTrendChart enabled={!!user} />
+        <SectionErrorBoundary sectionName="감정 흐름">
+          <EmotionTrendChart enabled={!!user} />
+        </SectionErrorBoundary>
       </section>
 
       {/* 나의 패턴 */}
       <section className="animate-slide-up" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
-        <DailyInsights enabled={!!user} />
+        <SectionErrorBoundary sectionName="나의 패턴">
+          <DailyInsights enabled={!!user} />
+        </SectionErrorBoundary>
       </section>
 
       <Separator />
 
       {/* 감정 캘린더 */}
       <section className="animate-slide-up" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
-        <EmotionCalendar userId={user.id} />
+        <SectionErrorBoundary sectionName="감정 캘린더">
+          <EmotionCalendar userId={user.id} />
+        </SectionErrorBoundary>
       </section>
 
       <Separator />
 
       {/* 커뮤니티 감정 타임라인 */}
       <section className="animate-slide-up" style={{ animationDelay: '200ms', animationFillMode: 'backwards' }}>
-        <EmotionWave />
+        <SectionErrorBoundary sectionName="마을의 감정">
+          <EmotionWave />
+        </SectionErrorBoundary>
       </section>
 
       <Separator />
 
       {/* 설정 */}
       <section className="animate-slide-up" style={{ animationDelay: '250ms', animationFillMode: 'backwards' }}>
-        <h2 className="text-sm font-semibold mb-3 text-muted-foreground">설정</h2>
-        <BlockedUsersSection enabled={!!user} />
+        <SectionErrorBoundary sectionName="차단 관리">
+          <h2 className="text-sm font-semibold mb-3 text-muted-foreground">설정</h2>
+          <BlockedUsersSection enabled={!!user} />
+        </SectionErrorBoundary>
       </section>
     </div>
   )

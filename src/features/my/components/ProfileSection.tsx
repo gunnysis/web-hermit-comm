@@ -31,6 +31,10 @@ export function ProfileSection({ user }: { user: User }) {
   }, [todayDaily])
 
   const handleSignOut = async () => {
+    const confirmed = window.confirm(
+      '⚠️ 로그아웃 확인\n\n익명 사용자가 로그아웃하면 새로운 계정이 생성되어 기존 글을 수정/삭제할 수 없게 됩니다.\n\n정말 로그아웃하시겠습니까?'
+    )
+    if (!confirmed) return
     await signOut()
     router.push('/')
   }
