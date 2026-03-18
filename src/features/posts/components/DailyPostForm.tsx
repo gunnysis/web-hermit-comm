@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ALLOWED_EMOTIONS, EMOTION_EMOJI, EMOTION_COLOR_MAP, DAILY_CONFIG, SHARED_PALETTE } from '@/lib/constants'
 import { ActivityTagSelector } from './ActivityTagSelector'
 import { useCreateDaily, useUpdateDaily } from '@/features/my/hooks/useCreateDaily'
+import { validateDailyPostInput } from '@/lib/utils.generated'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -35,7 +36,12 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
   }
 
   const handleSubmit = () => {
-    if (emotions.length === 0) return
+    const validationError = validateDailyPostInput({ emotions, activities, content: note })
+    if (validationError) {
+      toast.error(validationError)
+      return
+    }
+
     if (mode === 'edit' && initialData) {
       updateDaily(
         { postId: initialData.id, emotions, activities, content: note },
@@ -44,7 +50,7 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
             toast.success('수정했어요')
             router.push(`/post/${initialData.id}`)
           },
-          onError: () => alert('수정에 실패했습니다. 잠시 후 다시 시도해주세요.'),
+          onError: () => toast.error('수정에 실패했어요. 잠시 후 다시 시도해주세요.'),
         },
       )
     } else {
@@ -62,9 +68,9 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
           },
           onError: (err: Error & { code?: string }) => {
             if (err.code === 'P0002') {
-              alert('오늘은 이미 나눴어요. 하루에 한 번만 나눌 수 있어요.')
+              toast.error('오늘은 이미 나눴어요. 하루에 한 번만 나눌 수 있어요.')
             } else {
-              alert('잠시 후 다시 시도해주세요.')
+              toast.error('잠시 후 다시 시도해주세요.')
             }
           },
         },
