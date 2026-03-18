@@ -34,11 +34,20 @@ export const metadata: Metadata = {
     siteName: "은둔마을",
     locale: "ko_KR",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "은둔마을 — 은둔고립청년을 위한 소통 공간 서비스",
+      },
+    ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "은둔마을",
     description: "마음이 쉬어갈 수 있는 익명 커뮤니티",
+    images: ["/og-image.png"],
   },
   icons: {
     icon: [
