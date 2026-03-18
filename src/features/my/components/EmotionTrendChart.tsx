@@ -41,7 +41,7 @@ export function EmotionTrendChart({ enabled = true }: EmotionTrendChartProps) {
       <h3 className="text-sm font-semibold">📊 최근 4주 감정 흐름</h3>
 
       {/* 바 차트 */}
-      <div className="flex items-end justify-between" style={{ height: 80 }}>
+      <div className="flex justify-between">
         {weekData.map((w, i) => {
           const height = w.daysLogged > 0 ? (w.daysLogged / maxDays) * 60 + 12 : 8
           const colors = w.topEmotion ? EMOTION_COLOR_MAP[w.topEmotion] : null
