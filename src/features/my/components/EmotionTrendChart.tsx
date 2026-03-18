@@ -26,8 +26,6 @@ export function EmotionTrendChart({ enabled = true }: EmotionTrendChartProps) {
     [weekQueries.map(q => q.data).join(',')]
   )
 
-  if (weeks.length < 2) return null
-
   const weekData = useMemo(() => weeks.map((w) => ({
     label: w!.days_logged > 0 ? `${w!.days_logged}일` : '-',
     topEmotion: w!.top_emotions?.[0]?.emotion ?? null,
@@ -35,6 +33,8 @@ export function EmotionTrendChart({ enabled = true }: EmotionTrendChartProps) {
   })), [weeks])
 
   const maxDays = useMemo(() => Math.max(...weekData.map((w) => w.daysLogged), 1), [weekData])
+
+  if (weeks.length < 2) return null
 
   return (
     <div className="rounded-2xl border border-border/60 p-4 space-y-3">
