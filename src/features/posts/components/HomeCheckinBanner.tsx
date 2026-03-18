@@ -20,6 +20,14 @@ export function HomeCheckinBanner() {
     if (stored === new Date().toISOString().slice(0, 10)) setDismissed(true)
   }, [user, dismissKey])
 
+  // 배너 dismiss 후 직접 daily 작성한 경우 → dismiss 해제하여 "완료" 상태 표시
+  useEffect(() => {
+    if (todayDaily && dismissed) {
+      localStorage.removeItem(dismissKey)
+      setDismissed(false)
+    }
+  }, [todayDaily, dismissed, dismissKey])
+
   if (!user || dismissed) return null
 
   const handleDismiss = () => {
