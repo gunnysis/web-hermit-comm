@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMyAlias } from '../hooks/useMyAlias'
 import { useActivitySummary } from '../hooks/useActivitySummary'
@@ -8,6 +8,7 @@ import { useTodayDaily } from '../hooks/useTodayDaily'
 import { signOut } from '@/features/auth/auth'
 import { EMOTION_EMOJI, EMOTION_COLOR_MAP } from '@/lib/constants'
 import { Skeleton } from '@/components/ui/skeleton'
+import { toast } from 'sonner'
 import type { User } from '@supabase/supabase-js'
 
 function getDaysSince(dateStr: string): number {
@@ -30,13 +31,22 @@ export function ProfileSection({ user }: { user: User }) {
     return Array.isArray(todayDaily.emotions) ? todayDaily.emotions : []
   }, [todayDaily])
 
+  const [signingOut, setSigningOut] = useState(false)
+
   const handleSignOut = async () => {
     const confirmed = window.confirm(
       '⚠️ 로그아웃 확인\n\n익명 사용자가 로그아웃하면 새로운 계정이 생성되어 기존 글을 수정/삭제할 수 없게 됩니다.\n\n정말 로그아웃하시겠습니까?'
     )
     if (!confirmed) return
-    await signOut()
-    router.push('/')
+    setSigningOut(true)
+    try {
+      await signOut()
+      router.push('/')
+    } catch {
+      toast.error('로그아웃에 실패했어요')
+    } finally {
+      setSigningOut(false)
+    }
   }
 
   return (
@@ -60,9 +70,10 @@ export function ProfileSection({ user }: { user: User }) {
         </div>
         <button
           onClick={handleSignOut}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+          disabled={signingOut}
+          className="text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 disabled:opacity-50"
         >
-          로그아웃
+          {signingOut ? '로그아웃 중...' : '로그아웃'}
         </button>
       </div>
 
@@ -89,7 +100,7 @@ export function ProfileSection({ user }: { user: User }) {
               return (
                 <span
                   key={emotion}
-                  className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[10px] font-medium"
+                  className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium"
                   style={{ backgroundColor: color?.gradient[0] ?? '#f5f5f4' }}
                   title={emotion}
                 >

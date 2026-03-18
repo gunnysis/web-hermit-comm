@@ -42,8 +42,23 @@ export function useAuth() {
       }
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!cancelled) setUser(session?.user ?? null)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (cancelled) return
+
+      if (event === 'SIGNED_OUT') {
+        // 캐시 전체 초기화
+        const { getQueryClient } = await import('@/lib/query-client')
+        getQueryClient().clear()
+
+        // 새 익명 세션 생성
+        const newUser = await ensureAnonymousSession()
+        if (!cancelled && newUser) {
+          setUser(newUser)
+        }
+        return
+      }
+
+      setUser(session?.user ?? null)
     })
 
     return () => {

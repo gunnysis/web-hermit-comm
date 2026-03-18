@@ -5,14 +5,19 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { signOut } from '@/features/auth/auth'
+import { toast } from 'sonner'
 
 export default function AdminPage() {
   const router = useRouter()
   const { user } = useAuthContext()
 
   const handleSignOut = async () => {
-    await signOut()
-    router.replace('/')
+    try {
+      await signOut()
+      router.replace('/')
+    } catch {
+      toast.error('로그아웃에 실패했어요')
+    }
   }
 
   return (

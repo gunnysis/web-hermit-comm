@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getWeeklyEmotionSummary } from '@/features/posts/api/postsApi'
 import { EMOTION_EMOJI, ACTIVITY_PRESETS } from '@/lib/constants'
+import { getActivityLabel } from '@/lib/utils.generated'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 
@@ -59,14 +60,9 @@ export function WeeklySummary({ enabled = true }: WeeklySummaryProps) {
             )}
           </div>
         </div>
-        <p className="text-xs text-muted-foreground">이번 주는 아직 기록이 없어요</p>
+        <p className="text-xs text-muted-foreground">{weekLabel}에는 기록이 없어요</p>
       </div>
     )
-  }
-
-  const getActivityLabel = (id: string) => {
-    const preset = ACTIVITY_PRESETS.find((p) => p.id === id)
-    return preset ? `${preset.icon} ${preset.name}` : id
   }
 
   return (
@@ -118,7 +114,7 @@ export function WeeklySummary({ enabled = true }: WeeklySummaryProps) {
       {/* Top 활동 */}
       {data.top_activity && (
         <p className="text-xs text-muted-foreground">
-          가장 많이 한 활동: {getActivityLabel(data.top_activity)}
+          가장 많이 한 활동: {getActivityLabel(data.top_activity, ACTIVITY_PRESETS)}
         </p>
       )}
     </div>

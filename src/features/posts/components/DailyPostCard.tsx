@@ -3,6 +3,7 @@
 import { memo } from 'react'
 import Link from 'next/link'
 import { EMOTION_COLOR_MAP, EMOTION_EMOJI, ACTIVITY_PRESETS, SHARED_PALETTE } from '@/lib/constants'
+import { getActivityLabel } from '@/lib/utils.generated'
 import type { PostWithCounts } from '@/types/database'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
@@ -15,11 +16,6 @@ function DailyPostCardInner({ post }: DailyPostCardProps) {
   const emotions = post.emotions ?? post.initial_emotions ?? []
   const activities: string[] = post.activities ?? []
   const content = post.content || ''
-
-  const getActivityLabel = (id: string) => {
-    const preset = ACTIVITY_PRESETS.find((p) => p.id === id)
-    return preset ? `${preset.icon} ${preset.name}` : id
-  }
 
   return (
     <Link href={`/post/${post.id}`}>
@@ -61,7 +57,7 @@ function DailyPostCardInner({ post }: DailyPostCardProps) {
           <div className="flex flex-wrap gap-1.5 mb-2">
             {activities.map((act: string) => (
               <span key={act} className="rounded-full px-2.5 py-1 text-xs border border-border text-muted-foreground">
-                {getActivityLabel(act)}
+                {getActivityLabel(act, ACTIVITY_PRESETS)}
               </span>
             ))}
           </div>

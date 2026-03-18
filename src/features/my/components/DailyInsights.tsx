@@ -3,6 +3,7 @@
 import { useDailyInsights } from '../hooks/useDailyInsights'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ACTIVITY_PRESETS, EMOTION_EMOJI, EMOTION_COLOR_MAP, DAILY_INSIGHTS_CONFIG } from '@/lib/constants'
+import { getActivityLabel } from '@/lib/utils.generated'
 
 export function DailyInsights({ enabled = true }: { enabled?: boolean }) {
   const { data, isLoading } = useDailyInsights(30, enabled)
@@ -20,11 +21,6 @@ export function DailyInsights({ enabled = true }: { enabled?: boolean }) {
 
   const { total_dailies, activity_emotion_map } = data
 
-  const getActivityLabel = (id: string) => {
-    const preset = ACTIVITY_PRESETS.find((p) => p.id === id)
-    return preset ? `${preset.icon} ${preset.name}` : id
-  }
-
   if (total_dailies < DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS) {
     return (
       <div className="space-y-2">
@@ -38,7 +34,7 @@ export function DailyInsights({ enabled = true }: { enabled?: boolean }) {
           </p>
           <div className="mt-2 h-1.5 rounded-full bg-muted-foreground/10" role="progressbar" aria-valuenow={total_dailies} aria-valuemax={DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS} aria-label={`패턴 수집 진행률 ${total_dailies}/${DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS}일`}>
             <div
-              className="h-1.5 rounded-full bg-yellow-400"
+              className="h-1.5 rounded-full bg-happy-400"
               style={{ width: `${Math.min((total_dailies / DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS) * 100, 100)}%` }}
             />
           </div>
@@ -71,7 +67,7 @@ export function DailyInsights({ enabled = true }: { enabled?: boolean }) {
         <div key={item.activity} className="space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium">
-              {getActivityLabel(item.activity)} ({item.count}회)
+              {getActivityLabel(item.activity, ACTIVITY_PRESETS)} ({item.count}회)
             </span>
           </div>
           <div className="h-5 rounded-full overflow-hidden flex bg-muted">
@@ -101,7 +97,7 @@ export function DailyInsights({ enabled = true }: { enabled?: boolean }) {
       {topActivity && topEmotion && (
         <div className="rounded-xl px-3 py-2 bg-muted">
           <p className="text-xs text-muted-foreground">
-            💡 {getActivityLabel(topActivity.activity).replace(/^[^\s]+ /, '')}한 날에{' '}
+            💡 {getActivityLabel(topActivity.activity, ACTIVITY_PRESETS).replace(/^[^\s]+ /, '')}한 날에{' '}
             {topEmotion.emotion}을 자주 느끼는 경향이 있어요.
           </p>
         </div>

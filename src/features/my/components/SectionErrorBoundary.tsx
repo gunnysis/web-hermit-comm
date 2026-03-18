@@ -21,6 +21,13 @@ export class SectionErrorBoundary extends Component<Props, State> {
     return { hasError: true }
   }
 
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // dynamic import to avoid circular deps
+    import('@/lib/logger').then(({ logger }) => {
+      logger.error(`[${this.props.sectionName}]`, error, errorInfo)
+    })
+  }
+
   handleRetry = () => {
     this.setState({ hasError: false })
   }
