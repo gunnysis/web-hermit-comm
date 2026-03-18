@@ -16,7 +16,7 @@ export async function getUnreadCount(): Promise<number> {
   const { data, error } = await supabase.rpc('get_unread_notification_count')
   if (error) {
     logger.error('[getUnreadCount]', error.message, { code: error.code })
-    return 0
+    throw error
   }
   return (data as number) ?? 0
 }

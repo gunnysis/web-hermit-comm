@@ -100,11 +100,15 @@ export async function deletePost(postId: number): Promise<void> {
 
 export async function getPostAnalysis(postId: number) {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('post_analysis')
     .select('*')
     .eq('post_id', postId)
     .limit(1)
+  if (error) {
+    logger.error('[API] getPostAnalysis 에러:', error.message, { code: error.code })
+    throw error
+  }
   return data?.[0] ?? null
 }
 
@@ -284,7 +288,11 @@ export interface YesterdayDailyReactions {
 export async function getYesterdayDailyReactions(): Promise<YesterdayDailyReactions | null> {
   const supabase = createClient()
   const { data, error } = await supabase.rpc('get_yesterday_daily_reactions')
-  if (error || !data) return null
+  if (error) {
+    logger.error('[API] getYesterdayDailyReactions 에러:', error.message, { code: error.code })
+    throw error
+  }
+  if (!data) return null
   const result = data as unknown as YesterdayDailyReactions
   if (!result?.post_id) return null
   return result
@@ -304,7 +312,11 @@ export async function getSameMoodDailies(postId: number, emotions: string[]): Pr
     p_post_id: postId,
     p_emotions: emotions,
   })
-  if (error || !data) return []
+  if (error) {
+    logger.error('[API] getSameMoodDailies 에러:', error.message, { code: error.code })
+    throw error
+  }
+  if (!data) return []
   return (Array.isArray(data) ? data : []) as unknown as SameMoodDaily[]
 }
 
@@ -341,7 +353,7 @@ export async function getWeeklyEmotionSummary(weekOffset = 0): Promise<WeeklyEmo
   })
   if (error) {
     logger.error('[API] getWeeklyEmotionSummary 에러:', error.message)
-    return null
+    throw error
   }
   return data as unknown as WeeklyEmotionSummary | null
 }

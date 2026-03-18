@@ -7,6 +7,7 @@ export function useUnreadCount(enabled = true) {
     queryFn: getUnreadCount,
     enabled,
     refetchInterval: 30000,
+    meta: { silent: true },
   })
 }
 

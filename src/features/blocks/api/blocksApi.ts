@@ -24,7 +24,7 @@ export async function getBlockedAliases(): Promise<string[]> {
   const { data, error } = await supabase.rpc('get_blocked_aliases')
   if (error) {
     logger.error('[getBlockedAliases]', error.message, { code: error.code })
-    return []
+    throw error
   }
   return (data as string[]) ?? []
 }

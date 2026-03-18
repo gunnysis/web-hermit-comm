@@ -1,7 +1,20 @@
-import { QueryClient, defaultShouldDehydrateQuery, isServer } from '@tanstack/react-query'
+import { QueryClient, QueryCache, MutationCache, defaultShouldDehydrateQuery, isServer } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
-function makeQueryClientOptions() {
-  return {
+function makeQueryClient() {
+  return new QueryClient({
+    queryCache: new QueryCache({
+      onError: (error, query) => {
+        if (query.meta?.silent) return
+        toast.error(error.message || '데이터를 불러올 수 없어요')
+      },
+    }),
+    mutationCache: new MutationCache({
+      onError: (error, _variables, _context, mutation) => {
+        if (mutation.meta?.silent) return
+        toast.error(error.message || '요청에 실패했어요')
+      },
+    }),
     defaultOptions: {
       queries: {
         staleTime: 60 * 1000,
@@ -19,17 +32,15 @@ function makeQueryClientOptions() {
           defaultShouldDehydrateQuery(query) || query.state.status === 'pending',
       },
     },
-  }
+  })
 }
 
 let browserQueryClient: QueryClient | undefined
 
-export function makeQueryClient() {
-  return new QueryClient(makeQueryClientOptions())
-}
+export { makeQueryClient }
 
 export function getQueryClient() {
   if (isServer) return makeQueryClient()
-  if (!browserQueryClient) browserQueryClient = new QueryClient(makeQueryClientOptions())
+  if (!browserQueryClient) browserQueryClient = makeQueryClient()
   return browserQueryClient
 }

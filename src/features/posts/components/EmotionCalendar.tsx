@@ -17,6 +17,7 @@ export function EmotionCalendar({ userId, days = 30 }: EmotionCalendarProps) {
     queryKey: ['emotionCalendar', userId, days],
     queryFn: () => getUserEmotionCalendar(userId, days),
     staleTime: 5 * 60 * 1000,
+    meta: { silent: true },
   })
 
   const weeks = useMemo(() => {

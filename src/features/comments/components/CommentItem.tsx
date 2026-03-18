@@ -13,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { toast } from 'sonner'
 import type { Comment } from '@/types/database'
 import type { useComments } from '../hooks/useComments'
 
@@ -47,7 +46,6 @@ export function CommentItem({ comment, currentUserId, updateMutation, deleteMuta
 
   const handleDelete = () => {
     deleteMutation.mutate(comment.id, {
-      onError: () => toast.error('댓글 삭제에 실패했습니다.'),
       onSettled: () => setDeleteDialogOpen(false),
     })
   }

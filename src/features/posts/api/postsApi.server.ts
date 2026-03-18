@@ -20,17 +20,19 @@ export async function getBoardPostsServer(
     query = query.order('created_at', { ascending: false })
   }
 
-  const { data } = await query.range(0, PAGE_SIZE - 1)
+  const { data, error } = await query.range(0, PAGE_SIZE - 1)
+  if (error) throw error
   return (data ?? []) as PostWithCounts[]
 }
 
 export async function getPostServer(postId: number): Promise<PostWithCounts | null> {
   const supabase = await createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('posts_with_like_count')
     .select('*')
     .eq('id', postId)
     .limit(1)
+  if (error) throw error
   return (data?.[0] as PostWithCounts) ?? null
 }
 

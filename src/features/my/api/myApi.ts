@@ -45,7 +45,7 @@ export async function getMyAlias(): Promise<string | null> {
   const { data, error } = await supabase.rpc('get_my_alias')
   if (error) {
     logger.error('[API] getMyAlias 에러:', error.message, { code: error.code })
-    return null
+    throw error
   }
   return data as string | null
 }
