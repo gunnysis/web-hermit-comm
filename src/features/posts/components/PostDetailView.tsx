@@ -62,6 +62,14 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       router.push('/')
       queryClient.removeQueries({ queryKey: ['post', postId] })
       if (post?.board_id) queryClient.invalidateQueries({ queryKey: ['boardPosts', post.board_id] })
+      if (post?.post_type === 'daily') {
+        queryClient.invalidateQueries({ queryKey: ['todayDaily'] })
+        queryClient.invalidateQueries({ queryKey: ['myStreak'] })
+        queryClient.invalidateQueries({ queryKey: ['activitySummary'] })
+        queryClient.invalidateQueries({ queryKey: ['dailyInsights'] })
+        queryClient.invalidateQueries({ queryKey: ['dailyHistory'] })
+        queryClient.invalidateQueries({ queryKey: ['monthlyReport'] })
+      }
     } catch (err: unknown) {
       logger.error('deletePost error:', err)
       const msg = err instanceof Error ? err.message : (err as { message?: string })?.message

@@ -13,7 +13,7 @@ interface DailyPostCardProps {
 }
 
 function DailyPostCardInner({ post }: DailyPostCardProps) {
-  const emotions = post.emotions ?? post.initial_emotions ?? []
+  const emotions = post.initial_emotions ?? post.emotions ?? []
   const activities: string[] = post.activities ?? []
   const content = post.content || ''
 

@@ -31,7 +31,7 @@ function DailyEditWrapper({ editId }: { editId: number }) {
       mode="edit"
       initialData={{
         id: editId,
-        emotions: post.initial_emotions ?? [],
+        emotions: post.initial_emotions ?? post.emotions ?? [],
         activities: post.activities ?? [],
         content: post.content ?? '',
       }}
