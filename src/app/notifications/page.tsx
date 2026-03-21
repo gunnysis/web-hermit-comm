@@ -42,10 +42,11 @@ export default function NotificationsPage() {
                 key={n.id}
                 href={n.post_id ? `/post/${n.post_id}` : '#'}
                 onClick={() => { if (!n.read) markRead([n.id]) }}
+                aria-label={`${getLabel(n)}, ${formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: ko })}${n.read ? '' : ', 읽지 않음'}`}
               >
                 <div className={`rounded-lg px-4 py-3 transition-colors ${
                   n.read ? 'hover:bg-muted/50' : 'bg-muted/30 hover:bg-muted/50'
-                }`}>
+                }`} role="article">
                   <p className="text-sm">{getLabel(n)}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {formatDistanceToNow(new Date(n.created_at), { addSuffix: true, locale: ko })}

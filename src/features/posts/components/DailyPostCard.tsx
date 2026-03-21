@@ -18,9 +18,10 @@ function DailyPostCardInner({ post }: DailyPostCardProps) {
   const content = post.content || ''
 
   return (
-    <Link href={`/post/${post.id}`}>
+    <Link href={`/post/${post.id}`} aria-label={`오늘의 하루: ${emotions.join(', ')}${content ? ` — ${content.slice(0, 30)}` : ''}`}>
       <div
         className="rounded-2xl px-4 py-3 mb-3 transition-colors hover:opacity-90"
+        role="article"
         style={{
           backgroundColor: `var(--daily-bg, ${SHARED_PALETTE.cream[50]})`,
           borderWidth: 1,
