@@ -1,9 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import { createClient } from '@/utils/supabase/client'
-import { logger } from '@/lib/logger'
+import { useRealtimeTable } from '@/hooks/useRealtimeTable'
 import { getComments, createComment, updateComment, deleteComment } from '../api/commentsApi'
 import type { Comment, CreateCommentRequest } from '@/types/database'
 
@@ -16,21 +14,12 @@ export function useComments(postId: number) {
     staleTime: 30 * 1000,
   })
 
-  // Realtime 구독
-  useEffect(() => {
-    const supabase = createClient()
-    const channel = supabase
-      .channel(`comments-${postId}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'comments', filter: `post_id=eq.${postId}` },
-        () => queryClient.invalidateQueries({ queryKey: ['comments', postId] }),
-      )
-      .subscribe((status, err) => {
-        if (err) logger.error(`Realtime comments-${postId} error:`, err)
-      })
-    return () => { supabase.removeChannel(channel) }
-  }, [postId, queryClient])
+  useRealtimeTable({
+    channelName: `comments-${postId}`,
+    table: 'comments',
+    filter: `post_id=eq.${postId}`,
+    queryKeys: [['comments', postId]],
+  })
 
   const createMutation = useMutation({
     mutationFn: (args: { request: CreateCommentRequest & { author_id: string }; parentId?: number | null }) =>

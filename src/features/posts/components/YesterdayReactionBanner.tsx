@@ -19,15 +19,17 @@ export function YesterdayReactionBanner() {
   })
 
   useEffect(() => {
-    const stored = localStorage.getItem('yesterday_reaction_seen')
+    if (!user) return
+    const key = `yesterday_reaction_seen_${user.id}`
+    const stored = localStorage.getItem(key)
     setSeen(stored === new Date().toISOString().slice(0, 10))
-  }, [])
+  }, [user])
 
   if (!user || seen || !data) return null
 
   const handleDismiss = () => {
     setSeen(true)
-    localStorage.setItem('yesterday_reaction_seen', new Date().toISOString().slice(0, 10))
+    localStorage.setItem(`yesterday_reaction_seen_${user.id}`, new Date().toISOString().slice(0, 10))
   }
 
   return (

@@ -2,8 +2,7 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef } from 'react'
-import { createClient } from '@/utils/supabase/client'
-import { logger } from '@/lib/logger'
+import { useRealtimeTable } from '@/hooks/useRealtimeTable'
 import { getPostAnalysis, invokeAnalyzeOnDemand } from '../api/postsApi'
 
 export function usePostAnalysis(postId: number) {
@@ -16,31 +15,12 @@ export function usePostAnalysis(postId: number) {
     staleTime: 5 * 60 * 1000,
   })
 
-  // Realtime subscription: post_analysis INSERT/UPDATE 감지 (글 수정 시 재분석 포함)
-  useEffect(() => {
-    const supabase = createClient()
-    const channel = supabase
-      .channel(`post-analysis-${postId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'post_analysis',
-          filter: `post_id=eq.${postId}`,
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['postAnalysis', postId] })
-        },
-      )
-      .subscribe((status, err) => {
-        if (err) logger.error(`Realtime post-analysis-${postId} error:`, err)
-      })
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [postId, queryClient])
+  useRealtimeTable({
+    channelName: `post-analysis-${postId}`,
+    table: 'post_analysis',
+    filter: `post_id=eq.${postId}`,
+    queryKeys: [['postAnalysis', postId]],
+  })
 
   // On-demand 폴백: 15초 후에도 결과 없으면 수동 분석 요청
   useEffect(() => {
