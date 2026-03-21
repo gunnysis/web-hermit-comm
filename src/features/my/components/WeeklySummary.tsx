@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { getWeeklyEmotionSummary } from '@/features/posts/api/postsApi'
+import { getWeeklyEmotionSummary } from '../api/myApi'
 import { EMOTION_EMOJI, ACTIVITY_PRESETS } from '@/lib/constants'
 import { getActivityLabel } from '@/lib/utils.generated'
 import { ChevronLeft, ChevronRight } from 'lucide-react'

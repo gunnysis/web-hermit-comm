@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useQueries } from '@tanstack/react-query'
-import { getWeeklyEmotionSummary } from '@/features/posts/api/postsApi'
+import { getWeeklyEmotionSummary } from '../api/myApi'
 import { EMOTION_EMOJI, EMOTION_COLOR_MAP } from '@/lib/constants'
 
 interface EmotionTrendChartProps {

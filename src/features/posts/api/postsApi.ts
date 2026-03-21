@@ -320,14 +320,6 @@ export async function getSameMoodDailies(postId: number, emotions: string[]): Pr
   return (Array.isArray(data) ? data : []) as unknown as SameMoodDaily[]
 }
 
-export interface WeeklyEmotionSummary {
-  week_start: string
-  week_end: string
-  days_logged: number
-  top_emotions: { emotion: string; count: number }[] | null
-  top_activity: string | null
-}
-
 export interface StreakData {
   current_streak: number
   total_days: number
@@ -346,14 +338,3 @@ export async function getMyStreak(): Promise<StreakData> {
   return data as unknown as StreakData
 }
 
-export async function getWeeklyEmotionSummary(weekOffset = 0): Promise<WeeklyEmotionSummary | null> {
-  const supabase = createClient()
-  const { data, error } = await supabase.rpc('get_weekly_emotion_summary', {
-    p_week_offset: weekOffset,
-  })
-  if (error) {
-    logger.error('[API] getWeeklyEmotionSummary 에러:', error.message)
-    throw error
-  }
-  return data as unknown as WeeklyEmotionSummary | null
-}

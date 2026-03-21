@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/utils/supabase/client'
 import { logger } from '@/lib/logger'
@@ -23,6 +23,8 @@ export function useRealtimeTable({
   enabled?: boolean
 }) {
   const queryClient = useQueryClient()
+  const queryKeysRef = useRef(queryKeys)
+  queryKeysRef.current = queryKeys
 
   useEffect(() => {
     if (!enabled) return
@@ -34,7 +36,7 @@ export function useRealtimeTable({
         'postgres_changes',
         { event: '*', schema: 'public', table, filter },
         () => {
-          for (const key of queryKeys) {
+          for (const key of queryKeysRef.current) {
             queryClient.invalidateQueries({ queryKey: key })
           }
         },
@@ -46,6 +48,5 @@ export function useRealtimeTable({
     return () => {
       supabase.removeChannel(channel)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelName, table, filter, enabled, queryClient])
 }
