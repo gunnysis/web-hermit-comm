@@ -7,6 +7,8 @@ import { useActivitySummary } from '@/features/my/hooks/useActivitySummary'
 import { ProfileSection } from '@/features/my/components/ProfileSection'
 import { DailyInsights } from '@/features/my/components/DailyInsights'
 import { WeeklySummary } from '@/features/my/components/WeeklySummary'
+import { MonthlyReport } from '@/features/my/components/MonthlyReport'
+import { DailyHistory } from '@/features/my/components/DailyHistory'
 import { StreakBadge } from '@/features/my/components/StreakBadge'
 import { EmotionTrendChart } from '@/features/my/components/EmotionTrendChart'
 import { BlockedUsersSection } from '@/features/my/components/BlockedUsersSection'
@@ -102,6 +104,20 @@ export default function MySpacePage() {
       <section className="animate-slide-up" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
         <SectionErrorBoundary sectionName="나의 패턴">
           <DailyInsights enabled={!!user} />
+        </SectionErrorBoundary>
+      </section>
+
+      {/* 월간 회고 */}
+      <section className="animate-slide-up" style={{ animationDelay: '160ms', animationFillMode: 'backwards' }}>
+        <SectionErrorBoundary sectionName="월간 회고">
+          <MonthlyReport enabled={!!user} />
+        </SectionErrorBoundary>
+      </section>
+
+      {/* 나의 기록 */}
+      <section className="animate-slide-up" style={{ animationDelay: '170ms', animationFillMode: 'backwards' }}>
+        <SectionErrorBoundary sectionName="나의 기록">
+          <DailyHistory enabled={!!user} />
         </SectionErrorBoundary>
       </section>
 
