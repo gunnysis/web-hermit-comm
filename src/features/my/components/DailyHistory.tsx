@@ -18,7 +18,14 @@ export function DailyHistory({ enabled = true }: { enabled?: boolean }) {
     )
   }
 
-  if (items.length === 0) return null
+  if (items.length === 0) {
+    return (
+      <div className="rounded-2xl border border-border bg-muted/30 p-4 mt-4">
+        <p className="text-sm font-semibold mb-2">📖 나의 기록</p>
+        <p className="text-xs text-muted-foreground">오늘의 하루를 나누면 여기에 기록이 쌓여요</p>
+      </div>
+    )
+  }
 
   return (
     <div className="rounded-2xl border border-border bg-muted/30 p-4 mt-4">

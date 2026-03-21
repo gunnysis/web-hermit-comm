@@ -27,10 +27,10 @@ export function DailyInsights({ enabled = true }: { enabled?: boolean }) {
         <h3 className="text-sm font-semibold">나의 패턴</h3>
         <div className="rounded-xl px-4 py-4 bg-muted">
           <p className="text-sm text-muted-foreground">
-            💡 아직 패턴을 찾고 있어요.
+            💡 {total_dailies > 0 ? `${total_dailies}일째 기록하고 있어요!` : '패턴을 발견하려면 기록이 필요해요'}
           </p>
           <p className="text-xs text-muted-foreground/60 mt-1">
-            하루를 나눌수록 더 잘 보여요 :) ({total_dailies}/{DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS}일)
+            {DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS - total_dailies}일만 더 나누면 나만의 패턴이 보여요
           </p>
           <div className="mt-2 h-1.5 rounded-full bg-muted-foreground/10" role="progressbar" aria-valuenow={total_dailies} aria-valuemax={DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS} aria-label={`패턴 수집 진행률 ${total_dailies}/${DAILY_INSIGHTS_CONFIG.MIN_DAILIES_FOR_INSIGHTS}일`}>
             <div

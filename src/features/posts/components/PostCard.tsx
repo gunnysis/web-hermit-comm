@@ -113,16 +113,12 @@ export function PostCard({ post }: PostCardProps) {
         )}
 
         <CardFooter className="pt-1 gap-3">
-          {likeCount > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-happy-50 text-happy-700 dark:bg-happy-900/40 dark:text-happy-300 tabular-nums">
-              👍 {formatCount(likeCount)}
-            </span>
-          )}
-          {commentCount > 0 && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-lavender-50 text-lavender-700 dark:bg-lavender-900/40 dark:text-lavender-300 tabular-nums">
-              💬 {formatCount(commentCount)}
-            </span>
-          )}
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-happy-50 text-happy-700 dark:bg-happy-900/40 dark:text-happy-300 tabular-nums ${likeCount === 0 ? 'opacity-40' : ''}`}>
+            👍 {formatCount(likeCount)}
+          </span>
+          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-lavender-50 text-lavender-700 dark:bg-lavender-900/40 dark:text-lavender-300 tabular-nums ${commentCount === 0 ? 'opacity-40' : ''}`}>
+            💬 {formatCount(commentCount)}
+          </span>
         </CardFooter>
       </Card>
     </div>
