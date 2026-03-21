@@ -97,7 +97,7 @@ export function RegularDetailView({
         <div className="relative w-full overflow-hidden rounded-xl">
           <Image
             src={post.image_url}
-            alt="게시글 이미지"
+            alt={post.title?.replace(/<[^>]*>/g, '') || '게시글 이미지'}
             width={672}
             height={448}
             className="w-full object-contain max-h-[60vh] rounded-xl"

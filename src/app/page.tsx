@@ -28,8 +28,25 @@ export default async function HomePage() {
     }),
   ])
 
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: '은둔마을',
+    url: 'https://www.eundunmaeul.store',
+    description: '마음이 쉬어갈 수 있는 익명 커뮤니티',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: 'https://www.eundunmaeul.store/search?q={search_term_string}',
+      'query-input': 'required name=search_term_string',
+    },
+  }
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+      />
       <Header />
       <main className="max-w-2xl mx-auto px-4 py-4 pb-24 md:pb-6">
         <PublicFeed />

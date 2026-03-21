@@ -9,6 +9,8 @@ import {
   getReactionsServer,
 } from '@/features/posts/api/postsApi.server'
 
+const BASE_URL = 'https://www.eundunmaeul.store'
+
 interface PageProps {
   params: Promise<{ id: string }>
 }
@@ -26,14 +28,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = post.title.replace(/<[^>]*>/g, '')
   const description = (post.content ?? '').replace(/<[^>]*>/g, '').slice(0, 160)
+  const url = `${BASE_URL}/post/${id}`
 
   return {
     title: `${title} | 은둔마을`,
     description,
+    alternates: { canonical: url },
     openGraph: {
       title: `${title} | 은둔마을`,
       description,
       type: 'article',
+      url,
+      ...(post.image_url ? { images: [{ url: post.image_url }] } : {}),
+      publishedTime: post.created_at,
+      siteName: '은둔마을',
+      locale: 'ko_KR',
+    },
+    twitter: {
+      card: post.image_url ? 'summary_large_image' : 'summary',
+      title: `${title} | 은둔마을`,
+      description,
+      ...(post.image_url ? { images: [post.image_url] } : {}),
     },
   }
 }
@@ -43,7 +58,8 @@ export default async function PostPage({ params }: PageProps) {
   const postId = parseInt(id, 10)
   const queryClient = makeQueryClient()
 
-  await Promise.all([
+  const [post] = await Promise.all([
+    getPostServer(postId),
     queryClient.prefetchQuery({
       queryKey: ['post', postId],
       queryFn: () => getPostServer(postId),
@@ -58,8 +74,27 @@ export default async function PostPage({ params }: PageProps) {
     }),
   ])
 
+  const jsonLd = post ? {
+    '@context': 'https://schema.org',
+    '@type': post.post_type === 'daily' ? 'BlogPosting' : 'Article',
+    headline: post.title?.replace(/<[^>]*>/g, '') || '은둔마을 게시글',
+    description: (post.content ?? '').replace(/<[^>]*>/g, '').slice(0, 200),
+    datePublished: post.created_at,
+    ...(post.image_url ? { image: post.image_url } : {}),
+    author: { '@type': 'Person', name: post.display_name || '익명' },
+    publisher: { '@type': 'Organization', name: '은둔마을' },
+    url: `${BASE_URL}/post/${postId}`,
+    ...(post.emotions?.length ? { keywords: post.emotions.join(', ') } : {}),
+  } : null
+
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
       <Header />
       <main className="max-w-2xl mx-auto px-4 py-4 pb-24 md:pb-6">
         <PostDetailView postId={postId} />

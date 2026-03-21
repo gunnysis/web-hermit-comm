@@ -84,7 +84,7 @@ export function PostCard({ post }: PostCardProps) {
               <div className="relative w-full h-44 overflow-hidden rounded-md">
                 <Image
                   src={post.image_url}
-                  alt="게시글 이미지"
+                  alt={post.title?.replace(/<[^>]*>/g, '') || '게시글 이미지'}
                   fill
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                   sizes="(max-width: 672px) 100vw, 672px"
