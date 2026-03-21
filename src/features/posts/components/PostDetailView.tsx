@@ -2,23 +2,17 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { formatDistanceToNow } from 'date-fns'
 import { ko } from 'date-fns/locale'
-import { ArrowLeft, MoreHorizontal, Pencil, Trash2, Share2, Ban } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Separator } from '@/components/ui/separator'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { usePostDetail } from '../hooks/usePostDetail'
 import { usePostAnalysis } from '../hooks/usePostAnalysis'
-import { deletePost } from '../api/postsApi'
-import { EmotionTags } from './EmotionTags'
+import { deletePost, getSimilarFeelingCount } from '../api/postsApi'
+import { PostDetailHeader } from './PostDetailHeader'
+import { DailyDetailView } from './DailyDetailView'
+import { RegularDetailView } from './RegularDetailView'
 import { RecommendedPosts } from './RecommendedPosts'
 import { ReactionBar } from '@/features/reactions/components/ReactionBar'
 import { CommentSection } from '@/features/comments/components/CommentSection'
@@ -26,12 +20,6 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { toast } from 'sonner'
 import { useQueryClient, useQuery } from '@tanstack/react-query'
-import { RefreshCw } from 'lucide-react'
-import { EMOTION_COLOR_MAP, EMOTION_EMOJI, ACTIVITY_PRESETS } from '@/lib/constants'
-import { getSimilarFeelingCount } from '../api/postsApi'
-import { startViewTransition } from '@/lib/view-transition'
-import { PostContent } from './PostContent'
-import { SameMoodDailies } from './SameMoodDailies'
 import { logger } from '@/lib/logger'
 import { useBlockUser } from '@/features/blocks/hooks/useBlocks'
 
@@ -46,8 +34,7 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
   const { data: post, isLoading, isError } = usePostDetail(postId)
   const { data: analysis, retryAnalysis } = usePostAnalysis(postId)
 
-  const canEdit = user?.id === post?.author_id
-  const isOwnPost = canEdit
+  const isOwnPost = user?.id === post?.author_id
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [isRetryingAnalysis, setIsRetryingAnalysis] = useState(false)
@@ -85,21 +72,15 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     setIsRetryingAnalysis(true)
     try {
       await retryAnalysis()
-      // 스피너는 데이터 도착(useEffect) 또는 타임아웃(5초)까지 유지
-      spinnerTimeoutRef.current = setTimeout(() => {
-        setIsRetryingAnalysis(false)
-      }, 5000)
+      spinnerTimeoutRef.current = setTimeout(() => setIsRetryingAnalysis(false), 5000)
     } catch {
       toast.error('분석 요청에 실패했습니다.')
       setIsRetryingAnalysis(false)
     }
   }, [post, retryAnalysis])
 
-  // 분석 데이터 도착 시 스피너 해제
   const emotions = analysis?.emotions ?? post?.emotions
   const hasEmotions = (emotions?.length ?? 0) > 0
-  const primaryEmotion = emotions?.[0]
-  const emotionColors = primaryEmotion ? EMOTION_COLOR_MAP[primaryEmotion] : null
 
   const { data: similarCount } = useQuery({
     queryKey: ['similarFeeling', postId],
@@ -124,13 +105,13 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       <div className="space-y-4 animate-fade-in">
         <div className="flex justify-between">
           <Skeleton className="h-8 w-16" />
-          <Skeleton className="h-8 w-8 rounded-full shimmer-delay-1" />
+          <Skeleton className="h-8 w-8 rounded-full" />
         </div>
-        <Skeleton className="h-8 w-4/5 shimmer-delay-1" />
-        <Skeleton className="h-4 w-32 shimmer-delay-2" />
+        <Skeleton className="h-8 w-4/5" />
+        <Skeleton className="h-4 w-32" />
         <div className="space-y-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className={`h-4 ${i % 3 === 2 ? 'w-3/4' : 'w-full'} shimmer-delay-${Math.min(i + 1, 4)}`} />
+            <Skeleton key={i} className={`h-4 ${i % 3 === 2 ? 'w-3/4' : 'w-full'}`} />
           ))}
         </div>
       </div>
@@ -146,258 +127,59 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
     )
   }
 
-  const timeAgo = formatDistanceToNow(new Date(post.created_at), {
-    addSuffix: true,
-    locale: ko,
-  })
+  const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko })
 
   return (
     <article className="space-y-4 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
-      {/* 상단 내비게이션 */}
-      <div className="flex items-center justify-between">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            startViewTransition(() => {
-              if (window.history.length > 1) {
-                router.back()
-              } else {
-                router.push('/')
-              }
-            }, 'back')
-          }}
-          className="-ml-2"
-        >
-          <ArrowLeft size={16} className="mr-1" /> 뒤로
-        </Button>
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            aria-label="공유"
-            onClick={async () => {
-              const url = `${window.location.origin}/post/${postId}`
-              if (navigator.share) {
-                try { await navigator.share({ title: post.title, url }) } catch { /* cancelled */ }
-              } else {
-                await navigator.clipboard.writeText(url)
-                toast.success('링크가 복사됐습니다.')
-              }
-            }}
-          >
-            <Share2 size={16} />
-          </Button>
-        {user && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="더보기">
-                <MoreHorizontal size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {isOwnPost && (
-                <>
-                  <DropdownMenuItem onClick={() => {
-                    if (post.post_type === 'daily') {
-                      router.push(`/create?type=daily&edit=${postId}`)
-                    } else {
-                      router.push(`/post/${postId}/edit`)
-                    }
-                  }}>
-                    <Pencil size={14} className="mr-2" /> 수정
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setDeleteDialogOpen(true)}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <Trash2 size={14} className="mr-2" /> 삭제
-                  </DropdownMenuItem>
-                </>
-              )}
-              {!isOwnPost && post.display_name && post.display_name !== '익명' && (
-                <DropdownMenuItem
-                  onClick={() => {
-                    blockMutation.mutate(post.display_name, {
-                      onSuccess: () => toast.success('차단했습니다.'),
-                      onError: (err: Error & { code?: string }) => {
-                        toast.error(err.code === 'P0002' ? '차단할 수 없는 사용자입니다.' : '차단에 실패했습니다.')
-                      },
-                    })
-                  }}
-                  className="text-destructive focus:text-destructive"
-                >
-                  <Ban size={14} className="mr-2" /> 차단
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-        </div>
-      </div>
+      <PostDetailHeader
+        postId={postId}
+        post={post}
+        user={user}
+        isOwnPost={isOwnPost}
+        onDelete={() => setDeleteDialogOpen(true)}
+        onBlock={(alias) => {
+          blockMutation.mutate(alias, {
+            onSuccess: () => toast.success('차단했습니다.'),
+            onError: (err: Error & { code?: string }) => {
+              toast.error(err.code === 'P0002' ? '차단할 수 없는 사용자입니다.' : '차단에 실패했습니다.')
+            },
+          })
+        }}
+      />
 
       {post.post_type === 'daily' ? (
-        /* Daily 전용 렌더링 */
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-muted-foreground">🌤️ 오늘의 하루</span>
-            <span className="text-xs text-muted-foreground">
-              {timeAgo}
-            </span>
-          </div>
-
-          {/* 감정 칩 (크게) */}
-          <div className="flex flex-wrap gap-2">
-            {(analysis?.emotions ?? post.initial_emotions ?? []).map((emotion: string) => {
-              const colors = EMOTION_COLOR_MAP[emotion]
-              return (
-                <span key={emotion} className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ backgroundColor: colors?.gradient[0] ?? '#E7D7FF' }}>
-                  {EMOTION_EMOJI[emotion]} {emotion}
-                </span>
-              )
-            })}
-          </div>
-
-          {/* 활동 태그 */}
-          {(post.activities ?? []).length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {(post.activities ?? []).map((act: string) => {
-                const preset = ACTIVITY_PRESETS.find((p) => p.id === act)
-                return (
-                  <span key={act} className="rounded-full px-3 py-1.5 text-xs border border-border text-muted-foreground">
-                    {preset ? `${preset.icon} ${preset.name}` : act}
-                  </span>
-                )
-              })}
-            </div>
-          )}
-
-          {/* 한마디 */}
-          {post.content && post.content.length > 0 && (
-            <p className="text-base text-foreground">&ldquo;{post.content}&rdquo;</p>
-          )}
-
-          {/* 비슷한 마음 */}
-          {(similarCount ?? 0) > 0 && (
-            <p className="text-sm text-muted-foreground">
-              지난 30일간 {similarCount}명이 비슷한 마음이었어요
-            </p>
-          )}
-
-          <SameMoodDailies
-            postId={postId}
-            emotions={analysis?.emotions ?? post.initial_emotions ?? []}
-            postType={post.post_type}
-          />
-        </div>
+        <DailyDetailView
+          post={post}
+          analysis={analysis}
+          timeAgo={timeAgo}
+          similarCount={similarCount}
+          postId={postId}
+        />
       ) : (
-        /* 기존 일반 게시글 렌더링 */
-        <>
-          {/* 감정 그라데이션 밴드 */}
-          {emotionColors && (
-            <div
-              className="rounded-xl px-4 py-3 -mx-1"
-              style={{ background: `linear-gradient(135deg, ${emotionColors.gradient[0]}, ${emotionColors.gradient[1]})` }}
-            >
-              <h1 className="text-2xl font-bold leading-tight tracking-tight">{post.title}</h1>
-              {(similarCount ?? 0) > 0 && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  지난 30일간 {similarCount}명이 비슷한 마음이었어요
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* 제목 및 메타 */}
-          <header className="space-y-2">
-            {!emotionColors && (
-              <h1 className="text-2xl font-bold leading-tight tracking-tight">{post.title}</h1>
-            )}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground flex-wrap">
-              <span className="font-medium">{post.display_name}</span>
-              <span aria-hidden>·</span>
-              <time dateTime={post.created_at}>{timeAgo}</time>
-              {((post.like_count ?? 0) > 0 || (post.comment_count ?? 0) > 0) && (
-                <>
-                  <span aria-hidden>·</span>
-                  {(post.like_count ?? 0) > 0 && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs bg-happy-50 text-happy-700 dark:bg-happy-900/40 dark:text-happy-300">
-                      👍 {post.like_count}
-                    </span>
-                  )}
-                  {(post.comment_count ?? 0) > 0 && (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs bg-lavender-50 text-lavender-700 dark:bg-lavender-900/40 dark:text-lavender-300">
-                      💬 {post.comment_count}
-                    </span>
-                  )}
-                </>
-              )}
-            </div>
-            <EmotionTags emotions={emotions} clickable />
-            {!hasEmotions && analysis?.error_reason === 'content_too_short' && (
-              <p className="text-xs text-muted-foreground">글이 짧아 감정을 분석하지 못했어요</p>
-            )}
-            {!hasEmotions && analysis?.error_reason !== 'content_too_short' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleRetryAnalysis}
-                disabled={isRetryingAnalysis}
-                className="gap-1 text-xs text-muted-foreground"
-              >
-                <RefreshCw size={12} className={isRetryingAnalysis ? 'animate-spin' : ''} />
-                {isRetryingAnalysis ? '분석 중...' : '감정 분석 재시도'}
-              </Button>
-            )}
-          </header>
-
-          <Separator />
-
-          {/* 이미지 */}
-          {post.image_url && (
-            <div className="relative w-full overflow-hidden rounded-xl">
-              <Image
-                src={post.image_url}
-                alt="게시글 이미지"
-                width={672}
-                height={448}
-                className="w-full object-contain max-h-[60vh] rounded-xl"
-                priority
-              />
-            </div>
-          )}
-
-          {/* 본문 — prose 스타일 */}
-          <PostContent html={post.content} />
-        </>
+        <RegularDetailView
+          post={post}
+          analysis={analysis}
+          timeAgo={timeAgo}
+          emotions={emotions}
+          hasEmotions={hasEmotions}
+          similarCount={similarCount}
+          isRetryingAnalysis={isRetryingAnalysis}
+          onRetryAnalysis={handleRetryAnalysis}
+        />
       )}
 
       <Separator />
-
-      {/* 반응 */}
       <ReactionBar postId={postId} userId={user?.id ?? null} />
-
-      {/* 추천 게시글 */}
       <Separator />
       <RecommendedPosts postId={postId} hasEmotions={hasEmotions} />
-
       <Separator />
+      <CommentSection postId={postId} userId={user?.id ?? null} boardId={post.board_id ?? undefined} />
 
-      {/* 댓글 */}
-      <CommentSection
-        postId={postId}
-        userId={user?.id ?? null}
-        boardId={post.board_id ?? undefined}
-      />
       <ConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         title={post.post_type === 'daily' ? '오늘의 하루를 삭제할까요?' : '게시글을 삭제할까요?'}
-        description={post.post_type === 'daily'
-          ? '삭제하면 오늘 다시 나눌 수 있어요.'
-          : '삭제한 게시글은 복구할 수 없습니다.'}
+        description={post.post_type === 'daily' ? '삭제하면 오늘 다시 나눌 수 있어요.' : '삭제한 게시글은 복구할 수 없습니다.'}
         confirmLabel="삭제"
         onConfirm={handleDelete}
         isPending={isDeleting}

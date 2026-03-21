@@ -7,9 +7,11 @@ import type { Comment, CreateCommentRequest } from '@/types/database'
 
 export function useComments(postId: number) {
   const queryClient = useQueryClient()
+  const commentsKey = ['comments', postId]
+  const postKey = ['post', postId]
 
   const query = useQuery({
-    queryKey: ['comments', postId],
+    queryKey: commentsKey,
     queryFn: () => getComments(postId),
     staleTime: 30 * 1000,
   })
@@ -18,17 +20,19 @@ export function useComments(postId: number) {
     channelName: `comments-${postId}`,
     table: 'comments',
     filter: `post_id=eq.${postId}`,
-    queryKeys: [['comments', postId]],
+    queryKeys: [commentsKey],
   })
+
+  const rollback = (_err: unknown, _vars: unknown, context: { prev?: Comment[] } | undefined) => {
+    if (context?.prev !== undefined) queryClient.setQueryData(commentsKey, context.prev)
+  }
 
   const createMutation = useMutation({
     mutationFn: (args: { request: CreateCommentRequest & { author_id: string }; parentId?: number | null }) =>
       createComment(postId, args.request, args.parentId),
     onMutate: async ({ request, parentId }) => {
-      await queryClient.cancelQueries({ queryKey: ['comments', postId] })
-      const prev = queryClient.getQueryData<Comment[]>(['comments', postId])
-
-      // 낙관적으로 댓글 즉시 추가
+      await queryClient.cancelQueries({ queryKey: commentsKey })
+      const prev = queryClient.getQueryData<Comment[]>(commentsKey)
       const optimisticComment: Comment = {
         id: -Date.now(),
         post_id: postId,
@@ -42,19 +46,13 @@ export function useComments(postId: number) {
         deleted_at: null,
         parent_id: parentId ?? null,
       }
-
-      queryClient.setQueryData<Comment[]>(['comments', postId], old =>
-        [...(old ?? []), optimisticComment],
-      )
+      queryClient.setQueryData<Comment[]>(commentsKey, old => [...(old ?? []), optimisticComment])
       return { prev }
     },
-    onError: (_err, _vars, context) => {
-      if (context?.prev !== undefined)
-        queryClient.setQueryData(['comments', postId], context.prev)
-    },
+    onError: rollback,
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId] })
-      queryClient.invalidateQueries({ queryKey: ['post', postId] })
+      queryClient.invalidateQueries({ queryKey: commentsKey })
+      queryClient.invalidateQueries({ queryKey: postKey })
     },
   })
 
@@ -62,37 +60,31 @@ export function useComments(postId: number) {
     mutationFn: ({ commentId, content }: { commentId: number; content: string }) =>
       updateComment(commentId, content),
     onMutate: async ({ commentId, content }) => {
-      await queryClient.cancelQueries({ queryKey: ['comments', postId] })
-      const prev = queryClient.getQueryData<Comment[]>(['comments', postId])
-      queryClient.setQueryData<Comment[]>(['comments', postId], old =>
+      await queryClient.cancelQueries({ queryKey: commentsKey })
+      const prev = queryClient.getQueryData<Comment[]>(commentsKey)
+      queryClient.setQueryData<Comment[]>(commentsKey, old =>
         (old ?? []).map(c => c.id === commentId ? { ...c, content } : c),
       )
       return { prev }
     },
-    onError: (_err, _vars, context) => {
-      if (context?.prev !== undefined)
-        queryClient.setQueryData(['comments', postId], context.prev)
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['comments', postId] }),
+    onError: rollback,
+    onSettled: () => queryClient.invalidateQueries({ queryKey: commentsKey }),
   })
 
   const deleteMutation = useMutation({
     mutationFn: (commentId: number) => deleteComment(commentId),
     onMutate: async (commentId) => {
-      await queryClient.cancelQueries({ queryKey: ['comments', postId] })
-      const prev = queryClient.getQueryData<Comment[]>(['comments', postId])
-      queryClient.setQueryData<Comment[]>(['comments', postId], old =>
+      await queryClient.cancelQueries({ queryKey: commentsKey })
+      const prev = queryClient.getQueryData<Comment[]>(commentsKey)
+      queryClient.setQueryData<Comment[]>(commentsKey, old =>
         (old ?? []).filter(c => c.id !== commentId),
       )
       return { prev }
     },
-    onError: (_err, _vars, context) => {
-      if (context?.prev !== undefined)
-        queryClient.setQueryData(['comments', postId], context.prev)
-    },
+    onError: rollback,
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ['comments', postId] })
-      queryClient.invalidateQueries({ queryKey: ['post', postId] })
+      queryClient.invalidateQueries({ queryKey: commentsKey })
+      queryClient.invalidateQueries({ queryKey: postKey })
     },
   })
 
