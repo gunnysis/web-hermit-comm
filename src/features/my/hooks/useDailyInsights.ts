@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getDailyInsights } from '@/features/posts/api/postsApi'
+import { getDailyInsights } from '../api/myApi'
 
 export function useDailyInsights(days = 30, enabled = true) {
   return useQuery({

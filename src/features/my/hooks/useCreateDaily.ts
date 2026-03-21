@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createDailyPost, updateDailyPost } from '@/features/posts/api/postsApi'
+import { createDailyPost, updateDailyPost } from '../api/myApi'
 
 export function useCreateDaily() {
   const queryClient = useQueryClient()

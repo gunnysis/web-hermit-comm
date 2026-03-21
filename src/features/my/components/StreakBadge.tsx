@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { getMyStreak } from '@/features/posts/api/postsApi'
+import { getMyStreak } from '../api/myApi'
 
 const MILESTONES = [
   { days: 7, emoji: '🌱', label: '새싹' },

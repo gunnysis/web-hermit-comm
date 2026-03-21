@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { getTodayDaily } from '@/features/posts/api/postsApi'
+import { getTodayDaily } from '../api/myApi'
 
 export function useTodayDaily(enabled = true) {
   return useQuery({

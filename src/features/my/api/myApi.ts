@@ -100,6 +100,95 @@ export async function getWeeklyEmotionSummary(weekOffset = 0): Promise<WeeklyEmo
   return data as unknown as WeeklyEmotionSummary | null
 }
 
+// --- Daily/Streak (postsApi에서 이동) ---
+
+import type { Post } from '@/types/database'
+
+export async function createDailyPost(data: {
+  emotions: string[]
+  activities?: string[]
+  content?: string
+}): Promise<Post> {
+  const supabase = createClient()
+  const { data: result, error } = await supabase.rpc('create_daily_post', {
+    p_emotions: data.emotions,
+    p_activities: data.activities ?? [],
+    p_content: data.content ?? '',
+  })
+  if (error) {
+    logger.error('[API] createDailyPost 에러:', error.message, { code: error.code })
+    throw error
+  }
+  return result as unknown as Post
+}
+
+export async function updateDailyPost(data: {
+  postId: number
+  emotions: string[]
+  activities?: string[]
+  content?: string
+}): Promise<Post> {
+  const supabase = createClient()
+  const { data: result, error } = await supabase.rpc('update_daily_post', {
+    p_post_id: data.postId,
+    p_emotions: data.emotions,
+    p_activities: data.activities ?? [],
+    p_content: data.content ?? '',
+  })
+  if (error) {
+    logger.error('[API] updateDailyPost 에러:', error.message, { code: error.code })
+    throw error
+  }
+  return result as unknown as Post
+}
+
+export async function getTodayDaily(): Promise<Post | null> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_today_daily')
+  if (error) {
+    logger.error('[API] getTodayDaily 에러:', error.message, { code: error.code })
+    throw error
+  }
+  return data as Post | null
+}
+
+export interface DailyInsightsResult {
+  total_dailies: number
+  activity_emotion_map: {
+    activity: string
+    count: number
+    emotions: { emotion: string; pct: number }[]
+  }[]
+}
+
+export async function getDailyInsights(days = 30): Promise<DailyInsightsResult> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_daily_activity_insights', { p_days: days })
+  if (error) {
+    logger.error('[API] getDailyInsights 에러:', error.message, { code: error.code })
+    throw error
+  }
+  return data as unknown as DailyInsightsResult
+}
+
+export interface StreakData {
+  current_streak: number
+  total_days: number
+  longest_streak: number
+  completed_today: boolean
+  new_milestone: number
+}
+
+export async function getMyStreak(): Promise<StreakData> {
+  const supabase = createClient()
+  const { data, error } = await supabase.rpc('get_my_streak')
+  if (error) {
+    logger.error('[API] getMyStreak 에러:', error.message)
+    throw error
+  }
+  return data as unknown as StreakData
+}
+
 export async function getMyAlias(): Promise<string | null> {
   const supabase = createClient()
   const { data, error } = await supabase.rpc('get_my_alias')
