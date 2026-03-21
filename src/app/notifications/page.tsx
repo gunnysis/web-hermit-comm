@@ -10,7 +10,7 @@ import type { Notification } from '@/types/database'
 
 export default function NotificationsPage() {
   const { data: notifications = [] } = useNotifications()
-  const { mutate: markAllRead } = useMarkAllRead()
+  const { mutate: markAllRead, isPending: isMarkingAll } = useMarkAllRead()
   const { mutate: markRead } = useMarkRead()
 
   const getLabel = (n: Notification) => {
@@ -28,7 +28,9 @@ export default function NotificationsPage() {
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold">알림</h1>
           {notifications.some(n => !n.read) && (
-            <Button variant="ghost" size="sm" onClick={() => markAllRead()}>모두 읽음</Button>
+            <Button variant="ghost" size="sm" onClick={() => markAllRead()} disabled={isMarkingAll}>
+              {isMarkingAll ? '처리 중...' : '모두 읽음'}
+            </Button>
           )}
         </div>
         {notifications.length === 0 ? (
