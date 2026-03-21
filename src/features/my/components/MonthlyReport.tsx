@@ -3,16 +3,10 @@
 import { useState } from 'react'
 import { useMonthlyReport } from '../hooks/useMonthlyReport'
 import { EMOTION_EMOJI, ACTIVITY_PRESETS } from '@/lib/constants.generated'
-import { getActivityLabel } from '@/lib/utils.generated'
+import { getActivityLabel, getCurrentKST } from '@/lib/utils.generated'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const MONTH_NAMES = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월']
-
-function getCurrentKST() {
-  const now = new Date()
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000)
-  return { year: kst.getUTCFullYear(), month: kst.getUTCMonth() + 1 }
-}
 
 export function MonthlyReport({ enabled = true }: { enabled?: boolean }) {
   const current = getCurrentKST()
