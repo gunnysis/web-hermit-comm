@@ -6,7 +6,7 @@ export async function GET() {
 
   const { data: posts } = await supabase
     .from('posts_with_like_count')
-    .select('id, title, content, created_at')
+    .select('id, title, content, created_at, emotions, post_type')
     .order('created_at', { ascending: false })
     .limit(50)
 
@@ -16,13 +16,20 @@ export async function GET() {
         .replace(/<[^>]*>/g, '')
         .slice(0, 200)
       const pubDate = new Date(post.created_at ?? Date.now()).toUTCString()
+      const title = post.post_type === 'daily'
+        ? `오늘의 하루 — ${(post.emotions ?? []).join(', ') || '기록'}`
+        : (post.title ?? '무제')
+      const categories = (post.emotions ?? [])
+        .map((e: string) => `      <category>${e}</category>`)
+        .join('\n')
 
       return `    <item>
-      <title><![CDATA[${post.title ?? '무제'}]]></title>
+      <title><![CDATA[${title}]]></title>
       <link>${baseUrl}/post/${post.id}</link>
       <guid isPermaLink="true">${baseUrl}/post/${post.id}</guid>
       <description><![CDATA[${plainText}]]></description>
       <pubDate>${pubDate}</pubDate>
+${categories}
     </item>`
     })
     .join('\n')

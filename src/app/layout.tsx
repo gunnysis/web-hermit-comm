@@ -57,6 +57,7 @@ export const metadata: Metadata = {
     apple: "/apple-touch-icon.png",
   },
   alternates: {
+    canonical: "https://www.eundunmaeul.store",
     types: {
       "application/rss+xml": "/feed.xml",
     },
