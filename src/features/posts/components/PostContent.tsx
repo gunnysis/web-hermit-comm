@@ -1,6 +1,6 @@
 'use client'
 import { useMemo } from 'react'
-import DOMPurify from 'isomorphic-dompurify'
+import DOMPurify from 'dompurify'
 
 const ALLOWED_TAGS = ['p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'blockquote', 'img', 'pre', 'code']
 const ALLOWED_ATTR = ['href', 'src', 'alt', 'class', 'target', 'rel']

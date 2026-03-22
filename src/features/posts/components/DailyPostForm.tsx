@@ -93,7 +93,12 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
 
   return (
     <div className="max-w-lg mx-auto space-y-6">
-      <h2 className="text-lg font-bold">{mode === 'edit' ? '오늘의 하루 수정' : '오늘의 하루'}</h2>
+      <div className="text-center">
+        <h2 className="text-lg font-bold">{mode === 'edit' ? '오늘의 하루 수정' : '오늘의 하루'}</h2>
+        <p className="text-xs text-muted-foreground mt-1">
+          {new Date().toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'long' })}
+        </p>
+      </div>
 
       {/* 감정 선택 */}
       <div>
@@ -108,9 +113,9 @@ export function DailyPostForm({ mode = 'create', initialData }: DailyPostFormPro
                 type="button"
                 onClick={() => toggleEmotion(emotion)}
                 className={`rounded-full px-3 py-1.5 text-xs transition-all duration-200 active:scale-95 ${
-                  isActive ? 'font-semibold scale-105' : 'bg-muted hover:bg-muted/80'
+                  isActive ? 'font-semibold scale-105 ring-2 ring-offset-1' : 'bg-muted hover:bg-muted/80'
                 }`}
-                style={isActive ? { backgroundColor: colors?.gradient[0] ?? '#E7D7FF' } : undefined}
+                style={isActive ? { backgroundColor: colors?.gradient[0] ?? '#E7D7FF', '--tw-ring-color': colors?.gradient[1] ?? '#E7D7FF' } as React.CSSProperties : undefined}
                 aria-label={`감정: ${emotion}`}
                 role="checkbox"
                 aria-checked={isActive}

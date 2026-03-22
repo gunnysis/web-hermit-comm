@@ -8,6 +8,14 @@ import { signInAnonymously } from '../auth'
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [retryKey, setRetryKey] = useState(0)
+
+  const retry = useCallback(() => {
+    setAuthError(null)
+    setLoading(true)
+    setRetryKey((k) => k + 1)
+  }, [])
 
   const ensureAnonymousSession = useCallback(async (maxRetries = 3) => {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -31,11 +39,17 @@ export function useAuth() {
       if (cancelled) return
       if (session?.user) {
         setUser(session.user)
+        setAuthError(null)
         setLoading(false)
       } else {
         ensureAnonymousSession().then(u => {
           if (!cancelled) {
-            if (u) setUser(u)
+            if (u) {
+              setUser(u)
+              setAuthError(null)
+            } else {
+              setAuthError('서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.')
+            }
             setLoading(false)
           }
         })
@@ -65,7 +79,7 @@ export function useAuth() {
       cancelled = true
       subscription.unsubscribe()
     }
-  }, [ensureAnonymousSession])
+  }, [ensureAnonymousSession, retryKey])
 
-  return { user, loading }
+  return { user, loading, authError, retry }
 }
