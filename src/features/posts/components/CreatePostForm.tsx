@@ -1,37 +1,36 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ImagePlus, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import dynamic from 'next/dynamic'
 import { postSchema, type PostFormValues } from '@/lib/schemas'
 import { createPost } from '../api/postsApi'
-import { uploadPostImage, validateImageFile, ImageValidationError } from '../api/uploadImage'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { resolveDisplayName } from '@/lib/anonymous'
-import { DEFAULT_PUBLIC_BOARD_ID } from '@/lib/constants'
+import { DEFAULT_PUBLIC_BOARD_ID, POETRY_BOARD_ID } from '@/lib/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { MoodSelector } from './MoodSelector'
 
 const RichEditor = dynamic(() => import('./RichEditor').then(m => m.RichEditor), {
   ssr: false,
   loading: () => <div className="h-40 rounded-md border border-input bg-muted animate-pulse" />,
 })
 
-export function CreatePostForm() {
+interface CreatePostFormProps {
+  boardId?: number
+}
+
+export function CreatePostForm({ boardId = DEFAULT_PUBLIC_BOARD_ID }: CreatePostFormProps) {
   const router = useRouter()
   const { user } = useAuthContext()
   const queryClient = useQueryClient()
-  const [imageFile, setImageFile] = useState<File | null>(null)
-  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [initialEmotions, setInitialEmotions] = useState<string[]>([])
-  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const isPoetry = boardId === POETRY_BOARD_ID
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } =
     useForm<PostFormValues>({
@@ -41,60 +40,25 @@ export function CreatePostForm() {
 
   const content = watch('content') ?? ''
 
-  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    try {
-      validateImageFile(file)
-    } catch (err) {
-      if (err instanceof ImageValidationError) {
-        toast.error(err.message)
-      }
-      if (fileInputRef.current) fileInputRef.current.value = ''
-      return
-    }
-    setImageFile(file)
-    setImagePreview(prev => {
-      if (prev) URL.revokeObjectURL(prev)
-      return URL.createObjectURL(file)
-    })
-  }
-
-  const handleRemoveImage = () => {
-    setImageFile(null)
-    setImagePreview(prev => {
-      if (prev) URL.revokeObjectURL(prev)
-      return null
-    })
-    if (fileInputRef.current) fileInputRef.current.value = ''
-  }
-
   const onSubmit = async (values: PostFormValues) => {
     if (!user) { toast.error('로그인이 필요합니다.'); return }
     setIsSubmitting(true)
     try {
-      let image_url: string | undefined
-      if (imageFile) {
-        image_url = await uploadPostImage(imageFile, user.id)
-      }
-
-      const display_name = resolveDisplayName(user.id, DEFAULT_PUBLIC_BOARD_ID, true)
+      const display_name = resolveDisplayName(user.id, boardId, true)
       const post = await createPost({
         title: values.title,
         content: values.content,
         author_id: user.id,
-        board_id: DEFAULT_PUBLIC_BOARD_ID,
+        board_id: boardId,
         is_anonymous: true,
         display_name,
-        image_url,
-        ...(initialEmotions.length > 0 ? { initial_emotions: initialEmotions } : {}),
       })
 
-      queryClient.invalidateQueries({ queryKey: ['boardPosts', DEFAULT_PUBLIC_BOARD_ID] })
-      toast.success('게시글이 등록됐습니다.')
+      queryClient.invalidateQueries({ queryKey: ['boardPosts', boardId] })
+      toast.success(isPoetry ? '시가 등록됐습니다.' : '게시글이 등록됐습니다.')
       router.push(`/post/${post.id}`)
     } catch {
-      toast.error('게시글 등록에 실패했습니다.')
+      toast.error(isPoetry ? '시 등록에 실패했습니다.' : '게시글 등록에 실패했습니다.')
     } finally {
       setIsSubmitting(false)
     }
@@ -111,14 +75,11 @@ export function CreatePostForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* 감정 선택 */}
-      <MoodSelector value={initialEmotions} onChange={setInitialEmotions} />
-
       {/* 제목 */}
       <div className="space-y-1">
         <Input
           {...register('title')}
-          placeholder="제목"
+          placeholder={isPoetry ? '시의 제목' : '제목'}
           className="text-base font-medium"
         />
         {errors.title && (
@@ -131,50 +92,11 @@ export function CreatePostForm() {
         <RichEditor
           value={content}
           onChange={(html) => setValue('content', html, { shouldValidate: true })}
-          placeholder="내용을 입력하세요..."
+          placeholder={isPoetry ? '시를 작성해보세요...' : '내용을 입력하세요...'}
         />
         {errors.content && (
           <p className="text-xs text-destructive">{errors.content.message}</p>
         )}
-      </div>
-
-      {/* 이미지 첨부 */}
-      <div>
-        {imagePreview ? (
-          <div className="relative w-fit">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={imagePreview}
-              alt="첨부 이미지 미리보기"
-              className="max-h-48 rounded-md object-contain border"
-            />
-            <Button
-              type="button"
-              size="icon"
-              variant="destructive"
-              className="absolute top-1 right-1 h-6 w-6"
-              onClick={handleRemoveImage}
-            >
-              <X size={12} />
-            </Button>
-          </div>
-        ) : (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <ImagePlus size={15} className="mr-1" /> 이미지 첨부
-          </Button>
-        )}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleImageSelect}
-        />
       </div>
 
       <div className="flex gap-2 justify-end">

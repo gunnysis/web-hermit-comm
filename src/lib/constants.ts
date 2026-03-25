@@ -1,5 +1,3 @@
-/** 공개 게시판 기본 ID. 자유게시판 (visibility='public') */
-export const DEFAULT_PUBLIC_BOARD_ID = 12
 export const PAGE_SIZE = 20
 
 /** 입력 유효성 검사 상수 */
@@ -25,5 +23,6 @@ export {
   EMOTION_COLOR_MAP, MOTION, EMPTY_STATE_MESSAGES, GREETING_MESSAGES,
   SEARCH_HIGHLIGHT, SEARCH_CONFIG, SEARCH_SORT_OPTIONS, ADMIN_CONSTANTS,
   ACTIVITY_PRESETS, DAILY_CONFIG, DAILY_INSIGHTS_CONFIG,
+  DEFAULT_PUBLIC_BOARD_ID, POETRY_BOARD_ID, PUBLIC_BOARDS,
 } from './constants.generated'
 export type { AllowedEmotion, ReactionColorKey } from './constants.generated'

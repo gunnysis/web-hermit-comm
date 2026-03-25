@@ -11,10 +11,7 @@ import { CommunityPulse } from './CommunityPulse'
 import { EmotionFilterBar } from './EmotionFilterBar'
 import { TrendingPosts } from './TrendingPosts'
 import { GreetingBanner } from './GreetingBanner'
-import { HomeCheckinBanner } from './HomeCheckinBanner'
-import { YesterdayReactionBanner } from './YesterdayReactionBanner'
-import { DEFAULT_PUBLIC_BOARD_ID, EMPTY_STATE_MESSAGES } from '@/lib/constants'
-import { useBlockedAliases } from '@/features/blocks/hooks/useBlocks'
+import { DEFAULT_PUBLIC_BOARD_ID, EMPTY_STATE_MESSAGES, PUBLIC_BOARDS } from '@/lib/constants'
 import { Separator } from '@/components/ui/separator'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FileText } from 'lucide-react'
@@ -23,12 +20,13 @@ import { getPostsByEmotion } from '../api/postsApi'
 type SortOrder = 'latest' | 'popular'
 
 export function PublicFeed() {
+  const [selectedBoardId, setSelectedBoardId] = useState(DEFAULT_PUBLIC_BOARD_ID)
   const [sortOrder, setSortOrder] = useState<SortOrder>('latest')
   const [emotionFilter, setEmotionFilter] = useState<string | null>(null)
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
-    useBoardPosts(DEFAULT_PUBLIC_BOARD_ID, sortOrder)
-  useRealtimePosts(DEFAULT_PUBLIC_BOARD_ID)
+    useBoardPosts(selectedBoardId, sortOrder)
+  useRealtimePosts(selectedBoardId)
 
   const { data: filteredPosts, isLoading: isFilterLoading } = useQuery({
     queryKey: ['postsByEmotion', emotionFilter],
@@ -41,9 +39,7 @@ export function PublicFeed() {
     { enabled: hasNextPage && !isFetchingNextPage && !emotionFilter },
   )
 
-  const { data: blockedAliases = [] } = useBlockedAliases()
-  const allPosts = emotionFilter ? (filteredPosts ?? []) : (data?.pages.flat() ?? [])
-  const posts = allPosts.filter(p => !blockedAliases.includes(p.display_name))
+  const posts = emotionFilter ? (filteredPosts ?? []) : (data?.pages.flat() ?? [])
   const loading = emotionFilter ? isFilterLoading : isLoading
 
   const latestRef = useRef<HTMLButtonElement>(null)
@@ -61,11 +57,35 @@ export function PublicFeed() {
     setEmotionFilter(emotion)
   }
 
+  const handleBoardChange = (boardId: number) => {
+    setSelectedBoardId(boardId)
+    setEmotionFilter(null)
+    setSortOrder('latest')
+  }
+
+  const selectedBoard = PUBLIC_BOARDS.find(b => b.id === selectedBoardId)
+
   return (
     <div className="space-y-3 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
       <GreetingBanner />
-      <YesterdayReactionBanner />
-      <HomeCheckinBanner />
+
+      {/* 게시판 탭 */}
+      <div className="flex gap-2">
+        {PUBLIC_BOARDS.map((board) => (
+          <button
+            key={board.id}
+            onClick={() => handleBoardChange(board.id)}
+            className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${
+              selectedBoardId === board.id
+                ? 'bg-foreground text-background'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            {board.icon} {board.name}
+          </button>
+        ))}
+      </div>
+
       <CommunityPulse onEmotionSelect={handleEmotionSelect} selectedEmotion={emotionFilter} />
       <EmotionFilterBar selected={emotionFilter} onSelect={handleEmotionSelect} />
       <TrendingPosts />
@@ -118,8 +138,16 @@ export function PublicFeed() {
         {!loading && posts.length === 0 && (
           <EmptyState
             icon={FileText}
-            title={emotionFilter ? EMPTY_STATE_MESSAGES.emotion_filter.title : EMPTY_STATE_MESSAGES.feed.title}
-            description={emotionFilter ? EMPTY_STATE_MESSAGES.emotion_filter.description : EMPTY_STATE_MESSAGES.feed.description}
+            title={emotionFilter
+              ? EMPTY_STATE_MESSAGES.emotion_filter.title
+              : (selectedBoard?.name === '시 게시판'
+                ? '아직 시가 없어요'
+                : EMPTY_STATE_MESSAGES.feed.title)}
+            description={emotionFilter
+              ? EMPTY_STATE_MESSAGES.emotion_filter.description
+              : (selectedBoard?.name === '시 게시판'
+                ? '첫 번째 시를 작성해보세요.\n마음을 시로 표현해보는 건 어떨까요?'
+                : EMPTY_STATE_MESSAGES.feed.description)}
           />
         )}
       </div>

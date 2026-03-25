@@ -1,7 +1,6 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import Image from "next/image"
 import { formatDistanceToNow } from "date-fns"
 import { ko } from "date-fns/locale"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
@@ -73,23 +72,12 @@ export function PostCard({ post }: PostCardProps) {
           </h2>
         </CardHeader>
 
-        {(preview || post.image_url || visibleEmotions.length > 0) && (
+        {(preview || visibleEmotions.length > 0) && (
           <CardContent className="pb-2 space-y-2.5">
             {preview && (
               <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                 {preview}
               </p>
-            )}
-            {post.image_url && (
-              <div className="relative w-full h-44 overflow-hidden rounded-md">
-                <Image
-                  src={post.image_url}
-                  alt={post.title?.replace(/<[^>]*>/g, '') || '게시글 이미지'}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 672px) 100vw, 672px"
-                />
-              </div>
             )}
             {visibleEmotions.length > 0 && (
               <div className="flex flex-wrap gap-1.5">

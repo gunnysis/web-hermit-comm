@@ -21,7 +21,6 @@ import { useAuthContext } from '@/features/auth/AuthProvider'
 import { toast } from 'sonner'
 import { useQueryClient, useQuery } from '@tanstack/react-query'
 import { logger } from '@/lib/logger'
-import { useBlockUser } from '@/features/blocks/hooks/useBlocks'
 
 interface PostDetailViewProps {
   postId: number
@@ -39,8 +38,6 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isRetryingAnalysis, setIsRetryingAnalysis] = useState(false)
   const spinnerTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
-  const blockMutation = useBlockUser()
-
   const handleDelete = async () => {
     setIsDeleting(true)
     try {
@@ -137,14 +134,6 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
         user={user}
         isOwnPost={isOwnPost}
         onDelete={() => setDeleteDialogOpen(true)}
-        onBlock={(alias) => {
-          blockMutation.mutate(alias, {
-            onSuccess: () => toast.success('차단했습니다.'),
-            onError: (err: Error & { code?: string }) => {
-              toast.error(err.code === 'P0002' ? '차단할 수 없는 사용자입니다.' : '차단에 실패했습니다.')
-            },
-          })
-        }}
       />
 
       {post.post_type === 'daily' ? (

@@ -11,7 +11,6 @@ import { MonthlyReport } from '@/features/my/components/MonthlyReport'
 import { DailyHistory } from '@/features/my/components/DailyHistory'
 import { StreakBadge } from '@/features/my/components/StreakBadge'
 import { EmotionTrendChart } from '@/features/my/components/EmotionTrendChart'
-import { BlockedUsersSection } from '@/features/my/components/BlockedUsersSection'
 import { SectionErrorBoundary } from '@/features/my/components/SectionErrorBoundary'
 import { EmotionCalendar } from '@/features/posts/components/EmotionCalendar'
 import { EmotionWave } from '@/features/posts/components/EmotionWave'
@@ -142,12 +141,6 @@ export default function MySpacePage() {
       <Separator />
 
       {/* 설정 */}
-      <section className="animate-slide-up" style={{ animationDelay: '250ms', animationFillMode: 'backwards' }}>
-        <SectionErrorBoundary sectionName="차단 관리">
-          <h2 className="text-sm font-semibold mb-3 text-muted-foreground">설정</h2>
-          <BlockedUsersSection enabled={!!user} />
-        </SectionErrorBoundary>
-      </section>
     </div>
   )
 }

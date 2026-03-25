@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, MoreHorizontal, Pencil, Trash2, Share2, Ban } from 'lucide-react'
+import { ArrowLeft, MoreHorizontal, Pencil, Trash2, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -20,10 +20,9 @@ interface PostDetailHeaderProps {
   user: User | null
   isOwnPost: boolean
   onDelete: () => void
-  onBlock: (alias: string) => void
 }
 
-export function PostDetailHeader({ postId, post, user, isOwnPost, onDelete, onBlock }: PostDetailHeaderProps) {
+export function PostDetailHeader({ postId, post, user, isOwnPost, onDelete }: PostDetailHeaderProps) {
   const router = useRouter()
 
   return (
@@ -88,14 +87,6 @@ export function PostDetailHeader({ postId, post, user, isOwnPost, onDelete, onBl
                   <Trash2 size={14} className="mr-2" /> 삭제
                 </DropdownMenuItem>
               </>
-            )}
-            {!isOwnPost && post.display_name && post.display_name !== '익명' && (
-              <DropdownMenuItem
-                onClick={() => onBlock(post.display_name)}
-                className="text-destructive focus:text-destructive"
-              >
-                <Ban size={14} className="mr-2" /> 차단
-              </DropdownMenuItem>
             )}
           </DropdownMenuContent>
         </DropdownMenu>

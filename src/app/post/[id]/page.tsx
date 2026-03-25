@@ -39,16 +39,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       type: 'article',
       url,
-      ...(post.image_url ? { images: [{ url: post.image_url }] } : {}),
       publishedTime: post.created_at,
       siteName: '은둔마을',
       locale: 'ko_KR',
     },
     twitter: {
-      card: post.image_url ? 'summary_large_image' : 'summary',
+      card: 'summary',
       title: `${title} | 은둔마을`,
       description,
-      ...(post.image_url ? { images: [post.image_url] } : {}),
     },
   }
 }
@@ -80,7 +78,6 @@ export default async function PostPage({ params }: PageProps) {
     headline: post.title?.replace(/<[^>]*>/g, '') || '은둔마을 게시글',
     description: (post.content ?? '').replace(/<[^>]*>/g, '').slice(0, 200),
     datePublished: post.created_at,
-    ...(post.image_url ? { image: post.image_url } : {}),
     author: { '@type': 'Person', name: post.display_name || '익명' },
     publisher: { '@type': 'Organization', name: '은둔마을' },
     url: `${BASE_URL}/post/${postId}`,
