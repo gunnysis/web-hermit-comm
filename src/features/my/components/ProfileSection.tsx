@@ -4,9 +4,7 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMyAlias } from '../hooks/useMyAlias'
 import { useActivitySummary } from '../hooks/useActivitySummary'
-import { useTodayDaily } from '../hooks/useTodayDaily'
 import { signOut } from '@/features/auth/auth'
-import { EMOTION_EMOJI, EMOTION_COLOR_MAP } from '@/lib/constants'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from 'sonner'
 import type { User } from '@supabase/supabase-js'
@@ -21,15 +19,9 @@ export function ProfileSection({ user }: { user: User }) {
   const router = useRouter()
   const { data: alias, isLoading: aliasLoading } = useMyAlias(true)
   const { data: summary, isLoading: summaryLoading } = useActivitySummary(true)
-  const { data: todayDaily } = useTodayDaily(true)
 
   const daysSince = useMemo(() => getDaysSince(user.created_at), [user.created_at])
   const streak = summary?.streak ?? 0
-
-  const todayEmotions: string[] = useMemo(() => {
-    if (!todayDaily) return []
-    return Array.isArray(todayDaily.emotions) ? todayDaily.emotions : []
-  }, [todayDaily])
 
   const [signingOut, setSigningOut] = useState(false)
 
@@ -79,9 +71,8 @@ export function ProfileSection({ user }: { user: User }) {
         )}
       </div>
 
-      {/* Streak + Today's Emotion */}
+      {/* Streak */}
       <div className="flex items-center gap-3 flex-wrap">
-        {/* Streak Badge */}
         {summaryLoading ? (
           <Skeleton className="h-7 w-28 rounded-full" />
         ) : streak > 0 ? (
@@ -90,27 +81,8 @@ export function ProfileSection({ user }: { user: User }) {
           </span>
         ) : (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-white/70 dark:bg-muted px-3 py-1 text-xs text-muted-foreground">
-            오늘 하루를 나눠보세요
+            마음을 나눠보세요
           </span>
-        )}
-
-        {/* Today's Emotions */}
-        {todayEmotions.length > 0 && (
-          <div className="flex items-center gap-1">
-            {todayEmotions.map((emotion) => {
-              const color = EMOTION_COLOR_MAP[emotion]
-              return (
-                <span
-                  key={emotion}
-                  className="inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium"
-                  style={{ backgroundColor: color?.gradient[0] ?? '#f5f5f4' }}
-                  title={emotion}
-                >
-                  {EMOTION_EMOJI[emotion]} {emotion}
-                </span>
-              )
-            })}
-          </div>
         )}
       </div>
     </div>

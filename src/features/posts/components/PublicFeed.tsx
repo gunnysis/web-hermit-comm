@@ -70,14 +70,16 @@ export function PublicFeed() {
       <GreetingBanner />
 
       {/* 게시판 탭 */}
-      <div className="flex gap-2">
+      <div className="flex gap-2" role="tablist" aria-label="게시판 선택">
         {PUBLIC_BOARDS.map((board) => (
           <button
             key={board.id}
+            role="tab"
+            aria-selected={selectedBoardId === board.id}
             onClick={() => handleBoardChange(board.id)}
-            className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               selectedBoardId === board.id
-                ? 'bg-foreground text-background'
+                ? 'bg-foreground text-background shadow-sm'
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
