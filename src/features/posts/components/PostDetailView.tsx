@@ -11,7 +11,6 @@ import { usePostDetail } from '../hooks/usePostDetail'
 import { usePostAnalysis } from '../hooks/usePostAnalysis'
 import { deletePost, getSimilarFeelingCount } from '../api/postsApi'
 import { PostDetailHeader } from './PostDetailHeader'
-import { DailyDetailView } from './DailyDetailView'
 import { RegularDetailView } from './RegularDetailView'
 import { RecommendedPosts } from './RecommendedPosts'
 import { ReactionBar } from '@/features/reactions/components/ReactionBar'
@@ -46,14 +45,6 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       router.push('/')
       queryClient.removeQueries({ queryKey: ['post', postId] })
       if (post?.board_id) queryClient.invalidateQueries({ queryKey: ['boardPosts', post.board_id] })
-      if (post?.post_type === 'daily') {
-        queryClient.invalidateQueries({ queryKey: ['todayDaily'] })
-        queryClient.invalidateQueries({ queryKey: ['myStreak'] })
-        queryClient.invalidateQueries({ queryKey: ['activitySummary'] })
-        queryClient.invalidateQueries({ queryKey: ['dailyInsights'] })
-        queryClient.invalidateQueries({ queryKey: ['dailyHistory'] })
-        queryClient.invalidateQueries({ queryKey: ['monthlyReport'] })
-      }
     } catch (err: unknown) {
       logger.error('deletePost error:', err)
       const msg = err instanceof Error ? err.message : (err as { message?: string })?.message
@@ -136,26 +127,16 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
         onDelete={() => setDeleteDialogOpen(true)}
       />
 
-      {post.post_type === 'daily' ? (
-        <DailyDetailView
-          post={post}
-          analysis={analysis}
-          timeAgo={timeAgo}
-          similarCount={similarCount}
-          postId={postId}
-        />
-      ) : (
-        <RegularDetailView
-          post={post}
-          analysis={analysis}
-          timeAgo={timeAgo}
-          emotions={emotions}
-          hasEmotions={hasEmotions}
-          similarCount={similarCount}
-          isRetryingAnalysis={isRetryingAnalysis}
-          onRetryAnalysis={handleRetryAnalysis}
-        />
-      )}
+      <RegularDetailView
+        post={post}
+        analysis={analysis}
+        timeAgo={timeAgo}
+        emotions={emotions}
+        hasEmotions={hasEmotions}
+        similarCount={similarCount}
+        isRetryingAnalysis={isRetryingAnalysis}
+        onRetryAnalysis={handleRetryAnalysis}
+      />
 
       <Separator />
       <ReactionBar postId={postId} userId={user?.id ?? null} />
@@ -167,8 +148,8 @@ export function PostDetailView({ postId }: PostDetailViewProps) {
       <ConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        title={post.post_type === 'daily' ? '오늘의 하루를 삭제할까요?' : '게시글을 삭제할까요?'}
-        description={post.post_type === 'daily' ? '삭제하면 오늘 다시 나눌 수 있어요.' : '삭제한 게시글은 복구할 수 없습니다.'}
+        title="게시글을 삭제할까요?"
+        description="삭제한 게시글은 복구할 수 없습니다."
         confirmLabel="삭제"
         onConfirm={handleDelete}
         isPending={isDeleting}

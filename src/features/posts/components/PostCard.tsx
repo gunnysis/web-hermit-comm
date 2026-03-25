@@ -8,7 +8,6 @@ import type { PostWithCounts } from "@/types/database"
 import { EMOTION_EMOJI, EMOTION_COLOR_MAP } from "@/lib/constants"
 import { getEmotionClassName } from "@/lib/emotion-category"
 import { startViewTransition } from "@/lib/view-transition"
-import { DailyPostCard } from "./DailyPostCard"
 
 interface PostCardProps {
   post: PostWithCounts
@@ -22,9 +21,6 @@ function formatCount(n: number): string {
 }
 
 export function PostCard({ post }: PostCardProps) {
-  if (post.post_type === 'daily') {
-    return <DailyPostCard post={post} />
-  }
 
   const router = useRouter()
   const timeAgo = formatDistanceToNow(new Date(post.created_at), {

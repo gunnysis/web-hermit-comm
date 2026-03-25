@@ -5,11 +5,6 @@ import { useRouter } from 'next/navigation'
 import { useAuthContext } from '@/features/auth/AuthProvider'
 import { useActivitySummary } from '@/features/my/hooks/useActivitySummary'
 import { ProfileSection } from '@/features/my/components/ProfileSection'
-import { DailyInsights } from '@/features/my/components/DailyInsights'
-import { WeeklySummary } from '@/features/my/components/WeeklySummary'
-import { MonthlyReport } from '@/features/my/components/MonthlyReport'
-import { DailyHistory } from '@/features/my/components/DailyHistory'
-import { StreakBadge } from '@/features/my/components/StreakBadge'
 import { EmotionTrendChart } from '@/features/my/components/EmotionTrendChart'
 import { SectionErrorBoundary } from '@/features/my/components/SectionErrorBoundary'
 import { EmotionCalendar } from '@/features/posts/components/EmotionCalendar'
@@ -51,13 +46,6 @@ export default function MySpacePage() {
         </SectionErrorBoundary>
       </section>
 
-      {/* 스트릭 */}
-      <section className="animate-slide-up" style={{ animationDelay: '40ms', animationFillMode: 'backwards' }}>
-        <SectionErrorBoundary sectionName="스트릭">
-          <StreakBadge enabled={!!user} />
-        </SectionErrorBoundary>
-      </section>
-
       {/* 활동 요약 — 3 cards */}
       <section className="animate-slide-up" style={{ animationDelay: '50ms', animationFillMode: 'backwards' }}>
         <SectionErrorBoundary sectionName="활동 요약">
@@ -85,38 +73,10 @@ export default function MySpacePage() {
         </SectionErrorBoundary>
       </section>
 
-      {/* 주간 회고 */}
-      <section className="animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
-        <SectionErrorBoundary sectionName="주간 회고">
-          <WeeklySummary enabled={!!user} />
-        </SectionErrorBoundary>
-      </section>
-
       {/* 감정 흐름 */}
-      <section className="animate-slide-up" style={{ animationDelay: '120ms', animationFillMode: 'backwards' }}>
+      <section className="animate-slide-up" style={{ animationDelay: '100ms', animationFillMode: 'backwards' }}>
         <SectionErrorBoundary sectionName="감정 흐름">
           <EmotionTrendChart enabled={!!user} />
-        </SectionErrorBoundary>
-      </section>
-
-      {/* 나의 패턴 */}
-      <section className="animate-slide-up" style={{ animationDelay: '150ms', animationFillMode: 'backwards' }}>
-        <SectionErrorBoundary sectionName="나의 패턴">
-          <DailyInsights enabled={!!user} />
-        </SectionErrorBoundary>
-      </section>
-
-      {/* 월간 회고 */}
-      <section className="animate-slide-up" style={{ animationDelay: '160ms', animationFillMode: 'backwards' }}>
-        <SectionErrorBoundary sectionName="월간 회고">
-          <MonthlyReport enabled={!!user} />
-        </SectionErrorBoundary>
-      </section>
-
-      {/* 나의 기록 */}
-      <section className="animate-slide-up" style={{ animationDelay: '170ms', animationFillMode: 'backwards' }}>
-        <SectionErrorBoundary sectionName="나의 기록">
-          <DailyHistory enabled={!!user} />
         </SectionErrorBoundary>
       </section>
 
@@ -137,10 +97,6 @@ export default function MySpacePage() {
           <EmotionWave />
         </SectionErrorBoundary>
       </section>
-
-      <Separator />
-
-      {/* 설정 */}
     </div>
   )
 }
