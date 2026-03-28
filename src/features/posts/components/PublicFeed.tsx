@@ -24,7 +24,7 @@ export function PublicFeed() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('latest')
   const [emotionFilter, setEmotionFilter] = useState<string | null>(null)
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, refetch } =
     useBoardPosts(selectedBoardId, sortOrder)
   useRealtimePosts(selectedBoardId)
 
@@ -100,9 +100,15 @@ export function PublicFeed() {
       )}
 
       {isError && (
-        <p className="text-center text-muted-foreground py-10">
-          게시글을 불러오지 못했습니다.
-        </p>
+        <div className="text-center py-10 space-y-3">
+          <p className="text-muted-foreground">게시글을 불러오지 못했습니다.</p>
+          <button
+            onClick={() => refetch()}
+            className="text-sm font-medium px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+          >
+            다시 시도
+          </button>
+        </div>
       )}
 
       <div className="space-y-2.5">

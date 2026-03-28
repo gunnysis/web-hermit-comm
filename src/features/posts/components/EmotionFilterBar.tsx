@@ -9,9 +9,11 @@ interface EmotionFilterBarProps {
 
 export function EmotionFilterBar({ selected, onSelect }: EmotionFilterBarProps) {
   return (
-    <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+    <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none" role="group" aria-label="감정 필터">
       <button
         onClick={() => onSelect(null)}
+        aria-label="전체 보기"
+        aria-pressed={selected === null}
         className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
           selected === null
             ? 'bg-foreground text-background'
@@ -27,6 +29,8 @@ export function EmotionFilterBar({ selected, onSelect }: EmotionFilterBarProps) 
           <button
             key={emotion}
             onClick={() => onSelect(isActive ? null : emotion)}
+            aria-label={`${emotion} 필터`}
+            aria-pressed={isActive}
             className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
               isActive
                 ? 'ring-1 ring-foreground/20 shadow-sm'

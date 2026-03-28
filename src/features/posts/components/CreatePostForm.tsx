@@ -127,7 +127,9 @@ export function CreatePostForm({ boardId = DEFAULT_PUBLIC_BOARD_ID }: CreatePost
 
       {/* 제목 */}
       <div className="space-y-1">
+        <label htmlFor="post-title" className="sr-only">제목</label>
         <Input
+          id="post-title"
           {...register('title')}
           placeholder="멋진 제목을 입력하세요 ✨"
           className="text-base font-medium"

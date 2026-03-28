@@ -1,5 +1,6 @@
 "use client"
 
+import { memo, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { formatDistanceToNow } from "date-fns"
 import { ko } from "date-fns/locale"
@@ -20,19 +21,24 @@ function formatCount(n: number): string {
   return String(n)
 }
 
-export function PostCard({ post }: PostCardProps) {
-
-  const router = useRouter()
-  const timeAgo = formatDistanceToNow(new Date(post.created_at), {
-    addSuffix: true,
-    locale: ko,
-  })
-
-  const preview = (post.content ?? '')
+/** HTML 태그를 제거하고 텍스트 미리보기 추출 */
+function extractPreview(html: string): string {
+  return html
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 140)
+}
+
+export const PostCard = memo(function PostCard({ post }: PostCardProps) {
+  const router = useRouter()
+
+  const timeAgo = useMemo(
+    () => formatDistanceToNow(new Date(post.created_at), { addSuffix: true, locale: ko }),
+    [post.created_at],
+  )
+
+  const preview = useMemo(() => extractPreview(post.content ?? ''), [post.content])
 
   const likeCount = post.like_count ?? 0
   const commentCount = post.comment_count ?? 0
@@ -40,6 +46,7 @@ export function PostCard({ post }: PostCardProps) {
   const moreEmotions = (post.emotions?.length ?? 0) - 2
   const primaryEmotion = post.emotions?.[0]
   const stripeColors = primaryEmotion ? EMOTION_COLOR_MAP[primaryEmotion] : null
+
   const handleClick = () => {
     startViewTransition(() => {
       router.push(`/post/${post.id}`)
@@ -47,7 +54,14 @@ export function PostCard({ post }: PostCardProps) {
   }
 
   return (
-    <div onClick={handleClick} className="block group cursor-pointer" role="link" aria-label={post.title}>
+    <div
+      onClick={handleClick}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleClick() } }}
+      className="block group cursor-pointer"
+      role="link"
+      tabIndex={0}
+      aria-label={post.title}
+    >
       <Card className="card-hover border-border/60 group-hover:border-border transition-all duration-200 active:scale-[0.98] relative overflow-hidden">
         {stripeColors && (
           <div
@@ -106,4 +120,4 @@ export function PostCard({ post }: PostCardProps) {
       </Card>
     </div>
   )
-}
+})
