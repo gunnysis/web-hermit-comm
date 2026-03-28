@@ -31,11 +31,12 @@ export function EditPostForm({ postId }: EditPostFormProps) {
   const { data: post, isLoading } = usePostDetail(postId)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } =
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors, isDirty } } =
     useForm<PostFormValues>({
       resolver: zodResolver(postSchema),
     })
 
+  const title = watch('title') ?? ''
   const content = watch('content') ?? ''
 
   useEffect(() => {
@@ -43,6 +44,14 @@ export function EditPostForm({ postId }: EditPostFormProps) {
       reset({ title: post.title, content: post.content })
     }
   }, [post, reset])
+
+  // 수정 중 이탈 경고
+  useEffect(() => {
+    if (!isDirty) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [isDirty])
 
   if (isLoading) {
     return (
@@ -82,8 +91,16 @@ export function EditPostForm({ postId }: EditPostFormProps) {
           {...register('title')}
           placeholder="제목"
           className="text-base font-medium"
+          maxLength={100}
         />
-        {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
+        <div className="flex justify-between">
+          {errors.title ? (
+            <p className="text-xs text-destructive">{errors.title.message}</p>
+          ) : <span />}
+          <span className={`text-[11px] tabular-nums ${title.length > 90 ? 'text-amber-500' : 'text-muted-foreground/50'}`}>
+            {title.length}/100
+          </span>
+        </div>
       </div>
 
       <div className="space-y-1">

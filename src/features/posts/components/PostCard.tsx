@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns"
 import { ko } from "date-fns/locale"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import type { PostWithCounts } from "@/types/database"
-import { EMOTION_EMOJI, EMOTION_COLOR_MAP, POETRY_BOARD_ID } from "@/lib/constants"
+import { EMOTION_EMOJI, EMOTION_COLOR_MAP } from "@/lib/constants"
 import { getEmotionClassName } from "@/lib/emotion-category"
 import { startViewTransition } from "@/lib/view-transition"
 
@@ -40,8 +40,6 @@ export function PostCard({ post }: PostCardProps) {
   const moreEmotions = (post.emotions?.length ?? 0) - 2
   const primaryEmotion = post.emotions?.[0]
   const stripeColors = primaryEmotion ? EMOTION_COLOR_MAP[primaryEmotion] : null
-  const isPoem = post.board_id === POETRY_BOARD_ID
-
   const handleClick = () => {
     startViewTransition(() => {
       router.push(`/post/${post.id}`)
@@ -65,7 +63,6 @@ export function PostCard({ post }: PostCardProps) {
             <time className="text-xs text-muted-foreground/70 shrink-0">{timeAgo}</time>
           </div>
           <h2 className="font-semibold text-[0.95rem] leading-snug line-clamp-2 group-hover:text-happy-600 dark:group-hover:text-happy-400 transition-colors">
-            {isPoem && <span className="mr-1 opacity-60">🪶</span>}
             {post.title}
           </h2>
         </CardHeader>
@@ -73,7 +70,7 @@ export function PostCard({ post }: PostCardProps) {
         {(preview || visibleEmotions.length > 0) && (
           <CardContent className="pb-2 space-y-2.5">
             {preview && (
-              <p className={`text-sm text-muted-foreground leading-relaxed line-clamp-3 ${isPoem ? 'italic' : ''}`}>
+              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                 {preview}
               </p>
             )}

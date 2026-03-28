@@ -11,7 +11,7 @@ import { CommunityPulse } from './CommunityPulse'
 import { EmotionFilterBar } from './EmotionFilterBar'
 import { TrendingPosts } from './TrendingPosts'
 import { GreetingBanner } from './GreetingBanner'
-import { DEFAULT_PUBLIC_BOARD_ID, EMPTY_STATE_MESSAGES, PUBLIC_BOARDS } from '@/lib/constants'
+import { DEFAULT_PUBLIC_BOARD_ID, EMPTY_STATE_MESSAGES } from '@/lib/constants'
 import { Separator } from '@/components/ui/separator'
 import { EmptyState } from '@/components/ui/empty-state'
 import { FileText } from 'lucide-react'
@@ -20,7 +20,7 @@ import { getPostsByEmotion } from '../api/postsApi'
 type SortOrder = 'latest' | 'popular'
 
 export function PublicFeed() {
-  const [selectedBoardId, setSelectedBoardId] = useState(DEFAULT_PUBLIC_BOARD_ID)
+  const selectedBoardId = DEFAULT_PUBLIC_BOARD_ID
   const [sortOrder, setSortOrder] = useState<SortOrder>('latest')
   const [emotionFilter, setEmotionFilter] = useState<string | null>(null)
 
@@ -57,36 +57,9 @@ export function PublicFeed() {
     setEmotionFilter(emotion)
   }
 
-  const handleBoardChange = (boardId: number) => {
-    setSelectedBoardId(boardId)
-    setEmotionFilter(null)
-    setSortOrder('latest')
-  }
-
-  const selectedBoard = PUBLIC_BOARDS.find(b => b.id === selectedBoardId)
-
   return (
     <div className="space-y-3 animate-fade-in" style={{ viewTransitionName: 'page-content' }}>
       <GreetingBanner />
-
-      {/* 게시판 탭 */}
-      <div className="flex gap-2" role="tablist" aria-label="게시판 선택">
-        {PUBLIC_BOARDS.map((board) => (
-          <button
-            key={board.id}
-            role="tab"
-            aria-selected={selectedBoardId === board.id}
-            onClick={() => handleBoardChange(board.id)}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-              selectedBoardId === board.id
-                ? 'bg-foreground text-background shadow-sm'
-                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-            }`}
-          >
-            {board.icon} {board.name}
-          </button>
-        ))}
-      </div>
 
       <CommunityPulse onEmotionSelect={handleEmotionSelect} selectedEmotion={emotionFilter} />
       <EmotionFilterBar selected={emotionFilter} onSelect={handleEmotionSelect} />
@@ -142,14 +115,10 @@ export function PublicFeed() {
             icon={FileText}
             title={emotionFilter
               ? EMPTY_STATE_MESSAGES.emotion_filter.title
-              : (selectedBoard?.name === '시 게시판'
-                ? '아직 시가 없어요'
-                : EMPTY_STATE_MESSAGES.feed.title)}
+              : EMPTY_STATE_MESSAGES.feed.title}
             description={emotionFilter
               ? EMPTY_STATE_MESSAGES.emotion_filter.description
-              : (selectedBoard?.name === '시 게시판'
-                ? '첫 번째 시를 작성해보세요.\n마음을 시로 표현해보는 건 어떨까요?'
-                : EMPTY_STATE_MESSAGES.feed.description)}
+              : EMPTY_STATE_MESSAGES.feed.description}
           />
         )}
       </div>
